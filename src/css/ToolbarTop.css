@@ -1,0 +1,32 @@
+.custom-layout {
+	position: absolute;
+	inset: 0px;
+	z-index: 300;
+	pointer-events: none;
+}
+
+.custom-toolbar {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px;
+	gap: 8px;
+    box-shadow: 5px black;
+}
+
+.custom-button {
+	pointer-events: all;
+	padding: 4px 12px;
+	background: white;
+	border: none;
+	border-radius: 0px;
+}
+
+.custom-button[data-isactive='true'] {
+	background-color: lightblue;
+	/* color: white; */
+}
