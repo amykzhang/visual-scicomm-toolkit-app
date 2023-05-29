@@ -7,7 +7,7 @@ import {
 	TLInstance,
 	useLocalSyncClient,
 } from '@tldraw/tldraw'
-import { ToolbarTop } from './components/ToolbarTop'
+import { Toolbar } from './components/Toolbar'
 import '@tldraw/tldraw/editor.css'
 import '@tldraw/tldraw/ui.css'
 
@@ -26,9 +26,12 @@ export default function App() {
 	return (
 		<div className="tldraw__editor">
 			<TldrawEditor instanceId={instanceId} userId={userData.id} store={syncedStore} >
-
-						<Canvas />
-                        <ToolbarTop />
+                <TldrawUi>
+                    <ContextMenu>
+                        <Canvas />
+                        <Toolbar />
+                    </ContextMenu>
+                </TldrawUi>
 			</TldrawEditor>
 		</div>
 	)
