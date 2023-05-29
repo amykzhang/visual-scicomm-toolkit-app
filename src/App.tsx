@@ -7,9 +7,11 @@ import {
 	TLInstance,
 	useLocalSyncClient,
 } from '@tldraw/tldraw'
-import { Toolbar } from './components/Toolbar'
 import '@tldraw/tldraw/editor.css'
 import '@tldraw/tldraw/ui.css'
+
+import { Toolbar } from './components/Toolbar'
+import { ElementsMenu } from './containers/ElementsMenu'
 
 const instanceId = TLInstance.createCustomId('example')
 
@@ -26,12 +28,13 @@ export default function App() {
 	return (
 		<div className="tldraw__editor">
 			<TldrawEditor instanceId={instanceId} userId={userData.id} store={syncedStore} >
-                <TldrawUi>
-                    <ContextMenu>
+                {/* <TldrawUi> */}
+                    {/* <ContextMenu> */}
                         <Canvas />
                         <Toolbar />
-                    </ContextMenu>
-                </TldrawUi>
+                        <ElementsMenu />
+                    {/* </ContextMenu> */}
+                {/* </TldrawUi> */}
 			</TldrawEditor>
 		</div>
 	)
