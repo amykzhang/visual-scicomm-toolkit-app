@@ -2,9 +2,9 @@ import { Canvas, TldrawEditor, useApp } from '@tldraw/tldraw'
 import '@tldraw/tldraw/editor.css'
 import { useEffect } from 'react'
 import { track } from 'signia-react'
-import '../css/ToolbarTop.css'
+import '../css/Toolbar.css'
 
-export const ToolbarTop = track(() => {
+export const ViewControls = track(() => {
 	const app = useApp()
 
 	useEffect(() => {
@@ -33,20 +33,27 @@ export const ToolbarTop = track(() => {
 				>
 					Select
 				</button>
-				<button
+                <button
+					className="custom-button"
+					data-isactive={app.currentToolId === 'select'}
+					onClick={() => app.setSelectedTool('select')}
+				>
+					Select
+				</button>
+				{/* <button
 					className="custom-button"
 					data-isactive={app.currentToolId === 'draw'}
 					onClick={() => app.setSelectedTool('draw')}
 				>
 					Pencil
-				</button>
-				<button
+				</button> */}
+				{/* <button
 					className="custom-button"
 					data-isactive={app.currentToolId === 'eraser'}
 					onClick={() => app.setSelectedTool('eraser')}
 				>
 					Eraser
-				</button>
+				</button> */}
 			</div>
 		</div>
 	)
