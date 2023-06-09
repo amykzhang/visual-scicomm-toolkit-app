@@ -7,13 +7,14 @@ import {
 	TLInstance,
 	useLocalSyncClient,
 } from '@tldraw/tldraw'
-import '@tldraw/tldraw/editor.css'
-import '@tldraw/tldraw/ui.css'
+// import '@tldraw/tldraw/editor.css'
+// import '@tldraw/tldraw/ui.css'
 
 import { Toolbar } from './components/Toolbar'
 import { ElementsMenu } from './containers/ElementsMenu'
+import { UILayer, TopContainer } from './components/Components'
 
-const instanceId = TLInstance.createCustomId('example')
+const instanceId = TLInstance.createCustomId('toolkit')
 
 export default function App() {
 	const userData = getUserData()
@@ -21,20 +22,20 @@ export default function App() {
 	const syncedStore = useLocalSyncClient({
 		instanceId,
 		userId: userData.id,
-		universalPersistenceKey: 'exploded-example',
+		universalPersistenceKey: 'visscicomm',
 		// config: myConfig // for custom config, see 3-custom-config
 	})
 
 	return (
 		<div className="tldraw__editor">
 			<TldrawEditor instanceId={instanceId} userId={userData.id} store={syncedStore} >
-                {/* <TldrawUi> */}
-                    {/* <ContextMenu> */}
-                        <Canvas />
+                <UILayer>
+                    <TopContainer>
                         <Toolbar />
-                        <ElementsMenu />
-                    {/* </ContextMenu> */}
-                {/* </TldrawUi> */}
+                    </TopContainer>
+                    <ElementsMenu />
+                </UILayer>
+                <Canvas />
 			</TldrawEditor>
 		</div>
 	)

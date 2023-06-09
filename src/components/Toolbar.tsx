@@ -2,7 +2,18 @@ import { useApp } from '@tldraw/tldraw'
 import '@tldraw/tldraw/editor.css'
 import { useEffect } from 'react'
 import { track } from 'signia-react'
-import '../css/Toolbar.css'
+import { SquareButton } from './Components';
+import styled from 'styled-components';
+
+const ToolbarContainer = styled.div`
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+    display: flex;
+    padding: 8px;
+    gap: 8px;
+    background-color: grey;
+`
 
 export const Toolbar = track(() => {
 	const app = useApp()
@@ -24,24 +35,20 @@ export const Toolbar = track(() => {
 	})
 
 	return (
-		<div className="custom-layout">
-			<div className="custom-toolbar">
-				<button
-					className="custom-button"
+			<ToolbarContainer>
+				<SquareButton
 					data-isactive={app.currentToolId === 'select'}
 					onClick={() => app.setSelectedTool('select')}
 				>
 					Select
-				</button>
-                <button
-					className="custom-button"
+				</SquareButton>
+                <SquareButton
 					data-isactive={app.currentToolId === 'hand'}
 					onClick={() => app.setSelectedTool('hand')}
 				>
 					Pan
-				</button>
-                <button
-					className="custom-button"
+				</SquareButton>
+                <SquareButton
 					/* WIP - Comment tool
                      data-isactive={app.currentToolId === 'comment'}
                       onClick={() => app.setSelectedTool('comment')} 
@@ -50,20 +57,17 @@ export const Toolbar = track(() => {
                     */
 				>
 					Comment
-				</button>
-                <button
-					className="custom-button"
+				</SquareButton>
+                <SquareButton
 					onClick={() => app.undo()}
 				>
 					Undo
-				</button>
-                <button
-					className="custom-button"
+				</SquareButton>
+                <SquareButton
 					onClick={() => app.redo()}
 				>
 					Redo
-				</button>
-			</div>
-		</div>
+				</SquareButton>
+			</ToolbarContainer>
 	)
 })
