@@ -5,7 +5,7 @@ import { track } from 'signia-react'
 import { SquareButton } from './Components';
 import styled from 'styled-components';
 
-const ToolbarContainer = styled.div`
+const ToolBarContainer = styled.div`
     margin-left: auto;
     margin-right: auto;
     width: fit-content;
@@ -15,7 +15,7 @@ const ToolbarContainer = styled.div`
     background-color: grey;
 `
 
-export const Toolbar = track(() => {
+export const ToolBar = track(() => {
 	const app = useApp()
 
 	useEffect(() => {
@@ -35,7 +35,7 @@ export const Toolbar = track(() => {
 	})
 
 	return (
-			<ToolbarContainer>
+			<ToolBarContainer>
 				<SquareButton
 					data-isactive={app.currentToolId === 'select'}
 					onClick={() => app.setSelectedTool('select')}
@@ -68,6 +68,6 @@ export const Toolbar = track(() => {
 				>
 					Redo
 				</SquareButton>
-			</ToolbarContainer>
+			</ToolBarContainer>
 	)
 })

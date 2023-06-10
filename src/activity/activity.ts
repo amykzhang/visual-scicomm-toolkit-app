@@ -1,4 +1,4 @@
-type Activity = {
+export type Activity = {
     name: string;
     task: {
         primary: string;
@@ -43,7 +43,7 @@ type Activity = {
     };
 };
 
-const TestActivity: Activity = {
+const activity1: Activity = {
     name: "Visual Strategies",
     task: {
         primary:
@@ -153,4 +153,4 @@ const TestActivity: Activity = {
     },
 };
 
-export default TestActivity;
+export default activity1;
