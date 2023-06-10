@@ -2,7 +2,20 @@ import { useApp } from '@tldraw/tldraw'
 import '@tldraw/tldraw/editor.css'
 import { useEffect } from 'react'
 import { track } from 'signia-react'
-import '../css/ElementsMenu.css'
+import styled from 'styled-components';
+
+// .text-box-button {
+// 	pointer-events: all;
+// 	padding: 4px 12px;
+// 	background: white;
+// 	border: dotted 1px black;
+// 	border-radius: 0px;
+// }
+
+// .text-box-button[data-isactive='true'] {
+// 	background-color: lightblue;
+// 	/* color: white; */
+// }
 
 export const TextTool = track(() => {
 	const app = useApp()

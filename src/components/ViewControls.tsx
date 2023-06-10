@@ -2,7 +2,7 @@ import { Canvas, TldrawEditor, useApp } from '@tldraw/tldraw'
 import '@tldraw/tldraw/editor.css'
 import { useEffect } from 'react'
 import { track } from 'signia-react'
-import '../css/Toolbar.css'
+// import styled from 'styled-components';
 
 export const ViewControls = track(() => {
 	const app = useApp()
