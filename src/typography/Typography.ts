@@ -1,30 +1,38 @@
 import styled from "styled-components";
 
-const StyledH1 = styled.p`
-    font-size: 1rem;
+const LargeText = styled.p`
+    font-size: 20px;
     font-weight: 900;
     margin: 0;
     padding: 0;
 `;
 
-const StyledH2 = styled.p`
-    font-size: 0.8rem;
+const MediumText = styled.p`
+    font-size: 16.66px;
     font-weight: 700;
     margin: 0;
     padding: 0;
 `;
 
-const StyledH3 = styled.p`
-    font-size: 0.6rem;
+const SmallMediumText = styled.p`
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    padding: 0;
+`;
+
+const SmallText = styled.p`
+    font-size: 14px;
     font-weight: 700;
     margin: 0;
     padding: 0;
 `;
 
 const typography = {
-    LargeText: StyledH1,
-    MediumText: StyledH2,
-    SmallText: StyledH3,
+    LargeText: LargeText,
+    MediumText: MediumText,
+    SmallMediumText: SmallMediumText,
+    SmallText: SmallText,
 };
 
 export default typography;

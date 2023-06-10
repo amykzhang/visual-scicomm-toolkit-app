@@ -34,17 +34,17 @@ export const ActivityBar: FC<ActivityBarProps> = ({ activity }) => {
                 <typography.MediumText>
                     {activity.task.primary}
                 </typography.MediumText>
-                <typography.MediumText>
+                <typography.SmallMediumText>
                     {activity.task.secondary}
-                </typography.MediumText>
+                </typography.SmallMediumText>
             </div>
             <div>
                 <typography.LargeText>Instructions</typography.LargeText>
                 {instructions.map((instruction, index) => (
                     <div key={index}>
-                        <typography.MediumText>
-                            {index}. {instruction.step}
-                        </typography.MediumText>
+                        <typography.SmallText>
+                            {instruction.step}
+                        </typography.SmallText>
                         <typography.SmallText>
                             {instruction.body}
                         </typography.SmallText>
