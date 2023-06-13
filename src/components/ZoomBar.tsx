@@ -21,11 +21,11 @@ export function calculateZoom(zoomLevel: number, ratio: number = 1.0458) {
 }
 
 const ZoomBarContainer = styled.div`
-    position: fixed;
-    left: 0px;
+    /* position: fixed; */
+    /* left: 0px; */
     bottom: 0px;
-    /* margin-left: auto; */
-    /* margin-right: auto; */
+    margin-left: auto;
+    margin-right: auto;
     width: fit-content;
     display: flex;
     padding: 8px;

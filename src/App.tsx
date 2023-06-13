@@ -17,7 +17,7 @@ import { UILayer } from "./components/Components";
 import { ToolBar } from "./components/ToolBar";
 import { ActivityBar } from "./components/ActivityBar";
 import { ZoomBar } from "./components/ZoomBar";
-import { TopZone } from "./styles/containers";
+import { BottomZone, TopZone } from "./styles/containers";
 import { calculateZoom } from "./functions/ZoomManager";
 
 import activity_visual_strategies from "./activity/activity";
@@ -77,7 +77,9 @@ export default function App() {
                         </TopZone>
                         <ActivityBar activity={activity} />
                         <ElementsMenu activity={activity} />
-                        <ZoomBar zoom={zoom} setZoom={setZoom} />
+                        <BottomZone>
+                            <ZoomBar zoom={zoom} setZoom={setZoom} />
+                        </BottomZone>
                     </UILayer>
                     <Canvas />
                 </TldrawEditor>
