@@ -17,9 +17,3 @@ html,
 * {
 	box-sizing: border-box;
 }
-
-.tldraw__editor {
-	position: fixed;
-	inset: 0px;
-	overflow: hidden;
-}

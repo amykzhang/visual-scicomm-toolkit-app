@@ -1,9 +1,6 @@
-import { FC } from "react";
-import { useApp } from "@tldraw/tldraw";
-import { SquareButton } from "./Components";
 import styled from "styled-components";
 import { Activity } from "../activity/activity";
-import typography from "../typography/Typography";
+import typography from "../styles/typography";
 
 interface ActivityBarProps {
     activity: Activity;
@@ -22,9 +19,10 @@ const ActivityBarContainer = styled.div`
     gap: 8px;
     background-color: grey;
     flex-direction: column;
+    overflow-y: clip;
 `;
 
-export const ActivityBar: FC<ActivityBarProps> = ({ activity }) => {
+export const ActivityBar: React.FC<ActivityBarProps> = ({ activity }) => {
     const instructions = activity.instructions;
 
     return (

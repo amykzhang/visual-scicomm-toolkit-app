@@ -1,9 +1,11 @@
+import { FC } from "react";
 import { useApp } from "@tldraw/tldraw";
 import "@tldraw/tldraw/editor.css";
 import { track } from "signia-react";
-import { TextTool } from "../components/TextTool";
-import typography from "../typography/Typography";
+import { TextTool } from "./TextTool";
+import typography from "../styles/typography";
 import styled from "styled-components";
+import { Activity } from "../activity/activity";
 
 const ElementsMenuContainer = styled.div`
     position: absolute;
@@ -47,7 +49,11 @@ const Element = styled.div`
     } */
 `;
 
-export const ElementsMenu = track(() => {
+interface ElementsMenuProps {
+    activity: Activity;
+}
+
+export const ElementsMenu: FC<ElementsMenuProps> = track(({ activity }) => {
     const app = useApp();
 
     return (
@@ -56,6 +62,7 @@ export const ElementsMenu = track(() => {
 
             <ElementsSection>
                 <typography.MediumText>Text</typography.MediumText>
+
                 <ElementsTool>
                     <TextTool />
                 </ElementsTool>
@@ -63,6 +70,33 @@ export const ElementsMenu = track(() => {
 
             <ElementsSection>
                 <typography.MediumText>Lines</typography.MediumText>
+
+                <ElementsTool>
+                    <Element
+                        data-isactive={app.currentToolId === "draw"}
+                        onClick={() => app.setSelectedTool("draw")}
+                    >
+                        ✏️ Draw
+                    </Element>
+                </ElementsTool>
+            </ElementsSection>
+
+            <ElementsSection>
+                <typography.MediumText>Shapes</typography.MediumText>
+
+                <ElementsTool>
+                    <Element
+                        data-isactive={app.currentToolId === "draw"}
+                        onClick={() => app.setSelectedTool("draw")}
+                    >
+                        ✏️ Draw
+                    </Element>
+                </ElementsTool>
+            </ElementsSection>
+
+            <ElementsSection>
+                <typography.MediumText>Images</typography.MediumText>
+
                 <ElementsTool>
                     <Element
                         data-isactive={app.currentToolId === "draw"}
