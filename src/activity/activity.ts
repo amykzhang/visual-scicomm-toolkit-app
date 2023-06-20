@@ -43,7 +43,7 @@ export type Activity = {
     };
 };
 
-const activity1: Activity = {
+const activity_visual_strategies: Activity = {
     name: "Visual Strategies",
     task: {
         primary:
@@ -122,8 +122,6 @@ const activity1: Activity = {
                         "organelle-blue",
                         "organelle-pink",
                         "organelle-orange",
-                        "organelle-white",
-                        "organelle-grey",
                     ],
                 },
                 {
@@ -143,9 +141,6 @@ const activity1: Activity = {
                         "cell-membrane-purple",
                         "cell-membrane-blue",
                         "cell-membrane-pink",
-                        "cell-membrane-orange",
-                        "cell-membrane-white",
-                        "cell-membrane-grey",
                     ],
                 },
             ],
@@ -153,4 +148,4 @@ const activity1: Activity = {
     },
 };
 
-export default activity1;
+export default activity_visual_strategies;

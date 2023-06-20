@@ -1,11 +1,15 @@
-import styled from 'styled-components'
+import styled from "styled-components";
 
 export const UILayer = styled.div`
-	position: absolute;
-	inset: 0px;
-	z-index: 300;
-	pointer-events: none;
-`
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 100vh;
+    inset: 0px;
+    z-index: 300;
+    pointer-events: none;
+`;
 
 export const SquareButton = styled.button`
     pointer-events: all;
@@ -19,15 +23,7 @@ export const SquareButton = styled.button`
         background-color: lightblue;
     }
 
-    &[data-isactive='true'] {
-    background-color: lightblue;
+    &[data-isactive="true"] {
+        background-color: lightblue;
     }
-`
-
-export const TopContainer = styled.div`
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    background-color: red;
-`
+`;
