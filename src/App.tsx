@@ -42,11 +42,8 @@ const AppContainer = styled.div`
 `;
 
 const TldrawEditorContainer = styled.div`
-    background-color: grey;
-    border: 1px solid lightgrey;
-    width: 1vw;
-    height: 1vh;
-    /* overflow: visible; */
+    width: 100vw;
+    height: 100vh;
     touch-action: none;
 `;
 
@@ -60,12 +57,9 @@ export default function App() {
         // config: myConfig // for custom config, see 3-custom-config
     });
 
-    const [zoom, setZoom] = useState(2);
-    const { width: w, height: h } = calculateZoom(zoom);
-
     return (
         <AppContainer>
-            <TldrawEditorContainer style={{ width: w, height: h }}>
+            <TldrawEditorContainer>
                 <TldrawEditor
                     instanceId={instanceId}
                     userId={userData.id}
@@ -78,7 +72,7 @@ export default function App() {
                         <ActivityBar activity={activity} />
                         <ElementsMenu activity={activity} />
                         <BottomZone>
-                            <ZoomBar zoom={zoom} setZoom={setZoom} />
+                             <ZoomBar />
                         </BottomZone>
                     </UILayer>
                     <Canvas />

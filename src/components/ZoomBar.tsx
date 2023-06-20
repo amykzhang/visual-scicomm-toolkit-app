@@ -3,7 +3,7 @@ import "@tldraw/tldraw/editor.css";
 import { track } from "signia-react";
 import styled from "styled-components";
 import { SquareButton } from "./Components";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * Given a zoom level, calculates the values needed to resize the editor
@@ -33,57 +33,41 @@ const ZoomBarContainer = styled.div`
     background-color: grey;
 `;
 
-interface ZoomBarProps {
-    zoom: number;
-    setZoom: (zoom: number) => void;
-}
-
-export const ZoomBar: React.FC<ZoomBarProps> = track(({ zoom, setZoom }) => {
+export const ZoomBar = track(() => {
     const app = useApp();
-    app.canMoveCamera = false;
-
-    const scaleZoom = (zoom: number, base: number = 30, increments = 7) => {
-        return (base + increments * zoom) / 100;
-    };
-
-    useEffect(() => {
-        app.setCamera(0, 0, scaleZoom(zoom));
-    }, [app, zoom]);
+    const zoom = app.camera.z;
+    const zoompercent = Math.round(zoom * 100);
 
     function handleZoomIn() {
-        if (zoom < 10) {
-            const newZoom = zoom + 1;
-            setZoom(newZoom);
-            app.setCamera(0, 0, scaleZoom(newZoom));
-        }
+        app.zoomIn();
     }
 
     function handleZoomOut() {
-        if (zoom > 1) {
-            const newZoom = zoom - 1;
-            setZoom(newZoom);
-            app.setCamera(0, 0, scaleZoom(newZoom));
-        }
+        app.zoomOut();
     }
 
     function handleZoomFit() {
-        setZoom(2);
-        app.setCamera(0, 0, scaleZoom(2));
+        app.setCamera(0, 0, 1);
     }
 
-    function handleZoomFullscreen() {
-        setZoom(10);
-        app.setCamera(0, 0, scaleZoom(10));
+    function toggleFullscreen() {
+        if (document.fullscreenElement) {
+            document.exitFullscreen().catch((err) => {
+                alert(
+                    `Error attempting to enable fullscreen mode: ${err.message} (${err.name})`
+                );
+            });
+        } else {
+            document.body.requestFullscreen();
+        }
     }
 
     return (
         <ZoomBarContainer>
-            <SquareButton onClick={handleZoomFullscreen}>
-                Fullscreen
-            </SquareButton>
+            <SquareButton onClick={toggleFullscreen}></SquareButton>
             <SquareButton onClick={handleZoomFit}>Fit</SquareButton>
             <SquareButton onClick={handleZoomOut}>-</SquareButton>
-            <SquareButton>{zoom * 10}%</SquareButton>
+            <SquareButton>{zoompercent}%</SquareButton>
             <SquareButton onClick={handleZoomIn}>+</SquareButton>
         </ZoomBarContainer>
     );
