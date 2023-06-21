@@ -23,6 +23,10 @@ const StyledPercentage = styled.p`
     line-height: 20px;
 `;
 
+const StyledMinusIcon = styled(MinusIcon)`
+    transform: translateY(-4px);
+`;
+
 export const ZoomBar = track(() => {
     const app = useApp();
     const zoom = app.camera.z;
@@ -61,7 +65,7 @@ export const ZoomBar = track(() => {
                 <FitToScreenIcon />
             </SquareButton>
             <SquareButton onClick={handleZoomOut}>
-                <MinusIcon />
+                <StyledMinusIcon />
             </SquareButton>
             <SquareButton>
                 <StyledPercentage>{zoompercent}%</StyledPercentage>
