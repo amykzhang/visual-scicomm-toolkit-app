@@ -22,10 +22,16 @@ const ActivityContentContainer = styled(SideBarContent)`
     padding: 10px;
     gap: 8px;
     flex-direction: column;
-    overflow-y: hidden;
-
+    overflow-y: scroll;
     border-radius: 0px 0px 5px 0px;
+
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+    &::-webkit-scrollbar {
+        display: none;  /* Safari and Chrome */
+    }
 `
+
 
 const ActivityToggle = styled(SideBarToggle)`
     border-radius: 0 5px 5px 0;

@@ -57,7 +57,7 @@ export const ElementsMenu: FC<ElementsMenuProps> = track(({ activity }) => {
     // For expanding and collapsing the sidebar
     const [isExpanded, setIsExpanded] = useState(true);
     const toggleDisplay = () => setIsExpanded(!isExpanded);
-    const Arrow = isExpanded ? LeftArrow : RightArrow;
+    const Arrow = isExpanded ? RightArrow : LeftArrow;
 
 
     return (

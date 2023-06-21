@@ -32,6 +32,7 @@ export const SideBarToggle = styled.div`
     background: white;
     display: flex;
     align-items: center;
+    justify-content: center;
 `
 
 export const SideBarContent = styled.div`
