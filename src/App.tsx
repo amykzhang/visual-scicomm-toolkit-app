@@ -17,18 +17,13 @@ import { UILayer } from "./components/Components";
 import { ToolBar } from "./components/ToolBar";
 import { ActivityBar } from "./components/ActivityBar";
 import { ZoomBar } from "./components/ZoomBar";
+import { LogoBar } from "./components/LogoBar";
 import { BottomZone, TopZone } from "./styles/containers";
-import { calculateZoom } from "./functions/ZoomManager";
 
 import activity_visual_strategies from "./activity/activity";
 
 const instanceId = TLInstance.createCustomId("toolkit");
 const activity = activity_visual_strategies;
-
-// const CanvasContainer = styled.div`
-//     background-color: green;
-//     touch-action: none;
-// `;
 
 const AppContainer = styled.div`
     position: fixed;
@@ -67,12 +62,13 @@ export default function App() {
                 >
                     <UILayer>
                         <TopZone>
+                            <LogoBar activity={activity} />
                             <ToolBar />
                         </TopZone>
                         <ActivityBar activity={activity} />
                         <ElementsMenu activity={activity} />
                         <BottomZone>
-                             <ZoomBar />
+                            <ZoomBar />
                         </BottomZone>
                     </UILayer>
                     <Canvas />

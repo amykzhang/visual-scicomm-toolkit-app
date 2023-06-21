@@ -3,8 +3,8 @@ import { Activity } from "../activity/activity";
 import { SideBar, SideBarContent, SideBarToggle } from "../styles/containers";
 import typography from "../styles/typography";
 import styled from "styled-components";
-import { ReactComponent as LeftArrow } from '../assets/arrowhead-left.svg';
-import { ReactComponent as RightArrow } from '../assets/arrowhead-right.svg';
+import { ReactComponent as LeftArrow } from "../assets/arrowhead-left.svg";
+import { ReactComponent as RightArrow } from "../assets/arrowhead-right.svg";
 
 interface ActivityBarProps {
     activity: Activity;
@@ -25,17 +25,16 @@ const ActivityContentContainer = styled(SideBarContent)`
     overflow-y: scroll;
     border-radius: 0px 0px 5px 0px;
 
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    scrollbar-width: none; /* Firefox */
     &::-webkit-scrollbar {
-        display: none;  /* Safari and Chrome */
+        display: none; /* Safari and Chrome */
     }
-`
-
+`;
 
 const ActivityToggle = styled(SideBarToggle)`
     border-radius: 0 5px 5px 0;
-`
+`;
 
 export const ActivityBar: React.FC<ActivityBarProps> = ({ activity }) => {
     const instructions = activity.instructions;
@@ -47,7 +46,7 @@ export const ActivityBar: React.FC<ActivityBarProps> = ({ activity }) => {
 
     return (
         <ActivityBarContainer className={isExpanded ? "" : "slide-left"}>
-            <ActivityContentContainer> 
+            <ActivityContentContainer>
                 <div>
                     <typography.LargeText>Task</typography.LargeText>
                     <typography.MediumText>
@@ -71,7 +70,9 @@ export const ActivityBar: React.FC<ActivityBarProps> = ({ activity }) => {
                     ))}
                 </div>
             </ActivityContentContainer>
-            <ActivityToggle onClick={toggleDisplay}><Arrow/></ActivityToggle>
+            <ActivityToggle onClick={toggleDisplay}>
+                <Arrow />
+            </ActivityToggle>
         </ActivityBarContainer>
     );
 };

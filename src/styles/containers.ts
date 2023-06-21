@@ -17,7 +17,7 @@ export const BottomZone = styled.div`
 
 export const SideBar = styled.div`
     position: absolute;
-    top: 12vh;
+    top: 14vh;
     height: 76vh;
     display: flex;
     transition-duration: 0.5s;
