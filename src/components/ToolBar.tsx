@@ -4,15 +4,16 @@ import { useEffect } from "react";
 import { track } from "signia-react";
 import { SquareButton } from "./Components";
 import styled from "styled-components";
+import { CenterBar } from "../styles/containers";
+import { ReactComponent as SelectIcon } from "../assets/select.svg";
+import { ReactComponent as CommentIcon } from "../assets/comment.svg";
+import { ReactComponent as PanIcon } from "../assets/pan.svg";
+import { ReactComponent as UndoIcon } from "../assets/undo.svg";
+import { ReactComponent as RedoIcon } from "../assets/redo.svg";
 
-const ToolBarContainer = styled.div`
+const ToolBarContainer = styled(CenterBar)`
     margin-left: auto;
     margin-right: auto;
-    width: fit-content;
-    display: flex;
-    padding: 8px;
-    gap: 8px;
-    background-color: grey;
 `;
 
 export const ToolBar = track(() => {
@@ -40,26 +41,23 @@ export const ToolBar = track(() => {
                 data-isactive={app.currentToolId === "select"}
                 onClick={() => app.setSelectedTool("select")}
             >
-                Select
+                <SelectIcon />
             </SquareButton>
             <SquareButton
                 data-isactive={app.currentToolId === "hand"}
                 onClick={() => app.setSelectedTool("hand")}
             >
-                Pan
+                <PanIcon />
             </SquareButton>
-            <SquareButton
-            /* WIP - Comment tool
-                     data-isactive={app.currentToolId === 'comment'}
-                      onClick={() => app.setSelectedTool('comment')} 
-
-                      Create a comment view
-                    */
-            >
-                Comment
+            <SquareButton>
+                <CommentIcon />
             </SquareButton>
-            <SquareButton onClick={() => app.undo()}>Undo</SquareButton>
-            <SquareButton onClick={() => app.redo()}>Redo</SquareButton>
+            <SquareButton onClick={() => app.undo()}>
+                <UndoIcon />
+            </SquareButton>
+            <SquareButton onClick={() => app.redo()}>
+                <RedoIcon />
+            </SquareButton>
         </ToolBarContainer>
     );
 });

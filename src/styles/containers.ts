@@ -20,10 +20,10 @@ export const SideBar = styled.div`
     top: 12vh;
     height: 76vh;
     display: flex;
-    transition-duration: .5s;
+    transition-duration: 0.5s;
     transition-property: transform;
     filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.15));
-`
+`;
 
 export const SideBarToggle = styled.div`
     pointer-events: all;
@@ -33,7 +33,7 @@ export const SideBarToggle = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-`
+`;
 
 export const SideBarContent = styled.div`
     width: 20vw;
@@ -46,4 +46,21 @@ export const SideBarContent = styled.div`
     gap: 8px;
     flex-direction: column;
     overflow-y: hidden;
-`
+`;
+
+export const CenterBar = styled.div`
+    margin-left: auto;
+    margin-right: auto;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 7px 6px;
+    gap: 9px;
+
+    width: 330px;
+    height: 70px;
+
+    background: #ffffff;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+`;
