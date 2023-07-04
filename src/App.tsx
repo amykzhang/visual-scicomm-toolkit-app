@@ -4,7 +4,7 @@ import {
     TldrawEditor,
     TLInstance,
     useLocalSyncClient,
-    // useApp,
+    useApp,
 } from "@tldraw/tldraw";
 
 import { useState } from "react";
@@ -42,8 +42,11 @@ const TldrawEditorContainer = styled.div`
     touch-action: none;
 `;
 
+// const shapes = { card: { util: CardShapeUtil } };
+// const tools = [CardShapeTool];
+
 export default function App() {
-    // const app = useApp();
+    const app = useApp();
     const userData = getUserData();
     const syncedStore = useLocalSyncClient({
         instanceId,

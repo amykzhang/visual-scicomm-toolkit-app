@@ -7,8 +7,8 @@ import typography from "../styles/typography";
 import styled from "styled-components";
 import { Activity } from "../activity/activity";
 import { SideBar, SideBarContent, SideBarToggle } from "../styles/containers";
-import { ReactComponent as LeftArrow } from '../assets/arrowhead-left.svg';
-import { ReactComponent as RightArrow } from '../assets/arrowhead-right.svg';
+import { ReactComponent as LeftArrow } from "../assets/arrowhead-left.svg";
+import { ReactComponent as RightArrow } from "../assets/arrowhead-right.svg";
 
 const ElementsBarContainer = styled(SideBar)`
     right: 0;
@@ -29,8 +29,7 @@ const ElementsSection = styled.div`
     pointer-events: all;
 `;
 
-const ElementsTool = styled.div`
-`;
+const ElementsTool = styled.div``;
 
 const Element = styled.div`
     pointer-events: all;
@@ -59,11 +58,12 @@ export const ElementsMenu: FC<ElementsMenuProps> = track(({ activity }) => {
     const toggleDisplay = () => setIsExpanded(!isExpanded);
     const Arrow = isExpanded ? RightArrow : LeftArrow;
 
-
     return (
         <ElementsBarContainer className={isExpanded ? "" : "slide-right"}>
-            <ElementsToggle onClick={toggleDisplay}><Arrow/></ElementsToggle>
-            <ElementsMenuContainer >
+            <ElementsToggle onClick={toggleDisplay}>
+                <Arrow />
+            </ElementsToggle>
+            <ElementsMenuContainer>
                 <typography.LargeText>Elements</typography.LargeText>
 
                 <ElementsSection>
@@ -105,10 +105,10 @@ export const ElementsMenu: FC<ElementsMenuProps> = track(({ activity }) => {
 
                     <ElementsTool>
                         <Element
-                            data-isactive={app.currentToolId === "draw"}
-                            onClick={() => app.setSelectedTool("draw")}
+                            data-isactive={app.currentToolId === "note"}
+                            onClick={() => app.setSelectedTool("note")}
                         >
-                            ✏️ Draw
+                            Element
                         </Element>
                     </ElementsTool>
                 </ElementsSection>
