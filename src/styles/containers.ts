@@ -1,5 +1,21 @@
 import styled from "styled-components";
 
+export const Top10 = styled.div`
+    padding-top: 10px;
+`;
+
+export const Top20 = styled.div`
+    padding-top: 20px;
+`;
+
+export const Top30 = styled.div`
+    padding-top: 30px;
+`;
+
+/**
+ * For the Editor
+ */
+
 export const TopZone = styled.div`
     position: absolute;
     top: 0px;
@@ -23,6 +39,22 @@ export const SideBar = styled.div`
     transition-duration: 0.5s;
     transition-property: transform;
     filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.15));
+
+    &.slide-left {
+        transform: translateX(min(-20vw, -300px));
+    }
+
+    &.slide-right {
+        transform: translateX(max(20vw, 300px));
+    }
+`;
+
+export const SideBarHeader = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    line-height: 0px;
+    gap: 10px;
 `;
 
 export const SideBarToggle = styled.div`
@@ -37,15 +69,9 @@ export const SideBarToggle = styled.div`
 
 export const SideBarContent = styled.div`
     width: 20vw;
+    min-width: 300px;
     height: 100%;
     background: white;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    padding: 10px;
-    gap: 8px;
-    flex-direction: column;
-    overflow-y: hidden;
 `;
 
 export const CenterBar = styled.div`
@@ -63,4 +89,18 @@ export const CenterBar = styled.div`
 
     background: #ffffff;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+`;
+
+/**
+ * For the Activity Bar
+ */
+
+export const ParagraphContainer = styled.div`
+    width: 100%;
+    padding: 0;
+`;
+
+export const FocusedParagraphContainer = styled.div`
+    width: 100%;
+    padding: 5px 15px;
 `;

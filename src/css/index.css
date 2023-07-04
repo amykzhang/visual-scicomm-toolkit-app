@@ -17,11 +17,3 @@ html,
 * {
     box-sizing: border-box;
 }
-
-.slide-left {
-	transform: translateX(-20vw);
-}
-
-.slide-right {
-	transform: translateX(20vw);
-}

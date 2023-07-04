@@ -1,0 +1,17 @@
+@font-face {
+    font-family: "Quicksand";
+    src: url("../assets/Quicksand-VariableFont_wght.ttf");
+    src: url("../assets/Quicksand-VariableFont_wght.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Roboto";
+    src: url("../assets/Roboto-Regular.ttf");
+    src: url("../assets/Roboto-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Roboto-Bold";
+    src: url("../assets/Roboto-Bold.ttf");
+    src: url("../assets/Roboto-Bold.ttf") format("truetype");
+}
