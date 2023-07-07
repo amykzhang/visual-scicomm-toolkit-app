@@ -30,14 +30,7 @@ const ActivityContentContainer = styled(SideBarContent)`
     justify-content: flex-start;
     gap: 8px;
     flex-direction: column;
-    overflow-y: scroll;
     border-radius: 0px 0px 5px 0px;
-
-    -ms-overflow-style: none; /* Internet Explorer 10+ */
-    scrollbar-width: none; /* Firefox */
-    &::-webkit-scrollbar {
-        display: none; /* Safari and Chrome */
-    }
 `;
 
 const ActivityToggle = styled(SideBarToggle)`
@@ -70,9 +63,9 @@ const Instructions = (activity: Activity) => {
             {instructions.map((instruction, index) => (
                 <InstructionContainer key={index}>
                     <InstructionTitle>
-                        <typography.SmallText>
+                        <typography.BoldSmallText>
                             {instruction.step}
-                        </typography.SmallText>
+                        </typography.BoldSmallText>
                     </InstructionTitle>
                     <InstructionBody>
                         <typography.SmallText>

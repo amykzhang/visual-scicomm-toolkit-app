@@ -15,3 +15,9 @@
     src: url("../assets/Roboto-Bold.ttf");
     src: url("../assets/Roboto-Bold.ttf") format("truetype");
 }
+
+@font-face {
+    font-family: "Roboto-Medium";
+    src: url("../assets/Roboto-Medium.ttf");
+    src: url("../assets/Roboto-Medium.ttf") format("truetype");
+}

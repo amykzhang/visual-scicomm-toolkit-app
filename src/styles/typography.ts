@@ -13,36 +13,37 @@ const MediumText = styled.p`
     font-family: Roboto;
 
     b {
-        font-family: Roboto-Bold;
+        font-family: Roboto-Medium;
     }
 `;
 
 const BoldMediumText = styled.p`
     color: #000;
     font-size: 16px;
-    font-family: Roboto-Bold;
-    font-weight: 900;
-`;
-
-const SmallMediumText = styled.p`
-    font-size: 16px;
-    font-weight: 700;
-    margin: 0;
-    padding: 0;
+    font-family: Roboto-Medium;
 `;
 
 const SmallText = styled.p`
+    color: #000;
+    font-size: 14px;
+    font-family: Roboto;
+    margin: 0px;
+    padding: 0px;
+`;
+
+const BoldSmallText = styled.p`
     font-size: 14px;
     font-weight: 700;
-    margin: 0;
-    padding: 0;
+    font-family: Roboto-Bold;
+    margin: 0px;
+    padding: 0px;
 `;
 
 const typography = {
     LargeText: LargeText,
     MediumText: MediumText,
     BoldMediumText: BoldMediumText,
-    SmallMediumText: SmallMediumText,
+    BoldSmallText: BoldSmallText,
     SmallText: SmallText,
 };
 
