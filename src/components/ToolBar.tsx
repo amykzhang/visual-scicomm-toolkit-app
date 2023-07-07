@@ -1,6 +1,6 @@
 import { useApp } from "@tldraw/tldraw";
 import "@tldraw/tldraw/editor.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { track } from "signia-react";
 import { SquareButton } from "./Components";
 import styled from "styled-components";
@@ -10,6 +10,7 @@ import { ReactComponent as CommentIcon } from "../assets/comment.svg";
 import { ReactComponent as PanIcon } from "../assets/pan.svg";
 import { ReactComponent as UndoIcon } from "../assets/undo.svg";
 import { ReactComponent as RedoIcon } from "../assets/redo.svg";
+import commentview from "./CommentView";
 
 const ToolBarContainer = styled(CenterBar)`
     margin-left: auto;
@@ -17,6 +18,7 @@ const ToolBarContainer = styled(CenterBar)`
 `;
 
 export const ToolBar = track(() => {
+    const [isCommentView, setIsCommentView] = useState(false);
     const app = useApp();
 
     useEffect(() => {
@@ -35,6 +37,16 @@ export const ToolBar = track(() => {
         };
     });
 
+    function handleCommentToggle() {
+        if (isCommentView) {
+            commentview.exitCommentView();
+        } else {
+            commentview.enterCommentView();
+        }
+
+        setIsCommentView(!isCommentView);
+    }
+
     return (
         <ToolBarContainer>
             <SquareButton
@@ -49,7 +61,10 @@ export const ToolBar = track(() => {
             >
                 <PanIcon />
             </SquareButton>
-            <SquareButton>
+            <SquareButton
+                data-isactive={isCommentView}
+                onClick={handleCommentToggle}
+            >
                 <CommentIcon />
             </SquareButton>
             <SquareButton onClick={() => app.undo()}>
