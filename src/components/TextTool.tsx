@@ -1,50 +1,46 @@
-import { useApp } from '@tldraw/tldraw'
-import '@tldraw/tldraw/editor.css'
-import { useEffect } from 'react'
-import { track } from 'signia-react'
-import styled from 'styled-components';
+import { useApp } from "@tldraw/tldraw";
+import "@tldraw/tldraw/editor.css";
+import { useEffect } from "react";
+import { track } from "signia-react";
+import styled from "styled-components";
 
-// .text-box-button {
-// 	pointer-events: all;
-// 	padding: 4px 12px;
-// 	background: white;
-// 	border: dotted 1px black;
-// 	border-radius: 0px;
-// }
+const StyledTextContainer = styled.div``;
 
-// .text-box-button[data-isactive='true'] {
-// 	background-color: lightblue;
-// 	/* color: white; */
-// }
+const StyledTextButton = styled.button`
+    background: white;
+    border: 1px solid lightblue;
+    border-radius: 0px;
+`;
 
 export const TextTool = track(() => {
-	const app = useApp()
+    const app = useApp();
 
-	useEffect(() => {
-		const handleKeyUp = (e: KeyboardEvent) => {
-			switch (e.key) {
-				case 'Delete':
-				case 'Backspace': {
-					app.deleteShapes()
-				}
-			}
-		}
+    useEffect(() => {
+        const handleKeyUp = (e: KeyboardEvent) => {
+            switch (e.key) {
+                case "Delete":
+                case "Backspace": {
+                    app.deleteShapes();
+                }
+            }
+        };
 
-		window.addEventListener('keyup', handleKeyUp)
-		return () => {
-			window.removeEventListener('keyup', handleKeyUp)
-		}
-	})
+        window.addEventListener("keyup", handleKeyUp);
+        return () => {
+            window.removeEventListener("keyup", handleKeyUp);
+        };
+    });
 
-	return (
-		<div className="text-box-border">
-			<button
-					className="text-box-button"
-					data-isactive={app.currentToolId === 'text'}
-					onClick={() => app.setSelectedTool('text')}
+    return (
+        <StyledTextContainer>
+            <StyledTextButton
+                data-isactive={app.currentToolId === "text"}
+                onClick={() =>
+                    app.setSelectedTool("text", { "data-font": "sans" })
+                }
             >
-            Text Box
-            </button>
-		</div>
-	)
-})
+                Text Box
+            </StyledTextButton>
+        </StyledTextContainer>
+    );
+});

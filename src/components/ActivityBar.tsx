@@ -101,32 +101,30 @@ export const ActivityBar: React.FC<ActivityBarProps> = ({ activity }) => {
                     <Notebook />
                     <typography.LargeText>Task</typography.LargeText>
                 </SideBarHeader>
-                <Top20>
-                    {activity.task.map((paragraph, index) => {
-                        const { container, body } = paragraph;
-                        if (container === "paragraph")
-                            return (
-                                <ParagraphContainer key={index}>
-                                    <typography.MediumText
-                                        dangerouslySetInnerHTML={{
-                                            __html: body,
-                                        }}
-                                    ></typography.MediumText>
-                                </ParagraphContainer>
-                            );
-                        else if (container === "focused-paragraph")
-                            return (
-                                <FocusedParagraphContainer key={index}>
-                                    <typography.BoldMediumText>
-                                        {body}
-                                    </typography.BoldMediumText>
-                                </FocusedParagraphContainer>
-                            );
-                        // else if (container === "foobar") return (
-                        //     <div>foobar</div>
-                        // )
-                    })}
-                </Top20>
+                {activity.task.map((paragraph, index) => {
+                    const { container, body } = paragraph;
+                    if (container === "paragraph")
+                        return (
+                            <ParagraphContainer key={index}>
+                                <typography.MediumText
+                                    dangerouslySetInnerHTML={{
+                                        __html: body,
+                                    }}
+                                ></typography.MediumText>
+                            </ParagraphContainer>
+                        );
+                    else if (container === "focused-paragraph")
+                        return (
+                            <FocusedParagraphContainer key={index}>
+                                <typography.BoldMediumText>
+                                    {body}
+                                </typography.BoldMediumText>
+                            </FocusedParagraphContainer>
+                        );
+                    // else if (container === "foobar") return (
+                    //     <div>foobar</div>
+                    // )
+                })}
                 <Top30>
                     <SideBarHeader>
                         <Notebook />

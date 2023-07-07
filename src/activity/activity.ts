@@ -38,7 +38,7 @@ export type Activity = {
             sections: {
                 subheading: string;
                 icons: string[];
-                src: string[];
+                srcs: string[];
             }[];
         };
     };
@@ -108,13 +108,13 @@ const activity_visual_strategies: Activity = {
                         "molecule-x-white",
                         "molecule-x-grey",
                     ],
-                    src: [
-                        "/src/activity/assets/molecule-x-purple.png",
-                        "/src/activity/assets/molecule-x-blue.png",
-                        "/src/activity/assets/molecule-x-pink.png",
-                        "/src/activity/assets/molecule-x-orange.png",
-                        "/src/activity/assets/molecule-x-white.png",
-                        "/src/activity/assets/molecule-x-grey.png",
+                    srcs: [
+                        "/activity/assets/molecule-x-purple.png",
+                        "/activity/assets/molecule-x-blue.png",
+                        "/activity/assets/molecule-x-pink.png",
+                        "/activity/assets/molecule-x-orange.png",
+                        "/activity/assets/molecule-x-white.png",
+                        "/activity/assets/molecule-x-grey.png",
                     ],
                 },
                 {
@@ -127,13 +127,13 @@ const activity_visual_strategies: Activity = {
                         "receptor-y-white",
                         "receptor-y-grey",
                     ],
-                    src: [
-                        "/src/activity/assets/receptor-y-purple.png",
-                        "/src/activity/assets/receptor-y-blue.png",
-                        "/src/activity/assets/receptor-y-pink.png",
-                        "/src/activity/assets/receptor-y-orange.png",
-                        "/src/activity/assets/receptor-y-white.png",
-                        "/src/activity/assets/receptor-y-grey.png",
+                    srcs: [
+                        "/activity/assets/receptor-y-purple.png",
+                        "/activity/assets/receptor-y-blue.png",
+                        "/activity/assets/receptor-y-pink.png",
+                        "/activity/assets/receptor-y-orange.png",
+                        "/activity/assets/receptor-y-white.png",
+                        "/activity/assets/receptor-y-grey.png",
                     ],
                 },
                 {
@@ -142,13 +142,13 @@ const activity_visual_strategies: Activity = {
                         "organelle-purple",
                         "organelle-blue",
                         "organelle-pink",
-                        "organelle-orange",
+                        "organelle-yellow",
                     ],
-                    src: [
-                        "/src/activity/assets/organelle-purple.png",
-                        "/src/activity/assets/organelle-blue.png",
-                        "/src/activity/assets/organelle-pink.png",
-                        "/src/activity/assets/organelle-orange.png",
+                    srcs: [
+                        "/activity/assets/organelle-purple.png",
+                        "/activity/assets/organelle-blue.png",
+                        "/activity/assets/organelle-pink.png",
+                        "/activity/assets/organelle-yellow.png",
                     ],
                 },
                 {
@@ -161,13 +161,13 @@ const activity_visual_strategies: Activity = {
                         "protein-white",
                         "protein-grey",
                     ],
-                    src: [
-                        "/src/activity/assets/protein-purple.png",
-                        "/src/activity/assets/protein-blue.png",
-                        "/src/activity/assets/protein-pink.png",
-                        "/src/activity/assets/protein-orange.png",
-                        "/src/activity/assets/protein-white.png",
-                        "/src/activity/assets/protein-grey.png",
+                    srcs: [
+                        "/activity/assets/protein-purple.png",
+                        "/activity/assets/protein-blue.png",
+                        "/activity/assets/protein-pink.png",
+                        "/activity/assets/protein-orange.png",
+                        "/activity/assets/protein-white.png",
+                        "/activity/assets/protein-grey.png",
                     ],
                 },
                 {
@@ -177,10 +177,10 @@ const activity_visual_strategies: Activity = {
                         "cell-membrane-blue",
                         "cell-membrane-pink",
                     ],
-                    src: [
-                        "/src/activity/assets/cell-membrane-purple.png",
-                        "/src/activity/assets/cell-membrane-blue.png",
-                        "/src/activity/assets/cell-membrane-pink.png",
+                    srcs: [
+                        "/activity/assets/cell-membrane-purple.png",
+                        "/activity/assets/cell-membrane-blue.png",
+                        "/activity/assets/cell-membrane-pink.png",
                     ],
                 },
             ],

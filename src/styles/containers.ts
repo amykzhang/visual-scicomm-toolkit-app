@@ -55,6 +55,7 @@ export const SideBarHeader = styled.div`
     align-items: center;
     line-height: 0px;
     gap: 10px;
+    padding-bottom: 20px;
 `;
 
 export const SideBarToggle = styled.div`
