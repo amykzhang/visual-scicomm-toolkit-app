@@ -28,7 +28,6 @@ const ActivityContentContainer = styled(SideBarContent)`
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
-    padding: 18px;
     gap: 8px;
     flex-direction: column;
     overflow-y: scroll;
@@ -95,7 +94,7 @@ export const ActivityBar: React.FC<ActivityBarProps> = ({ activity }) => {
     return (
         <ActivityBarContainer className={isExpanded ? "" : "slide-left"}>
             <ActivityContentContainer>
-                <div>
+                <>
                     <SideBarHeader>
                         <Notebook />
                         <typography.LargeText>Task</typography.LargeText>
@@ -124,7 +123,7 @@ export const ActivityBar: React.FC<ActivityBarProps> = ({ activity }) => {
                         //     <div>foobar</div>
                         // )
                     })}
-                </div>
+                </>
                 <Top30>
                     <SideBarHeader>
                         <Notebook />

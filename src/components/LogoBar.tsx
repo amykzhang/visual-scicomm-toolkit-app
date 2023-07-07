@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { Activity } from "../activity/activity";
+import typography from "../styles/typography";
 
 interface LogoBarProps {
     activity: Activity;
@@ -40,9 +41,6 @@ const Logo = styled.div`
 const StyledName = styled.div`
     position: absolute;
     left: 100px;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 18px;
     line-height: 25px;
 `;
 
@@ -50,7 +48,9 @@ export const LogoBar: React.FC<LogoBarProps> = ({ activity }) => {
     return (
         <LogoBarContainer>
             <Logo>hello</Logo>
-            <StyledName>{activity.name}</StyledName>
+            <StyledName>
+                <typography.LargeText>{activity.name}</typography.LargeText>
+            </StyledName>
         </LogoBarContainer>
     );
 };

@@ -38,6 +38,7 @@ export type Activity = {
             sections: {
                 subheading: string;
                 icons: string[];
+                src: string[];
             }[];
         };
     };
@@ -107,6 +108,14 @@ const activity_visual_strategies: Activity = {
                         "molecule-x-white",
                         "molecule-x-grey",
                     ],
+                    src: [
+                        "/src/activity/assets/molecule-x-purple.png",
+                        "/src/activity/assets/molecule-x-blue.png",
+                        "/src/activity/assets/molecule-x-pink.png",
+                        "/src/activity/assets/molecule-x-orange.png",
+                        "/src/activity/assets/molecule-x-white.png",
+                        "/src/activity/assets/molecule-x-grey.png",
+                    ],
                 },
                 {
                     subheading: "Receptor Y",
@@ -118,6 +127,14 @@ const activity_visual_strategies: Activity = {
                         "receptor-y-white",
                         "receptor-y-grey",
                     ],
+                    src: [
+                        "/src/activity/assets/receptor-y-purple.png",
+                        "/src/activity/assets/receptor-y-blue.png",
+                        "/src/activity/assets/receptor-y-pink.png",
+                        "/src/activity/assets/receptor-y-orange.png",
+                        "/src/activity/assets/receptor-y-white.png",
+                        "/src/activity/assets/receptor-y-grey.png",
+                    ],
                 },
                 {
                     subheading: "Organelle",
@@ -126,6 +143,12 @@ const activity_visual_strategies: Activity = {
                         "organelle-blue",
                         "organelle-pink",
                         "organelle-orange",
+                    ],
+                    src: [
+                        "/src/activity/assets/organelle-purple.png",
+                        "/src/activity/assets/organelle-blue.png",
+                        "/src/activity/assets/organelle-pink.png",
+                        "/src/activity/assets/organelle-orange.png",
                     ],
                 },
                 {
@@ -138,6 +161,14 @@ const activity_visual_strategies: Activity = {
                         "protein-white",
                         "protein-grey",
                     ],
+                    src: [
+                        "/src/activity/assets/protein-purple.png",
+                        "/src/activity/assets/protein-blue.png",
+                        "/src/activity/assets/protein-pink.png",
+                        "/src/activity/assets/protein-orange.png",
+                        "/src/activity/assets/protein-white.png",
+                        "/src/activity/assets/protein-grey.png",
+                    ],
                 },
                 {
                     subheading: "Cell membranes",
@@ -145,6 +176,11 @@ const activity_visual_strategies: Activity = {
                         "cell-membrane-purple",
                         "cell-membrane-blue",
                         "cell-membrane-pink",
+                    ],
+                    src: [
+                        "/src/activity/assets/cell-membrane-purple.png",
+                        "/src/activity/assets/cell-membrane-blue.png",
+                        "/src/activity/assets/cell-membrane-pink.png",
                     ],
                 },
             ],

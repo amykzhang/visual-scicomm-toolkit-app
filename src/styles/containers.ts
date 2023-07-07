@@ -72,6 +72,7 @@ export const SideBarContent = styled.div`
     min-width: 300px;
     height: 100%;
     background: white;
+    padding: 18px;
 `;
 
 export const CenterBar = styled.div`
