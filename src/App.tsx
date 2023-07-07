@@ -12,7 +12,7 @@ import styled from "styled-components";
 import "@tldraw/tldraw/editor.css";
 import "@tldraw/tldraw/ui.css";
 
-import { ElementsMenu } from "./components/ElementsMenu";
+import { ElementsBar } from "./components/ElementsBar";
 import { UILayer } from "./components/Components";
 import { ToolBar } from "./components/ToolBar";
 import { ActivityBar } from "./components/ActivityBar";
@@ -69,7 +69,7 @@ export default function App() {
                             <ToolBar />
                         </TopZone>
                         <ActivityBar activity={activity} />
-                        <ElementsMenu activity={activity} />
+                        <ElementsBar activity={activity} />
                         <BottomZone>
                             <ZoomBar />
                         </BottomZone>

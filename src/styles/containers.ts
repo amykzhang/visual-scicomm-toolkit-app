@@ -73,6 +73,13 @@ export const SideBarContent = styled.div`
     height: 100%;
     background: white;
     padding: 18px;
+
+    overflow-y: scroll;
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    scrollbar-width: none; /* Firefox */
+    &::-webkit-scrollbar {
+        display: none; /* Safari and Chrome */
+    }
 `;
 
 export const CenterBar = styled.div`

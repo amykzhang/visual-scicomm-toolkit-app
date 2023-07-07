@@ -6,9 +6,20 @@ import { TextTool } from "./TextTool";
 import typography from "../styles/typography";
 import styled from "styled-components";
 import { Activity } from "../activity/activity";
-import { SideBar, SideBarContent, SideBarToggle } from "../styles/containers";
+import {
+    SideBar,
+    SideBarContent,
+    SideBarHeader,
+    SideBarToggle,
+} from "../styles/containers";
 import { ReactComponent as LeftArrow } from "../assets/arrowhead-left.svg";
 import { ReactComponent as RightArrow } from "../assets/arrowhead-right.svg";
+import { ReactComponent as PenAndRuler } from "../assets/penandruler.svg";
+
+interface IImageSubsection {
+    icons: string[];
+    src: string[];
+}
 
 const ElementsBarContainer = styled(SideBar)`
     right: 0;
@@ -18,7 +29,6 @@ const ElementsMenuContainer = styled(SideBarContent)`
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
-    padding: 10px;
     gap: 8px;
     flex-direction: column;
 
@@ -50,7 +60,7 @@ interface ElementsMenuProps {
     activity: Activity;
 }
 
-export const ElementsMenu: FC<ElementsMenuProps> = track(({ activity }) => {
+export const ElementsBar: FC<ElementsMenuProps> = track(({ activity }) => {
     const app = useApp();
 
     // For expanding and collapsing the sidebar
@@ -58,16 +68,51 @@ export const ElementsMenu: FC<ElementsMenuProps> = track(({ activity }) => {
     const toggleDisplay = () => setIsExpanded(!isExpanded);
     const Arrow = isExpanded ? RightArrow : LeftArrow;
 
+    const elements = activity.elements;
+    const images = activity.elements.images;
+    const sections = activity.elements.images.sections;
+
+    const ImageSection = () => {
+        return (
+            <>
+                {sections.map((section) => (
+                    <>
+                        <typography.MediumText>
+                            {section.subheading}
+                        </typography.MediumText>
+                        <ImageSubsection {...section} />
+                    </>
+                ))}
+            </>
+        );
+    };
+
+    const ImageSubsection: FC<IImageSubsection> = ({ icons, src }) => {
+        return (
+            <>
+                {icons.map((icon, i) => (
+                    <>
+                        <typography.SmallText>{icon}</typography.SmallText>
+                        {/* <ImageTool {...src} /> */}
+                    </>
+                ))}
+            </>
+        );
+    };
+
     return (
         <ElementsBarContainer className={isExpanded ? "" : "slide-right"}>
             <ElementsToggle onClick={toggleDisplay}>
                 <Arrow />
             </ElementsToggle>
             <ElementsMenuContainer>
-                <typography.LargeText>Elements</typography.LargeText>
+                <SideBarHeader>
+                    <PenAndRuler />
+                    <typography.LargeText>Elements</typography.LargeText>
+                </SideBarHeader>
 
                 <ElementsSection>
-                    <typography.MediumText>Text</typography.MediumText>
+                    <typography.BoldMediumText>Text</typography.BoldMediumText>
 
                     <ElementsTool>
                         <TextTool />
@@ -75,7 +120,7 @@ export const ElementsMenu: FC<ElementsMenuProps> = track(({ activity }) => {
                 </ElementsSection>
 
                 <ElementsSection>
-                    <typography.MediumText>Lines</typography.MediumText>
+                    <typography.BoldMediumText>Lines</typography.BoldMediumText>
 
                     <ElementsTool>
                         <Element
@@ -88,7 +133,9 @@ export const ElementsMenu: FC<ElementsMenuProps> = track(({ activity }) => {
                 </ElementsSection>
 
                 <ElementsSection>
-                    <typography.MediumText>Shapes</typography.MediumText>
+                    <typography.BoldMediumText>
+                        Shapes
+                    </typography.BoldMediumText>
 
                     <ElementsTool>
                         <Element
@@ -100,17 +147,9 @@ export const ElementsMenu: FC<ElementsMenuProps> = track(({ activity }) => {
                     </ElementsTool>
                 </ElementsSection>
 
+                <typography.BoldMediumText>Images</typography.BoldMediumText>
                 <ElementsSection>
-                    <typography.MediumText>Images</typography.MediumText>
-
-                    <ElementsTool>
-                        <Element
-                            data-isactive={app.currentToolId === "note"}
-                            onClick={() => app.setSelectedTool("note")}
-                        >
-                            Element
-                        </Element>
-                    </ElementsTool>
+                    <ImageSection />
                 </ElementsSection>
             </ElementsMenuContainer>
         </ElementsBarContainer>
