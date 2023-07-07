@@ -74,6 +74,7 @@ export const SideBarContent = styled.div`
     height: 100%;
     background: white;
     padding: 18px;
+    pointer-events: all;
 
     overflow-y: scroll;
     -ms-overflow-style: none; /* Internet Explorer 10+ */
