@@ -98,17 +98,3 @@ export const CenterBar = styled.div`
     background: #ffffff;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 `;
-
-/**
- * For the Activity Bar
- */
-
-export const ParagraphContainer = styled.div`
-    width: 100%;
-    padding: 0;
-`;
-
-export const FocusedParagraphContainer = styled.div`
-    width: 100%;
-    padding: 5px 15px;
-`;

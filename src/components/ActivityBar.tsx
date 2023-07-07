@@ -5,9 +5,9 @@ import {
     SideBarHeader,
     SideBarContent,
     SideBarToggle,
-    ParagraphContainer,
-    FocusedParagraphContainer,
     Top30,
+    Top20,
+    Top10,
 } from "../styles/containers";
 import typography from "../styles/typography";
 import styled from "styled-components";
@@ -37,10 +37,20 @@ const ActivityToggle = styled(SideBarToggle)`
     border-radius: 0 5px 5px 0;
 `;
 
+const ParagraphContainer = styled.div`
+    width: 100%;
+    padding-bottom: 18px;
+`;
+
+const FocusedParagraphContainer = styled.div`
+    width: 100%;
+    padding: 18px 18px;
+`;
+
 const InstructionContainer = styled.div`
     display: flex;
     flex-direction: column;
-    padding: 15px 0px;
+    padding: 15px;
     gap: 13px;
 `;
 
@@ -87,11 +97,11 @@ export const ActivityBar: React.FC<ActivityBarProps> = ({ activity }) => {
     return (
         <ActivityBarContainer className={isExpanded ? "" : "slide-left"}>
             <ActivityContentContainer>
-                <>
-                    <SideBarHeader>
-                        <Notebook />
-                        <typography.LargeText>Task</typography.LargeText>
-                    </SideBarHeader>
+                <SideBarHeader>
+                    <Notebook />
+                    <typography.LargeText>Task</typography.LargeText>
+                </SideBarHeader>
+                <Top20>
                     {activity.task.map((paragraph, index) => {
                         const { container, body } = paragraph;
                         if (container === "paragraph")
@@ -116,7 +126,7 @@ export const ActivityBar: React.FC<ActivityBarProps> = ({ activity }) => {
                         //     <div>foobar</div>
                         // )
                     })}
-                </>
+                </Top20>
                 <Top30>
                     <SideBarHeader>
                         <Notebook />
