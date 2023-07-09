@@ -9,8 +9,8 @@ interface IImageTool {
 }
 
 const StyledImage = styled.img`
-    width: 40px;
-    height: 40px;
+    /* width: 40px;
+    height: 40px; */
 `;
 
 export const ImageTool: FC<IImageTool> = ({ src, name }) => {

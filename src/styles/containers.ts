@@ -69,8 +69,7 @@ export const SideBarToggle = styled.div`
 `;
 
 export const SideBarContent = styled.div`
-    width: 20vw;
-    min-width: 300px;
+    width: 325px;
     height: 100%;
     background: white;
     padding: 18px;
