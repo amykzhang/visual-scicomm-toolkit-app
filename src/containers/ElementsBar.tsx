@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import { useApp } from "@tldraw/tldraw";
 import "@tldraw/tldraw/editor.css";
 import { track } from "signia-react";
-import { TextTool } from "./TextTool";
+import { TextTool } from "../components/TextTool";
 import typography from "../styles/typography";
 import styled from "styled-components";
 import { Activity } from "../activity/activity";
@@ -16,7 +16,7 @@ import { ReactComponent as LeftArrow } from "../assets/arrowhead-left.svg";
 import { ReactComponent as RightArrow } from "../assets/arrowhead-right.svg";
 import { ReactComponent as PenAndRuler } from "../assets/penandruler.svg";
 import { ReactComponent as Doodle } from "../assets/doodle.svg";
-import { ImageTool } from "./ImageTool";
+import { ImageTool } from "../components/ImageTool";
 
 const ElementsBarContainer = styled(SideBar)`
     right: 0;
@@ -79,7 +79,7 @@ export const ElementsBar: FC<ElementsMenuProps> = track(({ activity }) => {
     const elements = activity.elements;
     const sections = activity.elements.images.sections;
 
-    const ImageSection = () => {
+    const ImageSection = track(() => {
         return (
             <>
                 {sections.map((section, i) => (
@@ -101,7 +101,7 @@ export const ElementsBar: FC<ElementsMenuProps> = track(({ activity }) => {
                 ))}
             </>
         );
-    };
+    });
 
     return (
         <ElementsBarContainer className={isExpanded ? "" : "slide-right"}>

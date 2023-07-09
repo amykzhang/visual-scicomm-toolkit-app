@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { Activity } from "../activity/activity";
 import typography from "../styles/typography";
+import { track } from "signia-react";
 
 interface LogoBarProps {
     activity: Activity;
@@ -44,7 +45,7 @@ const StyledName = styled.div`
     line-height: 25px;
 `;
 
-export const LogoBar: React.FC<LogoBarProps> = ({ activity }) => {
+export const LogoBar: React.FC<LogoBarProps> = track(({ activity }) => {
     return (
         <LogoBarContainer>
             <Logo>hello</Logo>
@@ -53,4 +54,4 @@ export const LogoBar: React.FC<LogoBarProps> = ({ activity }) => {
             </StyledName>
         </LogoBarContainer>
     );
-};
+});

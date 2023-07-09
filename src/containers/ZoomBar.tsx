@@ -2,7 +2,7 @@ import { useApp } from "@tldraw/tldraw";
 import "@tldraw/tldraw/editor.css";
 import { track } from "signia-react";
 import styled from "styled-components";
-import { SquareButton } from "./Components";
+import { SquareButton } from "../components/Components";
 import { CenterBar } from "../styles/containers";
 import { ReactComponent as FitToScreenIcon } from "../assets/fit-to-screen.svg";
 import { ReactComponent as MinusIcon } from "../assets/minus.svg";

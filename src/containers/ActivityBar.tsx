@@ -14,6 +14,7 @@ import styled from "styled-components";
 import { ReactComponent as LeftArrow } from "../assets/arrowhead-left.svg";
 import { ReactComponent as RightArrow } from "../assets/arrowhead-right.svg";
 import { ReactComponent as Notebook } from "../assets/notebook.svg";
+import { track } from "signia-react";
 
 interface ActivityBarProps {
     activity: Activity;
@@ -66,7 +67,7 @@ const InstructionBody = styled.div`
     gap: 8px;
 `;
 
-const Instructions = (activity: Activity) => {
+const Instructions = track((activity: Activity) => {
     const instructions = activity.instructions;
     return (
         <>
@@ -86,9 +87,9 @@ const Instructions = (activity: Activity) => {
             ))}
         </>
     );
-};
+});
 
-export const ActivityBar: React.FC<ActivityBarProps> = ({ activity }) => {
+export const ActivityBar: React.FC<ActivityBarProps> = track(({ activity }) => {
     // For expanding and collapsing the sidebar
     const [isExpanded, setIsExpanded] = useState(true);
     const Arrow = isExpanded ? LeftArrow : RightArrow;
@@ -140,4 +141,4 @@ export const ActivityBar: React.FC<ActivityBarProps> = ({ activity }) => {
             </ActivityToggle>
         </ActivityBarContainer>
     );
-};
+});

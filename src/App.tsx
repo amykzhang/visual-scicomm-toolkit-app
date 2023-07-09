@@ -7,17 +7,16 @@ import {
     useApp,
 } from "@tldraw/tldraw";
 
-import { useState } from "react";
 import styled from "styled-components";
 import "@tldraw/tldraw/editor.css";
 import "@tldraw/tldraw/ui.css";
 
-import { ElementsBar } from "./components/ElementsBar";
+import { ElementsBar } from "./containers/ElementsBar";
 import { UILayer } from "./components/Components";
-import { ToolBar } from "./components/ToolBar";
-import { ActivityBar } from "./components/ActivityBar";
-import { ZoomBar } from "./components/ZoomBar";
-import { LogoBar } from "./components/LogoBar";
+import { ToolBar } from "./containers/ToolBar";
+import { ActivityBar } from "./containers/ActivityBar";
+import { ZoomBar } from "./containers/ZoomBar";
+import { LogoBar } from "./containers/LogoBar";
 import { BottomZone, TopZone } from "./styles/containers";
 
 import activity_visual_strategies from "./activity/activity";
@@ -41,9 +40,6 @@ const TldrawEditorContainer = styled.div`
     height: 100vh;
     touch-action: none;
 `;
-
-// const shapes = { card: { util: CardShapeUtil } };
-// const tools = [CardShapeTool];
 
 export default function App() {
     const app = useApp();

@@ -13,7 +13,7 @@ const StyledImage = styled.img`
     height: 40px; */
 `;
 
-export const ImageTool: FC<IImageTool> = ({ src, name }) => {
+export const ImageTool: FC<IImageTool> = track(({ src, name }) => {
     const app = useApp();
 
     const handleImageClick = () => {
@@ -28,4 +28,4 @@ export const ImageTool: FC<IImageTool> = ({ src, name }) => {
     };
 
     return <StyledImage src={src} title={name} />;
-};
+});

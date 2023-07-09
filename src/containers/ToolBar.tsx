@@ -2,7 +2,7 @@ import { useApp } from "@tldraw/tldraw";
 import "@tldraw/tldraw/editor.css";
 import { useEffect, useState } from "react";
 import { track } from "signia-react";
-import { SquareButton } from "./Components";
+import { SquareButton } from "../components/Components";
 import styled from "styled-components";
 import { CenterBar } from "../styles/containers";
 import { ReactComponent as SelectIcon } from "../assets/select.svg";
@@ -10,7 +10,7 @@ import { ReactComponent as CommentIcon } from "../assets/comment.svg";
 import { ReactComponent as PanIcon } from "../assets/pan.svg";
 import { ReactComponent as UndoIcon } from "../assets/undo.svg";
 import { ReactComponent as RedoIcon } from "../assets/redo.svg";
-import commentview from "./CommentView";
+import commentview from "../functions/CommentView";
 
 const ToolBarContainer = styled(CenterBar)`
     margin-left: auto;
