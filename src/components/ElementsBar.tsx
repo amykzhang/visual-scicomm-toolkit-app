@@ -18,11 +18,6 @@ import { ReactComponent as PenAndRuler } from "../assets/penandruler.svg";
 import { ReactComponent as Doodle } from "../assets/doodle.svg";
 import { ImageTool } from "./ImageTool";
 
-interface IImageSubsection {
-    icons: string[];
-    srcs: string[];
-}
-
 const ElementsBarContainer = styled(SideBar)`
     right: 0;
 `;
@@ -38,13 +33,12 @@ const ElementsMenuContainer = styled(SideBarContent)`
 `;
 
 const ElementsRow = styled.div`
-    pointer-events: all;
     display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    gap: 3px;
     flex-direction: row;
-    width: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 3px;
+    width: 288px;
 `;
 
 const ElementTool = styled.div`
@@ -88,25 +82,24 @@ export const ElementsBar: FC<ElementsMenuProps> = track(({ activity }) => {
     const ImageSection = () => {
         return (
             <>
-                {sections.map((section) => (
-                    <>
+                {sections.map((section, i) => (
+                    <div key={i}>
                         <ImageSubheadingText>
                             {section.subheading}
                         </ImageSubheadingText>
-                        <ImageSubsection {...section} />
-                    </>
+
+                        <ElementsRow>
+                            {section.srcs.map((src, j) => (
+                                <ImageTool
+                                    key={j}
+                                    src={src}
+                                    name={section.icons[i]}
+                                />
+                            ))}
+                        </ElementsRow>
+                    </div>
                 ))}
             </>
-        );
-    };
-
-    const ImageSubsection: FC<IImageSubsection> = ({ icons, srcs }) => {
-        return (
-            <ElementsRow>
-                {srcs.map((src, i) => (
-                    <ImageTool src={src} name={icons[i]} />
-                ))}
-            </ElementsRow>
         );
     };
 
