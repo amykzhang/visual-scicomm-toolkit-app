@@ -6,19 +6,17 @@ import { SquareButton } from "../components/Components";
 import styled from "styled-components";
 import { CenterBar } from "../styles/containers";
 import { ReactComponent as SelectIcon } from "../assets/select.svg";
-import { ReactComponent as CommentIcon } from "../assets/comment.svg";
 import { ReactComponent as PanIcon } from "../assets/pan.svg";
 import { ReactComponent as UndoIcon } from "../assets/undo.svg";
 import { ReactComponent as RedoIcon } from "../assets/redo.svg";
 import commentview from "../functions/CommentView";
+import { CommentTool } from "../components/CommentTool";
 
 const ToolBarContainer = styled(CenterBar)`
-    margin-left: auto;
-    margin-right: auto;
+    top: 0;
 `;
 
 export const ToolBar = track(() => {
-    const [isCommentView, setIsCommentView] = useState(false);
     const app = useApp();
 
     useEffect(() => {
@@ -37,16 +35,6 @@ export const ToolBar = track(() => {
         };
     });
 
-    function handleCommentToggle() {
-        if (isCommentView) {
-            commentview.exitCommentView();
-        } else {
-            commentview.enterCommentView();
-        }
-
-        setIsCommentView(!isCommentView);
-    }
-
     return (
         <ToolBarContainer>
             <SquareButton
@@ -61,12 +49,7 @@ export const ToolBar = track(() => {
             >
                 <PanIcon />
             </SquareButton>
-            <SquareButton
-                data-isactive={isCommentView}
-                onClick={handleCommentToggle}
-            >
-                <CommentIcon />
-            </SquareButton>
+            <CommentTool />
             <SquareButton onClick={() => app.undo()}>
                 <UndoIcon />
             </SquareButton>

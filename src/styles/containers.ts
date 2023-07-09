@@ -41,11 +41,11 @@ export const SideBar = styled.div`
     filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.15));
 
     &.slide-left {
-        transform: translateX(min(-20vw, -300px));
+        transform: translateX(-325px);
     }
 
     &.slide-right {
-        transform: translateX(max(20vw, 300px));
+        transform: translateX(325px);
     }
 `;
 
