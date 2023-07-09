@@ -1,33 +1,30 @@
-import styled from 'styled-components'
+import styled from "styled-components";
 
 export const UILayer = styled.div`
-	position: absolute;
-	inset: 0px;
-	z-index: 300;
-	pointer-events: none;
-`
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 100vh;
+    inset: 0px;
+    z-index: 300;
+    pointer-events: none;
+`;
 
 export const SquareButton = styled.button`
     pointer-events: all;
     background: white;
     border: none;
-    border-radius: 0px;
-    width: 2rem;
-    height: 2rem;
+    border-radius: 5px;    
+    width: 55px;
+    height: 55px;
+    background: white;
 
     &:hover {
-        background-color: lightblue;
+        background-color: #D7E9FF;
     }
 
-    &[data-isactive='true'] {
-    background-color: lightblue;
+    &[data-isactive="true"] {
+        background-color: #D7E9FF;
     }
-`
-
-export const TopContainer = styled.div`
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    background-color: red;
-`
+`;

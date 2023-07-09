@@ -1,9 +1,9 @@
 export type Activity = {
     name: string;
     task: {
-        primary: string;
-        secondary: string;
-    };
+        container: string;
+        body: string;
+    }[];
     instructions: {
         step: string;
         body: string;
@@ -38,19 +38,24 @@ export type Activity = {
             sections: {
                 subheading: string;
                 icons: string[];
+                srcs: string[];
             }[];
         };
     };
 };
 
-const activity1: Activity = {
+const activity_visual_strategies: Activity = {
     name: "Visual Strategies",
-    task: {
-        primary:
-            "You’re a researcher who wants to describe the following process in a visual diagram. Can you design a communication piece using the elements provided in this activity?",
-        secondary:
-            "The receptor Y is found in the cell membrane. The molecule X binds to the receptor. This triggers the release of proteins by an organelle in the cell.",
-    },
+    task: [
+        {
+            container: "paragraph",
+            body: "You’re a researcher who wants to describe the following process in a <b>visual diagram</b>. Can you design a communication piece using the elements provided in this activity?",
+        },
+        {
+            container: "focused-paragraph",
+            body: "The receptor Y is found in the cell membrane. The molecule X binds to the receptor. This triggers the release of proteins by an organelle in the cell.",
+        },
+    ],
     instructions: [
         {
             step: "1. Understand the science",
@@ -103,6 +108,14 @@ const activity1: Activity = {
                         "molecule-x-white",
                         "molecule-x-grey",
                     ],
+                    srcs: [
+                        "/activity/assets/molecule-x-purple.png",
+                        "/activity/assets/molecule-x-blue.png",
+                        "/activity/assets/molecule-x-pink.png",
+                        "/activity/assets/molecule-x-orange.png",
+                        "/activity/assets/molecule-x-white.png",
+                        "/activity/assets/molecule-x-grey.png",
+                    ],
                 },
                 {
                     subheading: "Receptor Y",
@@ -114,6 +127,14 @@ const activity1: Activity = {
                         "receptor-y-white",
                         "receptor-y-grey",
                     ],
+                    srcs: [
+                        "/activity/assets/receptor-y-purple.png",
+                        "/activity/assets/receptor-y-blue.png",
+                        "/activity/assets/receptor-y-pink.png",
+                        "/activity/assets/receptor-y-orange.png",
+                        "/activity/assets/receptor-y-white.png",
+                        "/activity/assets/receptor-y-grey.png",
+                    ],
                 },
                 {
                     subheading: "Organelle",
@@ -121,9 +142,13 @@ const activity1: Activity = {
                         "organelle-purple",
                         "organelle-blue",
                         "organelle-pink",
-                        "organelle-orange",
-                        "organelle-white",
-                        "organelle-grey",
+                        "organelle-yellow",
+                    ],
+                    srcs: [
+                        "/activity/assets/organelle-purple.png",
+                        "/activity/assets/organelle-blue.png",
+                        "/activity/assets/organelle-pink.png",
+                        "/activity/assets/organelle-yellow.png",
                     ],
                 },
                 {
@@ -136,6 +161,14 @@ const activity1: Activity = {
                         "protein-white",
                         "protein-grey",
                     ],
+                    srcs: [
+                        "/activity/assets/protein-purple.png",
+                        "/activity/assets/protein-blue.png",
+                        "/activity/assets/protein-pink.png",
+                        "/activity/assets/protein-orange.png",
+                        "/activity/assets/protein-white.png",
+                        "/activity/assets/protein-grey.png",
+                    ],
                 },
                 {
                     subheading: "Cell membranes",
@@ -143,9 +176,11 @@ const activity1: Activity = {
                         "cell-membrane-purple",
                         "cell-membrane-blue",
                         "cell-membrane-pink",
-                        "cell-membrane-orange",
-                        "cell-membrane-white",
-                        "cell-membrane-grey",
+                    ],
+                    srcs: [
+                        "/activity/assets/cell-membrane-purple.png",
+                        "/activity/assets/cell-membrane-blue.png",
+                        "/activity/assets/cell-membrane-pink.png",
                     ],
                 },
             ],
@@ -153,4 +188,4 @@ const activity1: Activity = {
     },
 };
 
-export default activity1;
+export default activity_visual_strategies;
