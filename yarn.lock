@@ -2761,7 +2761,7 @@
   dependencies:
     "@tldraw/tlschema" "2.0.0-alpha.12"
 
-"@tldraw/tldraw@^2.0.0-alpha.12":
+"@tldraw/tldraw@2.0.0-alpha.12":
   version "2.0.0-alpha.12"
   resolved "https://registry.yarnpkg.com/@tldraw/tldraw/-/tldraw-2.0.0-alpha.12.tgz#f2ee1a5952f3ebf386487d8ed896a7d83f2d3840"
   integrity sha512-VfYa75aG9OI7ywpWlFbdUHut3Ty4WAKS94IKWbx71DzPq7PXVumBL/+YFE3lw/Xi2gtsUmILcIPey0slYu6KqQ==

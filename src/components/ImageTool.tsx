@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { useApp } from "@tldraw/tldraw";
 import styled from "styled-components";
 import { track } from "signia-react";
@@ -9,23 +9,61 @@ interface IImageTool {
 }
 
 const StyledImage = styled.img`
-    /* width: 40px;
-    height: 40px; */
+    cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+
+    &:active {
+        cursor: grabbing;
+        cursor: -moz-grabbing;
+        cursor: -webkit-grabbing;
+    }
 `;
 
 export const ImageTool: FC<IImageTool> = track(({ src, name }) => {
     const app = useApp();
 
+    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+    const handleImageLoad = (e: any) => {
+        setDimensions({ width: e.target.width, height: e.target.height });
+    };
+
     const handleImageClick = () => {
+        console.log("handleImageClick", dimensions.width, dimensions.height);
+    };
+
+    const handleImageDragStart = () => {
+        console.log("handleImageDrag");
+    };
+
+    const handleImageDragEnd = () => {
+        console.log("handleImageDragEnd");
+
         const imageShape = {
             type: "image",
             src: src,
-            // x: canvasState.cursor.x,
-            // y: canvasState.cursor.y,
-            width: 100, // Set your desired width
-            height: 100, // Set your desired height
+            x: app.userPresence?.cursor.x,
+            y: app.userPresence?.cursor.y,
+            width: dimensions.width,
+            height: dimensions.height,
         };
+        console.log(imageShape);
+
+        // app.createShapes([{ id: "box1", type: "box" }], true);
     };
 
-    return <StyledImage src={src} title={name} />;
+    // function makeImageShape(x, y, w, h, src) {}
+
+    return (
+        <StyledImage
+            src={src}
+            title={name}
+            onLoad={handleImageLoad}
+            onClick={handleImageClick}
+            onDragStart={handleImageDragStart}
+            onDragEnd={handleImageDragEnd}
+        />
+    );
 });
