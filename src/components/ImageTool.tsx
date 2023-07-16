@@ -1,7 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { useApp } from "@tldraw/tldraw";
 import styled from "styled-components";
-import { track } from "signia-react";
 
 interface IImageTool {
     src: string;
@@ -21,9 +19,7 @@ const StyledImage = styled.img`
     }
 `;
 
-export const ImageTool: FC<IImageTool> = track(({ src, name }) => {
-    const app = useApp();
-
+export const ImageTool: FC<IImageTool> = ({ src, name }) => {
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
     const handleImageLoad = (e: any) => {
@@ -44,8 +40,8 @@ export const ImageTool: FC<IImageTool> = track(({ src, name }) => {
         const imageShape = {
             type: "image",
             src: src,
-            x: app.userPresence?.cursor.x,
-            y: app.userPresence?.cursor.y,
+            // x: app.userPresence?.cursor.x,
+            // y: app.userPresence?.cursor.y,
             width: dimensions.width,
             height: dimensions.height,
         };
@@ -66,4 +62,4 @@ export const ImageTool: FC<IImageTool> = track(({ src, name }) => {
             onDragEnd={handleImageDragEnd}
         />
     );
-});
+};

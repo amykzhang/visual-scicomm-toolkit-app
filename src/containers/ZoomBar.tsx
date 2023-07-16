@@ -1,6 +1,3 @@
-import { useApp } from "@tldraw/tldraw";
-import "@tldraw/tldraw/editor.css";
-import { track } from "signia-react";
 import styled from "styled-components";
 import { SquareButton } from "../components/Components";
 import { CenterBar } from "../styles/containers";
@@ -24,21 +21,20 @@ const StyledMinusIcon = styled(MinusIcon)`
     transform: translateY(-4px);
 `;
 
-export const ZoomBar = track(() => {
-    const app = useApp();
-    const zoom = app.camera.z;
-    const zoompercent = Math.round(zoom * 100);
+export const ZoomBar = () => {
+    // const zoom = app.camera.z;
+    // const zoompercent = Math.round(zoom * 100);
 
     function handleZoomIn() {
-        app.zoomIn();
+        // app.zoomIn();
     }
 
     function handleZoomOut() {
-        app.zoomOut();
+        // app.zoomOut();
     }
 
     function handleZoomFit() {
-        app.setCamera(0, 0, 1);
+        // app.setCamera(0, 0, 1);
     }
 
     function toggleFullscreen() {
@@ -65,11 +61,11 @@ export const ZoomBar = track(() => {
                 <StyledMinusIcon />
             </SquareButton>
             <SquareButton>
-                <StyledPercentage>{zoompercent}%</StyledPercentage>
+                <StyledPercentage>000%</StyledPercentage>
             </SquareButton>
             <SquareButton onClick={handleZoomIn}>
                 <PlusIcon />
             </SquareButton>
         </ZoomBarContainer>
     );
-});
+};

@@ -1,7 +1,4 @@
-import { App, useApp } from "@tldraw/tldraw";
-import "@tldraw/tldraw/editor.css";
 import { useEffect } from "react";
-import { track } from "signia-react";
 import styled from "styled-components";
 
 const StyledTextContainer = styled.div``;
@@ -12,21 +9,19 @@ const StyledTextButton = styled.button`
     border-radius: 0px;
 `;
 
-export const TextTool = track(() => {
-    const app = useApp();
-
+export const TextTool = () => {
     useEffect(() => {
-        app.setProp("font", "sans");
+        // app.setProp("font", "sans");
     }, []);
 
     return (
         <StyledTextContainer>
             <StyledTextButton
-                data-isactive={app.currentToolId === "text"}
-                onClick={() => app.setSelectedTool("text")}
+            // data-isactive={app.currentToolId === "text"}
+            // onClick={() => app.setSelectedTool("text")}
             >
                 Text Box
             </StyledTextButton>
         </StyledTextContainer>
     );
-});
+};

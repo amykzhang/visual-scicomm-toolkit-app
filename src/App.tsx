@@ -1,16 +1,4 @@
-import {
-    Canvas,
-    getUserData,
-    TldrawEditor,
-    TLInstance,
-    useLocalSyncClient,
-    useApp,
-} from "@tldraw/tldraw";
-
 import styled from "styled-components";
-import "@tldraw/tldraw/editor.css";
-import "@tldraw/tldraw/ui.css";
-
 import { ElementsBar } from "./containers/ElementsBar";
 import { UILayer } from "./components/Components";
 import { ToolBar } from "./containers/ToolBar";
@@ -18,10 +6,8 @@ import { ActivityBar } from "./containers/ActivityBar";
 import { ZoomBar } from "./containers/ZoomBar";
 import { LogoBar } from "./containers/LogoBar";
 import { BottomZone, TopZone } from "./styles/containers";
-
 import activity_visual_strategies from "./activity/activity";
 
-const instanceId = TLInstance.createCustomId("toolkit");
 const activity = activity_visual_strategies;
 
 const AppContainer = styled.div`
@@ -42,23 +28,10 @@ const TldrawEditorContainer = styled.div`
 `;
 
 export default function App() {
-    const app = useApp();
-    const userData = getUserData();
-    const syncedStore = useLocalSyncClient({
-        instanceId,
-        userId: userData.id,
-        universalPersistenceKey: "visscicomm",
-        // config: myConfig // for custom config, see 3-custom-config
-    });
-
     return (
         <AppContainer>
             <TldrawEditorContainer>
-                <TldrawEditor
-                    instanceId={instanceId}
-                    userId={userData.id}
-                    store={syncedStore}
-                >
+                <>
                     <UILayer>
                         <TopZone>
                             <LogoBar activity={activity} />
@@ -70,8 +43,8 @@ export default function App() {
                             <ZoomBar />
                         </BottomZone>
                     </UILayer>
-                    <Canvas />
-                </TldrawEditor>
+                    <></>
+                </>
             </TldrawEditorContainer>
         </AppContainer>
     );

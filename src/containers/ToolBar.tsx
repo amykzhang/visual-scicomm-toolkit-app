@@ -1,7 +1,4 @@
-import { useApp } from "@tldraw/tldraw";
-import "@tldraw/tldraw/editor.css";
 import { useEffect, useState } from "react";
-import { track } from "signia-react";
 import { SquareButton } from "../components/Components";
 import styled from "styled-components";
 import { CenterBar } from "../styles/containers";
@@ -16,15 +13,13 @@ const ToolBarContainer = styled(CenterBar)`
     top: 0;
 `;
 
-export const ToolBar = track(() => {
-    const app = useApp();
-
+export const ToolBar = () => {
     useEffect(() => {
         const handleKeyUp = (e: KeyboardEvent) => {
             switch (e.key) {
                 case "Delete":
                 case "Backspace": {
-                    app.deleteShapes();
+                    // app.deleteShapes();
                 }
             }
         };
@@ -38,24 +33,28 @@ export const ToolBar = track(() => {
     return (
         <ToolBarContainer>
             <SquareButton
-                data-isactive={app.currentToolId === "select"}
-                onClick={() => app.setSelectedTool("select")}
+            // data-isactive={app.currentToolId === "select"}
+            // onClick={() => app.setSelectedTool("select")}
             >
                 <SelectIcon />
             </SquareButton>
             <SquareButton
-                data-isactive={app.currentToolId === "hand"}
-                onClick={() => app.setSelectedTool("hand")}
+            // data-isactive={app.currentToolId === "hand"}
+            // onClick={() => app.setSelectedTool("hand")}
             >
                 <PanIcon />
             </SquareButton>
             <CommentTool />
-            <SquareButton onClick={() => app.undo()}>
+            <SquareButton
+            // onClick={() => app.undo()}
+            >
                 <UndoIcon />
             </SquareButton>
-            <SquareButton onClick={() => app.redo()}>
+            <SquareButton
+            // onClick={() => app.redo()}
+            >
                 <RedoIcon />
             </SquareButton>
         </ToolBarContainer>
     );
-});
+};

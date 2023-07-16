@@ -1,7 +1,4 @@
 import { FC, useState } from "react";
-import { useApp } from "@tldraw/tldraw";
-import "@tldraw/tldraw/editor.css";
-import { track } from "signia-react";
 import { TextTool } from "../components/TextTool";
 import typography from "../styles/typography";
 import styled from "styled-components";
@@ -68,9 +65,7 @@ interface ElementsMenuProps {
     activity: Activity;
 }
 
-export const ElementsBar: FC<ElementsMenuProps> = track(({ activity }) => {
-    const app = useApp();
-
+export const ElementsBar: FC<ElementsMenuProps> = ({ activity }) => {
     // For expanding and collapsing the sidebar
     const [isExpanded, setIsExpanded] = useState(true);
     const toggleDisplay = () => setIsExpanded(!isExpanded);
@@ -79,7 +74,7 @@ export const ElementsBar: FC<ElementsMenuProps> = track(({ activity }) => {
     const elements = activity.elements;
     const sections = activity.elements.images.sections;
 
-    const ImageSection = track(() => {
+    const ImageSection = () => {
         return (
             <>
                 {sections.map((section, i) => (
@@ -101,7 +96,7 @@ export const ElementsBar: FC<ElementsMenuProps> = track(({ activity }) => {
                 ))}
             </>
         );
-    });
+    };
 
     return (
         <ElementsBarContainer className={isExpanded ? "" : "slide-right"}>
@@ -117,8 +112,8 @@ export const ElementsBar: FC<ElementsMenuProps> = track(({ activity }) => {
                 <TextTool />
                 <typography.BoldMediumText>Lines</typography.BoldMediumText>
                 <ElementTool
-                    data-isactive={app.currentToolId === "draw"}
-                    onClick={() => app.setSelectedTool("draw")}
+                // data-isactive={app.currentToolId === "draw"}
+                // onClick={() => app.setSelectedTool("draw")}
                 >
                     <Doodle />
                 </ElementTool>
@@ -129,4 +124,4 @@ export const ElementsBar: FC<ElementsMenuProps> = track(({ activity }) => {
             </ElementsMenuContainer>
         </ElementsBarContainer>
     );
-});
+};

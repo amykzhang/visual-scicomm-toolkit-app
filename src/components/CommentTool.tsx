@@ -1,7 +1,5 @@
-import { track } from "signia-react";
 import { SquareButton } from "./Components";
 import { styled } from "styled-components";
-import { useApp } from "@tldraw/tldraw";
 import { ReactComponent as CommentIcon } from "../assets/comment.svg";
 import typography from "../styles/typography";
 import { useState } from "react";
@@ -32,9 +30,7 @@ const HideCommentButton = styled.div`
     }
 `;
 
-export const CommentTool = track((props) => {
-    const app = useApp();
-
+export const CommentTool = () => {
     const [isCommentView, setIsCommentView] = useState(false);
 
     const displayStyle = isCommentView ? {} : { display: "none" };
@@ -42,7 +38,7 @@ export const CommentTool = track((props) => {
     function handleCommentToggle() {
         if (!isCommentView) {
             commentview.enterCommentView();
-            app.setSelectedTool("select");
+            // app.setSelectedTool("select");
         } else {
             commentview.exitCommentView();
         }
@@ -65,4 +61,4 @@ export const CommentTool = track((props) => {
             </HideCommentButton>
         </div>
     );
-});
+};
