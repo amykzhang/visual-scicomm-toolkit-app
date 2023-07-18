@@ -15,16 +15,18 @@ export const SquareButton = styled.button`
     pointer-events: all;
     background: white;
     border: none;
-    border-radius: 5px;    
+    border-radius: 5px;
     width: 55px;
     height: 55px;
     background: white;
+    padding: 2px;
 
     &:hover {
-        background-color: #D7E9FF;
+        padding: 0;
+        border: 2px solid #bbbbbb;
     }
 
     &[data-isactive="true"] {
-        background-color: #D7E9FF;
+        background-color: #d7e9ff;
     }
 `;

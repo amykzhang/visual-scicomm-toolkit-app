@@ -1,5 +1,9 @@
 export type Activity = {
     name: string;
+    canvas_size: {
+        width: number;
+        height: number;
+    };
     task: {
         container: string;
         body: string;
@@ -46,6 +50,10 @@ export type Activity = {
 
 const activity_visual_strategies: Activity = {
     name: "Visual Strategies",
+    canvas_size: {
+        width: 850,
+        height: 810,
+    },
     task: [
         {
             container: "paragraph",

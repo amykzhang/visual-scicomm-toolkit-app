@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { SquareButton } from "../components/Components";
 import styled from "styled-components";
 import { CenterBar } from "../styles/containers";
@@ -11,9 +11,18 @@ import { CommentTool } from "../components/CommentTool";
 
 const ToolBarContainer = styled(CenterBar)`
     top: 0;
+    border-radius: 0px 0px 8px 8px;
 `;
 
-export const ToolBar = () => {
+interface ToolBarProps {
+    isPanning: boolean;
+    setIsPanning: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const ToolBar: React.FC<ToolBarProps> = ({
+    isPanning,
+    setIsPanning,
+}) => {
     useEffect(() => {
         const handleKeyUp = (e: KeyboardEvent) => {
             switch (e.key) {
@@ -33,14 +42,16 @@ export const ToolBar = () => {
     return (
         <ToolBarContainer>
             <SquareButton
-            // data-isactive={app.currentToolId === "select"}
-            // onClick={() => app.setSelectedTool("select")}
+                id="select-tool"
+                data-isactive={!isPanning}
+                onClick={() => setIsPanning(false)}
             >
                 <SelectIcon />
             </SquareButton>
             <SquareButton
-            // data-isactive={app.currentToolId === "hand"}
-            // onClick={() => app.setSelectedTool("hand")}
+                id="pan-tool"
+                data-isactive={isPanning}
+                onClick={() => setIsPanning(true)}
             >
                 <PanIcon />
             </SquareButton>

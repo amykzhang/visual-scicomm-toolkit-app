@@ -8,6 +8,7 @@ import { ReactComponent as FullscreenIcon } from "../assets/fullscreen.svg";
 
 const ZoomBarContainer = styled(CenterBar)`
     bottom: 0px;
+    border-radius: 8px 8px 0px 0px;
 `;
 
 const StyledPercentage = styled.p`
