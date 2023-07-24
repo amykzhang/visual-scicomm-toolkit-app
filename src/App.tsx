@@ -1,22 +1,35 @@
-import { Stage, Layer, Circle, Rect, useStrictMode } from "react-konva";
-import Konva from "konva";
-import Node = Konva.Node;
-import { useRef, useState } from "react";
+import { useState } from "react";
+import { Stage, Layer, Circle } from "react-konva";
 import styled from "styled-components";
-
-import { ElementsBar } from "./containers/ElementsBar";
-import { UILayer } from "./components/Components";
-import { ToolBar } from "./containers/ToolBar";
-import { ActivityBar } from "./containers/ActivityBar";
-import { ZoomBar } from "./containers/ZoomBar";
-import { LogoBar } from "./containers/LogoBar";
+import { StageViewManager } from "./functions";
+import { CommentViewManager } from "./functions";
+import { STAGE_VIEW } from "./utils/enums";
+import { ElementsPanel } from "./Panels/ElementsPanel";
+import { ToolbarPanel } from "./Panels/ToolbarPanel";
+import { ActivityPanel } from "./Panels/ActivityPanel";
+import { ZoomPanel } from "./Panels/ZoomPanel";
+import { TitlePanel } from "./Panels/TitlePanel";
 import { BottomZone, TopZone } from "./styles/containers";
+import typography from "./styles/typography";
 import { ExportArea } from "./components/ExportArea";
-
+import { ExitCommentViewButton } from "./components/Components";
 import activity_visual_strategies from "./activity/activity";
+import { CommentViewProp } from "./utils/interfaces";
+
 const activity = activity_visual_strategies;
 
 const AppContainer = styled.div``;
+
+const PanelsContainer = styled.div`
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 100vh;
+    inset: 0px;
+    z-index: 300;
+    pointer-events: none;
+`;
 
 const _props = { perfectDrawEnabled: false };
 
@@ -30,33 +43,11 @@ function generateShapes() {
     }));
 }
 
-const INITIAL_STATE = generateShapes();
-
-// Zooming
-function getDistance(
-    p1: { x: number; y: number },
-    p2: { x: number; y: number }
-) {
-    return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
-}
-
-function getCenter(p1: { x: number; y: number }, p2: { x: number; y: number }) {
-    return {
-        x: (p1.x + p2.x) / 2,
-        y: (p1.y + p2.y) / 2,
-    };
-}
-
-function isTouchEnabled() {
-    return (
-        "ontouchstart" in window || navigator.maxTouchPoints > 0 //||
-        // navigator.msMaxTouchPoints > 0
-    );
-}
+const initial_state = generateShapes();
 
 export default function App() {
     // for example
-    const [shapes, setShapes] = useState(INITIAL_STATE);
+    const [shapes, setShapes] = useState(initial_state);
 
     const handleDragStart = (e: any) => {
         const id = e.target?.id();
@@ -70,7 +61,7 @@ export default function App() {
         );
     };
 
-    const handleDragEnd = (e: any) => {
+    const handleDragEnd = () => {
         setShapes(
             shapes.map((shape) => {
                 return {
@@ -81,132 +72,47 @@ export default function App() {
         );
     };
 
-    // Panning
-    const [isPanning, setIsPanning] = useState(false);
-    const pan = { isPanning, setIsPanning };
+    // Stage View
+    const {
+        view,
+        setView,
+        stageRef,
+        zoomStage,
+        handleTouchMove,
+        handleTouchEnd,
+    } = StageViewManager();
 
-    // Zooming
-    type StageState = Konva.Stage | null;
-    const stageRef = useRef<StageState>(null);
-    let lastCenter: { x: number; y: number } | null;
-    let lastDist = 0;
-    const scaleBy = 1.1;
-
-    function zoomStage(event: Konva.KonvaEventObject<WheelEvent>) {
-        console.log("wheel");
-        event.evt.preventDefault();
-        if (stageRef.current !== null) {
-            const stage = stageRef.current;
-            const oldScale = stage.scaleX();
-            const pointer = stage.getPointerPosition();
-            const pointerX = pointer?.x as number;
-            const pointerY = pointer?.y as number;
-            const mousePointTo = {
-                x: (pointerX - stage.x()) / oldScale,
-                y: (pointerY - stage.y()) / oldScale,
-            };
-            const newScale =
-                event.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-            stage.scale({ x: newScale, y: newScale });
-            const newPos = {
-                x: pointerX - mousePointTo.x * newScale,
-                y: pointerY - mousePointTo.y * newScale,
-            };
-            stage.position(newPos);
-            stage.batchDraw();
-        }
-    }
-
-    function handleTouch(e: Konva.KonvaEventObject<TouchEvent>) {
-        console.log("touchmove");
-        e.evt.preventDefault();
-        var touch1 = e.evt.touches[0];
-        var touch2 = e.evt.touches[1];
-        if (stageRef.current !== null) {
-            const stage = stageRef.current;
-            if (touch1 && touch2) {
-                if (stage.isDragging()) {
-                    stage.stopDrag();
-                }
-
-                var p1 = {
-                    x: touch1.clientX,
-                    y: touch1.clientY,
-                };
-                var p2 = {
-                    x: touch2.clientX,
-                    y: touch2.clientY,
-                };
-
-                if (!lastCenter) {
-                    lastCenter = getCenter(p1, p2);
-                    return;
-                }
-                var newCenter = getCenter(p1, p2);
-
-                var dist = getDistance(p1, p2);
-
-                if (!lastDist) {
-                    lastDist = dist;
-                }
-
-                // local coordinates of center point
-                var pointTo = {
-                    x: (newCenter.x - stage.x()) / stage.scaleX(),
-                    y: (newCenter.y - stage.y()) / stage.scaleX(),
-                };
-
-                var scale = stage.scaleX() * (dist / lastDist);
-
-                stage.scaleX(scale);
-                stage.scaleY(scale);
-
-                // calculate new position of the stage
-                var dx = newCenter.x - lastCenter.x;
-                var dy = newCenter.y - lastCenter.y;
-
-                var newPos = {
-                    x: newCenter.x - pointTo.x * scale + dx,
-                    y: newCenter.y - pointTo.y * scale + dy,
-                };
-
-                stage.position(newPos);
-                stage.batchDraw();
-
-                lastDist = dist;
-                lastCenter = newCenter;
-            }
-        }
-    }
-
-    function handleTouchEnd() {
-        console.log("touchend");
-        lastCenter = null;
-        lastDist = 0;
-    }
+    // Comment View
+    const commentView = CommentViewManager(setView);
 
     return (
         <AppContainer>
-            <UILayer>
+            <PanelsContainer>
                 <TopZone>
-                    <LogoBar {...activity} />
-                    <ToolBar {...pan} />
+                    <TitlePanel {...activity} />
+                    <ToolbarPanel
+                        view={view}
+                        setView={setView}
+                        commentView={commentView}
+                    />
+                    <ExitCommentView commentView={commentView} />
                 </TopZone>
-                <ActivityBar activity={activity} />
-                <ElementsBar activity={activity} />
+                <ActivityPanel activity={activity} />
+                <ElementsPanel activity={activity} />
                 <BottomZone>
-                    <ZoomBar />
+                    <ZoomPanel />
                 </BottomZone>
-            </UILayer>
+            </PanelsContainer>
             <Stage
                 width={window.innerWidth}
                 height={window.innerHeight}
                 // draggable={isPanning}
-                draggable={!isTouchEnabled() || isPanning}
-                onWheel={zoomStage}
-                onTouchMove={handleTouch}
+                draggable={true}
+                // onWheel={zoomStage}
+                onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
                 ref={stageRef}
+                fill={commentView.state.backgroundColor}
             >
                 <Layer>
                     <ExportArea {...activity.canvas_size} />
@@ -219,7 +125,7 @@ export default function App() {
                             radius={25}
                             fill="#050505"
                             opacity={0.8}
-                            draggable={!isPanning}
+                            draggable={view === STAGE_VIEW.select}
                             scaleX={shape.isDragging ? 1.05 : 1}
                             scaleY={shape.isDragging ? 1.05 : 1}
                             onDragStart={handleDragStart}
@@ -232,3 +138,17 @@ export default function App() {
         </AppContainer>
     );
 }
+
+interface ExitCommentStateProps {
+    commentView: CommentViewProp;
+}
+
+const ExitCommentView: React.FC<ExitCommentStateProps> = ({ commentView }) => {
+    const displayStyle = commentView.state.active ? {} : { display: "none" };
+
+    return (
+        <ExitCommentViewButton style={displayStyle} onClick={commentView.exit}>
+            <typography.LargeText>Exit Comment Mode</typography.LargeText>
+        </ExitCommentViewButton>
+    );
+};
