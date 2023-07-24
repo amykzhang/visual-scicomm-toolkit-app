@@ -15,7 +15,7 @@ import { ReactComponent as PenAndRuler } from "../assets/penandruler.svg";
 import { ReactComponent as Doodle } from "../assets/doodle.svg";
 import { ImageTool } from "../components/ImageTool";
 
-const ElementsBarContainer = styled(SideBar)`
+const ElementsPanelContainer = styled(SideBar)`
     right: 0;
 `;
 
@@ -65,7 +65,7 @@ interface ElementsMenuProps {
     activity: Activity;
 }
 
-export const ElementsBar: FC<ElementsMenuProps> = ({ activity }) => {
+export const ElementsPanel: FC<ElementsMenuProps> = ({ activity }) => {
     // For expanding and collapsing the sidebar
     const [isExpanded, setIsExpanded] = useState(true);
     const toggleDisplay = () => setIsExpanded(!isExpanded);
@@ -99,7 +99,7 @@ export const ElementsBar: FC<ElementsMenuProps> = ({ activity }) => {
     };
 
     return (
-        <ElementsBarContainer className={isExpanded ? "" : "slide-right"}>
+        <ElementsPanelContainer className={isExpanded ? "" : "slide-right"}>
             <ElementsToggle onClick={toggleDisplay}>
                 <Arrow />
             </ElementsToggle>
@@ -122,6 +122,6 @@ export const ElementsBar: FC<ElementsMenuProps> = ({ activity }) => {
                 <typography.BoldMediumText>Images</typography.BoldMediumText>
                 <ImageSection />
             </ElementsMenuContainer>
-        </ElementsBarContainer>
+        </ElementsPanelContainer>
     );
 };

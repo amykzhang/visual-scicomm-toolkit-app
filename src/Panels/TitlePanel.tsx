@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { Activity } from "../activity/activity";
 import typography from "../styles/typography";
 
-const LogoBarContainer = styled.div`
+const TitlePanelContainer = styled.div`
     position: absolute;
     width: 24vw;
     height: 69px;
@@ -40,17 +40,17 @@ const StyledName = styled.div`
     line-height: 25px;
 `;
 
-interface LogoBarProps {
+interface TitlePanelProps {
     name: string;
 }
 
-export const LogoBar: React.FC<LogoBarProps> = ({ name }) => {
+export const TitlePanel: React.FC<TitlePanelProps> = ({ name }) => {
     return (
-        <LogoBarContainer>
+        <TitlePanelContainer>
             <Logo>hello</Logo>
             <StyledName>
                 <typography.LargeText>{name}</typography.LargeText>
             </StyledName>
-        </LogoBarContainer>
+        </TitlePanelContainer>
     );
 };

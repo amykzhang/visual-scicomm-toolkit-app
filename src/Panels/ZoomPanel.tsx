@@ -6,7 +6,7 @@ import { ReactComponent as MinusIcon } from "../assets/minus.svg";
 import { ReactComponent as PlusIcon } from "../assets/plus.svg";
 import { ReactComponent as FullscreenIcon } from "../assets/fullscreen.svg";
 
-const ZoomBarContainer = styled(CenterBar)`
+const ZoomPanelContainer = styled(CenterBar)`
     bottom: 0px;
     border-radius: 8px 8px 0px 0px;
 `;
@@ -22,7 +22,7 @@ const StyledMinusIcon = styled(MinusIcon)`
     transform: translateY(-4px);
 `;
 
-export const ZoomBar = () => {
+export const ZoomPanel = () => {
     // const zoom = app.camera.z;
     // const zoompercent = Math.round(zoom * 100);
 
@@ -51,7 +51,7 @@ export const ZoomBar = () => {
     }
 
     return (
-        <ZoomBarContainer>
+        <ZoomPanelContainer>
             <SquareButton onClick={toggleFullscreen}>
                 <FullscreenIcon />
             </SquareButton>
@@ -67,6 +67,6 @@ export const ZoomBar = () => {
             <SquareButton onClick={handleZoomIn}>
                 <PlusIcon />
             </SquareButton>
-        </ZoomBarContainer>
+        </ZoomPanelContainer>
     );
 };

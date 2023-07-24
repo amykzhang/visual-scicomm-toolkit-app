@@ -15,11 +15,11 @@ import { ReactComponent as LeftArrow } from "../assets/arrowhead-left.svg";
 import { ReactComponent as RightArrow } from "../assets/arrowhead-right.svg";
 import { ReactComponent as Notebook } from "../assets/notebook.svg";
 
-interface ActivityBarProps {
+interface ActivityPanelProps {
     activity: Activity;
 }
 
-const ActivityBarContainer = styled(SideBar)`
+const ActivityPanelContainer = styled(SideBar)`
     left: 0;
 `;
 
@@ -88,14 +88,14 @@ const Instructions = (activity: Activity) => {
     );
 };
 
-export const ActivityBar: React.FC<ActivityBarProps> = ({ activity }) => {
+export const ActivityPanel: React.FC<ActivityPanelProps> = ({ activity }) => {
     // For expanding and collapsing the sidebar
     const [isExpanded, setIsExpanded] = useState(true);
     const Arrow = isExpanded ? LeftArrow : RightArrow;
     const toggleDisplay = () => setIsExpanded(!isExpanded);
 
     return (
-        <ActivityBarContainer className={isExpanded ? "" : "slide-left"}>
+        <ActivityPanelContainer className={isExpanded ? "" : "slide-left"}>
             <ActivityContentContainer>
                 <SideBarHeader>
                     <Notebook />
@@ -138,6 +138,6 @@ export const ActivityBar: React.FC<ActivityBarProps> = ({ activity }) => {
             <ActivityToggle onClick={toggleDisplay}>
                 <Arrow />
             </ActivityToggle>
-        </ActivityBarContainer>
+        </ActivityPanelContainer>
     );
 };

@@ -1,16 +1,5 @@
 import styled from "styled-components";
 
-export const UILayer = styled.div`
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    width: 100vw;
-    height: 100vh;
-    inset: 0px;
-    z-index: 300;
-    pointer-events: none;
-`;
-
 export const SquareButton = styled.button`
     pointer-events: all;
     background: white;
@@ -27,6 +16,29 @@ export const SquareButton = styled.button`
     }
 
     &[data-isactive="true"] {
+        background-color: #d7e9ff;
+    }
+`;
+
+export const ExitCommentViewButton = styled.div`
+    position: absolute;
+    pointer-events: all;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 7px 6px;
+
+    width: 230px;
+    height: 50px;
+    top: 85px;
+    left: calc(50% - 115px);
+
+    background-color: #ffffff;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+
+    &:hover {
         background-color: #d7e9ff;
     }
 `;

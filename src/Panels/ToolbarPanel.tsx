@@ -1,27 +1,31 @@
 import { useEffect } from "react";
+import { STAGE_VIEW } from "../utils/enums";
+import { CommentViewProp } from "../utils/interfaces";
+import { CommentViewManager } from "../functions";
 import { SquareButton } from "../components/Components";
-import styled from "styled-components";
-import { CenterBar } from "../styles/containers";
+import { CommentTool } from "../components/CommentTool";
 import { ReactComponent as SelectIcon } from "../assets/select.svg";
 import { ReactComponent as PanIcon } from "../assets/pan.svg";
 import { ReactComponent as UndoIcon } from "../assets/undo.svg";
 import { ReactComponent as RedoIcon } from "../assets/redo.svg";
-import commentview from "../functions/CommentView";
-import { CommentTool } from "../components/CommentTool";
+import styled from "styled-components";
+import { CenterBar } from "../styles/containers";
 
-const ToolBarContainer = styled(CenterBar)`
+const ToolbarPanelContainer = styled(CenterBar)`
     top: 0;
     border-radius: 0px 0px 8px 8px;
 `;
 
-interface ToolBarProps {
-    isPanning: boolean;
-    setIsPanning: React.Dispatch<React.SetStateAction<boolean>>;
+interface ToolbarPanelProps {
+    view: STAGE_VIEW;
+    setView: React.Dispatch<React.SetStateAction<STAGE_VIEW>>;
+    commentView: CommentViewProp;
 }
 
-export const ToolBar: React.FC<ToolBarProps> = ({
-    isPanning,
-    setIsPanning,
+export const ToolbarPanel: React.FC<ToolbarPanelProps> = ({
+    view,
+    setView,
+    commentView,
 }) => {
     useEffect(() => {
         const handleKeyUp = (e: KeyboardEvent) => {
@@ -40,32 +44,38 @@ export const ToolBar: React.FC<ToolBarProps> = ({
     });
 
     return (
-        <ToolBarContainer>
+        <ToolbarPanelContainer>
             <SquareButton
-                id="select-tool"
-                data-isactive={!isPanning}
-                onClick={() => setIsPanning(false)}
+                data-isactive={view === STAGE_VIEW.select}
+                onClick={() => setView(STAGE_VIEW.select)}
             >
                 <SelectIcon />
             </SquareButton>
+
             <SquareButton
-                id="pan-tool"
-                data-isactive={isPanning}
-                onClick={() => setIsPanning(true)}
+                data-isactive={view === STAGE_VIEW.pan}
+                onClick={() => setView(STAGE_VIEW.pan)}
             >
                 <PanIcon />
             </SquareButton>
-            <CommentTool />
+
+            <CommentTool
+                view={view}
+                setView={setView}
+                commentView={commentView}
+            ></CommentTool>
+
             <SquareButton
             // onClick={() => app.undo()}
             >
                 <UndoIcon />
             </SquareButton>
+
             <SquareButton
             // onClick={() => app.redo()}
             >
                 <RedoIcon />
             </SquareButton>
-        </ToolBarContainer>
+        </ToolbarPanelContainer>
     );
 };
