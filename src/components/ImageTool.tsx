@@ -74,8 +74,11 @@ export const ImageTool: FC<ImageToolProps> = ({
         console.log("handleImageDragEnd");
         if (stageRef.current !== null) {
             const stage = stageRef.current;
-            const x = e.clientX - stage.x() - dimensions.width / 2;
-            const y = e.clientY - stage.y() - dimensions.height / 2;
+            const x =
+                (e.clientX - stage.x() - dimensions.width / 2) / stage.scaleX();
+            const y =
+                (e.clientY - stage.y() - dimensions.height / 2) /
+                stage.scaleY();
             putImageOnCanvas(x, y);
         }
     };
