@@ -4,13 +4,10 @@ export const ExportArea: React.FC<{ width: number; height: number }> = ({
     width,
     height,
 }) => {
-    const x = window.innerWidth / 2 - width / 2;
-    const y = window.innerHeight / 2 - height / 2;
-
     return (
         <Rect
-            x={x}
-            y={y}
+            x={0}
+            y={0}
             width={width}
             height={height}
             id={"export-area"}

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Stage, Layer, Circle } from "react-konva";
+import { Stage, Layer, Circle, Image } from "react-konva";
+import Konva from "konva";
 import styled from "styled-components";
 import { StageViewManager } from "./functions";
 import { CommentViewManager } from "./functions";
@@ -14,7 +15,7 @@ import typography from "./styles/typography";
 import { ExportArea } from "./components/ExportArea";
 import { ExitCommentViewButton } from "./components/Components";
 import activity_visual_strategies from "./activity/activity";
-import { CommentViewProp } from "./utils/interfaces";
+import { CommentViewProp, ImageProp } from "./utils/interfaces";
 
 const activity = activity_visual_strategies;
 
@@ -31,8 +32,6 @@ const PanelsContainer = styled.div`
     pointer-events: none;
 `;
 
-const _props = { perfectDrawEnabled: false };
-
 function generateShapes() {
     return [...Array(10)].map((_, i) => ({
         id: i.toString(),
@@ -46,30 +45,66 @@ function generateShapes() {
 const initial_state = generateShapes();
 
 export default function App() {
-    // for example
-    const [shapes, setShapes] = useState(initial_state);
+    // Images
+    const [images, setImages] = useState<ImageProp[]>([]);
+    let startX = 0;
+    let startY = 0;
 
-    const handleDragStart = (e: any) => {
-        const id = e.target?.id();
-        setShapes(
-            shapes.map((shape) => {
-                return {
-                    ...shape,
-                    isDragging: shape.id === id,
-                };
-            })
-        );
+    const handleDragStart = (
+        elements: any[],
+        setElements: React.Dispatch<React.SetStateAction<any>>
+    ) => {
+        return (e: Konva.KonvaEventObject<DragEvent>) => {
+            console.log(e.target.x(), e.target.y());
+            console.log("start");
+
+            const id = e.target.id();
+
+            startX = e.target.x();
+            startY = e.target.y();
+
+            setElements(
+                elements.map((element) => {
+                    return {
+                        ...element,
+                        isDragging: element.id === id,
+                    };
+                })
+            );
+        };
     };
 
-    const handleDragEnd = () => {
-        setShapes(
-            shapes.map((shape) => {
-                return {
-                    ...shape,
-                    isDragging: false,
-                };
-            })
-        );
+    const handleDragEnd = (
+        elements: any[],
+        setElements: React.Dispatch<React.SetStateAction<any>>
+    ) => {
+        return (e: Konva.KonvaEventObject<DragEvent>) => {
+            console.log("end");
+            console.log(e.target.x(), e.target.y());
+
+            const id = e.target.id();
+
+            const endX = e.target.x();
+            const endY = e.target.y();
+            const diffX = endX - startX;
+            const diffY = endY - startY;
+
+            setElements(
+                elements
+                    .filter((element) => element.isDragging)
+                    .map((element) => {
+                        console.log(element);
+                        return {
+                            ...element,
+                            x: element.x - diffX,
+                            y: element.y - diffY,
+                            isDragging: false,
+                        };
+                    })
+            );
+
+            console.log(elements.find((el) => el.id === id));
+        };
     };
 
     // Stage View
@@ -80,10 +115,22 @@ export default function App() {
         zoomStage,
         handleTouchMove,
         handleTouchEnd,
+        handleWheel,
     } = StageViewManager();
 
     // Comment View
     const commentView = CommentViewManager(setView);
+
+    const canvasElementConstants = {
+        perfectDrawEnabled: false,
+        draggable: view === STAGE_VIEW.select,
+    };
+
+    function printPosition(e: Konva.KonvaEventObject<MouseEvent>) {
+        console.log("mouse pos: ", e.evt.clientX, e.evt.clientY);
+        console.log("konva pos: ", e.target.x(), e.target.y());
+        console.log("zoom:, ", stageRef.current?.scale());
+    }
 
     return (
         <AppContainer>
@@ -98,7 +145,12 @@ export default function App() {
                     <ExitCommentView commentView={commentView} />
                 </TopZone>
                 <ActivityPanel activity={activity} />
-                <ElementsPanel activity={activity} />
+                <ElementsPanel
+                    activity={activity}
+                    images={images}
+                    setImages={setImages}
+                    stageRef={stageRef}
+                />
                 <BottomZone>
                     <ZoomPanel />
                 </BottomZone>
@@ -108,15 +160,16 @@ export default function App() {
                 height={window.innerHeight}
                 // draggable={isPanning}
                 draggable={true}
-                // onWheel={zoomStage}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
+                onWheel={handleWheel}
+                // onTouchMove={handleTouchMove}
+                // onTouchEnd={handleTouchEnd}
                 ref={stageRef}
                 fill={commentView.state.backgroundColor}
+                onClick={printPosition}
             >
                 <Layer>
                     <ExportArea {...activity.canvas_size} />
-                    {shapes.map((shape) => (
+                    {/* {shapes.map((shape) => (
                         <Circle
                             key={shape.id}
                             id={shape.id}
@@ -130,9 +183,23 @@ export default function App() {
                             scaleY={shape.isDragging ? 1.05 : 1}
                             onDragStart={handleDragStart}
                             onDragEnd={handleDragEnd}
-                            {..._props}
+                            {...canvasElementConstants}
                         />
-                    ))}
+                    ))} */}
+                    {images.map((image) => {
+                        return (
+                            <Image
+                                key={image.id}
+                                id={image.id}
+                                x={image.x}
+                                y={image.y}
+                                image={image.image}
+                                onDragStart={handleDragStart(images, setImages)}
+                                onDragEnd={handleDragEnd(images, setImages)}
+                                {...canvasElementConstants}
+                            />
+                        );
+                    })}
                 </Layer>
             </Stage>
         </AppContainer>

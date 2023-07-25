@@ -1,16 +1,45 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Konva from "konva";
 import { STAGE_VIEW } from "../utils/enums";
 
 export const StageViewManager = () => {
     const [view, setView] = useState(STAGE_VIEW.select);
 
+    // Keyboard shortcuts
+    let shiftPressed = false;
+    let ctrlPressed = false;
+    let altPressed = false;
+    let metaPressed = false;
+
+    function handleKeyDown(e: KeyboardEvent) {
+        if (e.key === "Shift") shiftPressed = true;
+        if (e.key === "Control") ctrlPressed = true;
+        if (e.key === "Alt") altPressed = true;
+        if (e.key === "Meta") metaPressed = true;
+        console.log(shiftPressed, ctrlPressed, altPressed, metaPressed);
+    }
+
+    function handleKeyUp(e: KeyboardEvent) {
+        if (e.key === "Shift") shiftPressed = false;
+        if (e.key === "Control") ctrlPressed = false;
+        if (e.key === "Alt") altPressed = false;
+        if (e.key === "Meta") metaPressed = false;
+        console.log(shiftPressed, ctrlPressed, altPressed, metaPressed);
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
     // Zooming
-    type StageState = Konva.Stage | null;
-    const stageRef = useRef<StageState>(null);
+    const stageRef = useRef<Konva.Stage | null>(null);
     let lastCenter: { x: number; y: number } | null;
     let lastDist = 0;
-    const scaleBy = 1.1;
+    const zoomScale = 1.02;
+    const zoomConstants = [
+        2, 3, 6, 13, 25, 50, 100, 200, 300, 400, 800, 1600, 3200, 6400, 12800,
+        25600,
+    ];
+    let zoomIndex = 6;
 
     function zoomStage(event: Konva.KonvaEventObject<WheelEvent>) {
         console.log("wheel");
@@ -28,7 +57,9 @@ export const StageViewManager = () => {
                 y: (pointerY - stage.y()) / oldScale,
             };
             const newScale =
-                event.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+                event.evt.deltaY > 0
+                    ? oldScale * zoomScale
+                    : oldScale / zoomScale;
             stage.scale({ x: newScale, y: newScale });
 
             const newPos = {
@@ -41,6 +72,12 @@ export const StageViewManager = () => {
         }
     }
 
+    function zoom() {}
+
+    function zoomIn() {}
+
+    function zoomOut() {}
+
     function handleTouchMove(e: Konva.KonvaEventObject<TouchEvent>) {
         console.log("touchmove");
         e.evt.preventDefault();
@@ -50,6 +87,7 @@ export const StageViewManager = () => {
 
         if (stageRef.current !== null) {
             const stage = stageRef.current;
+
             if (touch1 && touch2) {
                 if (stage.isDragging()) {
                     stage.stopDrag();
@@ -111,6 +149,62 @@ export const StageViewManager = () => {
         lastDist = 0;
     }
 
+    function handleWheel(e: Konva.KonvaEventObject<WheelEvent>) {
+        e.evt.preventDefault();
+        if (stageRef.current !== null) {
+            const stage = stageRef.current;
+
+            const dx = e.evt.deltaX;
+            const dy = e.evt.deltaY;
+
+            // panning has integers in dx and dy, zooming has float in dy
+            if (Number.isInteger(dy)) {
+                console.log("pan");
+
+                if (stage.isDragging()) {
+                    stage.stopDrag();
+                }
+
+                var newPos = {
+                    x: stage.x() - dx,
+                    y: stage.y() - dy,
+                };
+
+                stage.position(newPos);
+                stage.batchDraw();
+            } else {
+                console.log("zoom:", dy);
+
+                const oldScale = stage.scaleX();
+
+                // get point to zoom in on
+                const pointer = stage.getPointerPosition();
+                const pointerX = pointer?.x as number;
+                const pointerY = pointer?.y as number;
+                const mousePointTo = {
+                    x: (pointerX - stage.x()) / oldScale,
+                    y: (pointerY - stage.y()) / oldScale,
+                };
+
+                const newScale =
+                    dy < 0 ? oldScale * zoomScale : oldScale / zoomScale;
+                const newPos = {
+                    x: pointerX - mousePointTo.x * newScale,
+                    y: pointerY - mousePointTo.y * newScale,
+                };
+
+                stage.scale({ x: newScale, y: newScale });
+                stage.position(newPos);
+                stage.batchDraw();
+            }
+        }
+    }
+
+    // TODO: center stage or last known positon, zoom,
+    useEffect(() => {
+        console.log("useEffect stageViewManager");
+    }, []);
+
     return {
         view,
         setView,
@@ -118,6 +212,7 @@ export const StageViewManager = () => {
         zoomStage,
         handleTouchMove,
         handleTouchEnd,
+        handleWheel,
     };
 };
 

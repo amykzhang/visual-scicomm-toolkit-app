@@ -9,3 +9,14 @@ export interface CommentViewProp {
     enter: () => void;
     exit: () => void;
 }
+
+export interface ImageProp {
+    id: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    rotation: number;
+    isDragging: boolean;
+    image: HTMLImageElement | undefined;
+}

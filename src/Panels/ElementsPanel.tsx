@@ -1,19 +1,21 @@
 import { FC, useState } from "react";
+import Konva from "konva";
+import { ImageProp } from "../utils/interfaces";
+import { Activity } from "../activity/activity";
+import { ReactComponent as LeftArrow } from "../assets/arrowhead-left.svg";
+import { ReactComponent as RightArrow } from "../assets/arrowhead-right.svg";
+import { ReactComponent as PenAndRuler } from "../assets/penandruler.svg";
+import { ReactComponent as Doodle } from "../assets/doodle.svg";
+import { ImageTool } from "../components/ImageTool";
 import { TextTool } from "../components/TextTool";
 import typography from "../styles/typography";
-import styled from "styled-components";
-import { Activity } from "../activity/activity";
 import {
     SideBar,
     SideBarContent,
     SideBarHeader,
     SideBarToggle,
 } from "../styles/containers";
-import { ReactComponent as LeftArrow } from "../assets/arrowhead-left.svg";
-import { ReactComponent as RightArrow } from "../assets/arrowhead-right.svg";
-import { ReactComponent as PenAndRuler } from "../assets/penandruler.svg";
-import { ReactComponent as Doodle } from "../assets/doodle.svg";
-import { ImageTool } from "../components/ImageTool";
+import styled from "styled-components";
 
 const ElementsPanelContainer = styled(SideBar)`
     right: 0;
@@ -63,9 +65,17 @@ const ImageSubheadingText = styled(typography.BoldSmallText)`
 
 interface ElementsMenuProps {
     activity: Activity;
+    images: ImageProp[];
+    setImages: React.Dispatch<React.SetStateAction<ImageProp[]>>;
+    stageRef: React.MutableRefObject<Konva.Stage | null>;
 }
 
-export const ElementsPanel: FC<ElementsMenuProps> = ({ activity }) => {
+export const ElementsPanel: FC<ElementsMenuProps> = ({
+    activity,
+    images,
+    setImages,
+    stageRef,
+}) => {
     // For expanding and collapsing the sidebar
     const [isExpanded, setIsExpanded] = useState(true);
     const toggleDisplay = () => setIsExpanded(!isExpanded);
@@ -89,6 +99,9 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({ activity }) => {
                                     key={j}
                                     src={src}
                                     name={section.icons[i]}
+                                    images={images}
+                                    setImages={setImages}
+                                    stageRef={stageRef}
                                 />
                             ))}
                         </ElementsRow>

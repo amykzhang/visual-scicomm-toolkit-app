@@ -1,10 +1,9 @@
-import { FC, useEffect, useState } from "react";
+import { FC, SyntheticEvent, useEffect, useState } from "react";
+import Konva from "konva";
 import styled from "styled-components";
-
-interface IImageTool {
-    src: string;
-    name: string;
-}
+import { ImageProp } from "../utils/interfaces";
+import { v4 as uuid } from "uuid";
+import useImage from "use-image";
 
 const StyledImage = styled.img`
     cursor: move; /* fallback if grab cursor is unsupported */
@@ -19,38 +18,69 @@ const StyledImage = styled.img`
     }
 `;
 
-export const ImageTool: FC<IImageTool> = ({ src, name }) => {
-    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+interface ImageToolProps {
+    src: string;
+    name: string;
+    images: ImageProp[];
+    setImages: React.Dispatch<React.SetStateAction<ImageProp[]>>;
+    stageRef: React.MutableRefObject<Konva.Stage | null>;
+}
 
-    const handleImageLoad = (e: any) => {
-        setDimensions({ width: e.target.width, height: e.target.height });
+export const ImageTool: FC<ImageToolProps> = ({
+    src,
+    name,
+    images,
+    setImages,
+    stageRef,
+}) => {
+    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+    const [image] = useImage(src);
+
+    function putImageOnCanvas(x: number, y: number) {
+        console.log(src);
+
+        setImages([
+            ...images,
+            {
+                id: uuid(),
+                x: x,
+                y: y,
+                width: dimensions.width,
+                height: dimensions.height,
+                rotation: 0,
+                isDragging: false,
+                image: image,
+            },
+        ]);
+    }
+
+    const handleImageLoad = (e: SyntheticEvent) => {
+        setDimensions({
+            width: e.currentTarget.clientWidth,
+            height: e.currentTarget.clientHeight,
+        });
     };
 
     const handleImageClick = () => {
         console.log("handleImageClick", dimensions.width, dimensions.height);
     };
 
-    const handleImageDragStart = () => {
+    const handleImageDragStart = (e: React.DragEvent) => {
         console.log("handleImageDrag");
     };
 
-    const handleImageDragEnd = () => {
+    const handleImageDragEnd = (e: React.DragEvent) => {
         console.log("handleImageDragEnd");
 
-        const imageShape = {
-            type: "image",
-            src: src,
-            // x: app.userPresence?.cursor.x,
-            // y: app.userPresence?.cursor.y,
-            width: dimensions.width,
-            height: dimensions.height,
-        };
-        console.log(imageShape);
+        if (stageRef.current !== null) {
+            const pos = stageRef.current.getPointerPosition();
 
-        // app.createShapes([{ id: "box1", type: "box" }], true);
+            if (pos !== null) {
+                console.log(pos.x, pos.y);
+                putImageOnCanvas(pos.x, pos.y);
+            }
+        }
     };
-
-    // function makeImageShape(x, y, w, h, src) {}
 
     return (
         <StyledImage
