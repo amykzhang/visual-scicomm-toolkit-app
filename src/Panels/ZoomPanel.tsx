@@ -1,3 +1,4 @@
+import { useState } from "react";
 import styled from "styled-components";
 import { SquareButton } from "../components/Components";
 import { CenterBar } from "../styles/containers";
@@ -22,49 +23,36 @@ const StyledMinusIcon = styled(MinusIcon)`
     transform: translateY(-4px);
 `;
 
-export const ZoomPanel = () => {
-    // const zoom = app.camera.z;
-    // const zoompercent = Math.round(zoom * 100);
+interface ZoomPanelProps {
+    zoomLevel: number;
+    zoomIn: () => void;
+    zoomOut: () => void;
+    zoomFit: () => void;
+    toggleFullscreen: () => void;
+}
 
-    function handleZoomIn() {
-        // app.zoomIn();
-    }
-
-    function handleZoomOut() {
-        // app.zoomOut();
-    }
-
-    function handleZoomFit() {
-        // app.setCamera(0, 0, 1);
-    }
-
-    function toggleFullscreen() {
-        if (document.fullscreenElement) {
-            document.exitFullscreen().catch((err) => {
-                alert(
-                    `Error attempting to enable fullscreen mode: ${err.message} (${err.name})`
-                );
-            });
-        } else {
-            document.body.requestFullscreen();
-        }
-    }
-
+export const ZoomPanel: React.FC<ZoomPanelProps> = ({
+    zoomLevel,
+    zoomIn,
+    zoomOut,
+    zoomFit,
+    toggleFullscreen,
+}) => {
     return (
         <ZoomPanelContainer>
             <SquareButton onClick={toggleFullscreen}>
                 <FullscreenIcon />
             </SquareButton>
-            <SquareButton onClick={handleZoomFit}>
+            <SquareButton onClick={zoomFit}>
                 <FitToScreenIcon />
             </SquareButton>
-            <SquareButton onClick={handleZoomOut}>
+            <SquareButton onClick={zoomOut}>
                 <StyledMinusIcon />
             </SquareButton>
             <SquareButton>
-                <StyledPercentage>000%</StyledPercentage>
+                <StyledPercentage>{zoomLevel}%</StyledPercentage>
             </SquareButton>
-            <SquareButton onClick={handleZoomIn}>
+            <SquareButton onClick={zoomIn}>
                 <PlusIcon />
             </SquareButton>
         </ZoomPanelContainer>

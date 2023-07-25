@@ -112,11 +112,13 @@ export default function App() {
         view,
         setView,
         stageRef,
-        zoomStage,
-        handleTouchMove,
-        handleTouchEnd,
         handleWheel,
-    } = StageViewManager();
+        zoomLevel,
+        zoomIn,
+        zoomOut,
+        zoomFit,
+        toggleFullscreen,
+    } = StageViewManager(activity.canvas_size);
 
     // Comment View
     const commentView = CommentViewManager(setView);
@@ -152,40 +154,26 @@ export default function App() {
                     stageRef={stageRef}
                 />
                 <BottomZone>
-                    <ZoomPanel />
+                    <ZoomPanel
+                        zoomLevel={zoomLevel}
+                        zoomIn={zoomIn}
+                        zoomOut={zoomOut}
+                        zoomFit={zoomFit}
+                        toggleFullscreen={toggleFullscreen}
+                    />
                 </BottomZone>
             </PanelsContainer>
             <Stage
                 width={window.innerWidth}
                 height={window.innerHeight}
-                // draggable={isPanning}
                 draggable={true}
                 onWheel={handleWheel}
-                // onTouchMove={handleTouchMove}
-                // onTouchEnd={handleTouchEnd}
                 ref={stageRef}
                 fill={commentView.state.backgroundColor}
                 onClick={printPosition}
             >
                 <Layer>
                     <ExportArea {...activity.canvas_size} />
-                    {/* {shapes.map((shape) => (
-                        <Circle
-                            key={shape.id}
-                            id={shape.id}
-                            x={shape.x}
-                            y={shape.y}
-                            radius={25}
-                            fill="#050505"
-                            opacity={0.8}
-                            draggable={view === STAGE_VIEW.select}
-                            scaleX={shape.isDragging ? 1.05 : 1}
-                            scaleY={shape.isDragging ? 1.05 : 1}
-                            onDragStart={handleDragStart}
-                            onDragEnd={handleDragEnd}
-                            {...canvasElementConstants}
-                        />
-                    ))} */}
                     {images.map((image) => {
                         return (
                             <Image

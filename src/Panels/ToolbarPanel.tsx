@@ -27,22 +27,6 @@ export const ToolbarPanel: React.FC<ToolbarPanelProps> = ({
     setView,
     commentView,
 }) => {
-    useEffect(() => {
-        const handleKeyUp = (e: KeyboardEvent) => {
-            switch (e.key) {
-                case "Delete":
-                case "Backspace": {
-                    // app.deleteShapes();
-                }
-            }
-        };
-
-        window.addEventListener("keyup", handleKeyUp);
-        return () => {
-            window.removeEventListener("keyup", handleKeyUp);
-        };
-    });
-
     return (
         <ToolbarPanelContainer>
             <SquareButton
