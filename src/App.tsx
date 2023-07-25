@@ -130,7 +130,11 @@ export default function App() {
 
     function printPosition(e: Konva.KonvaEventObject<MouseEvent>) {
         console.log("mouse pos: ", e.evt.clientX, e.evt.clientY);
-        console.log("konva pos: ", e.target.x(), e.target.y());
+        console.log(
+            "konva pos: ",
+            stageRef?.current?.x(),
+            stageRef?.current?.y()
+        );
         console.log("zoom:, ", stageRef.current?.scale());
     }
 
