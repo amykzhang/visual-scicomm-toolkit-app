@@ -66,7 +66,7 @@ export const ImageTool: FC<ImageToolProps> = ({
     };
 
     const handleImageDragStart = (e: React.DragEvent) => {
-        console.log("handleImageDrag");
+        console.log("handleImageDragStart");
     };
 
     const handleImageDragEnd = (e: React.DragEvent) => {
@@ -75,10 +75,10 @@ export const ImageTool: FC<ImageToolProps> = ({
         if (stageRef.current !== null) {
             const stage = stageRef.current;
             const x =
-                (e.clientX - stage.x() - dimensions.width / 2) / stage.scaleX();
+                (e.clientX - stage.x()) / stage.scaleX() - dimensions.width / 2;
             const y =
-                (e.clientY - stage.y() - dimensions.height / 2) /
-                stage.scaleY();
+                (e.clientY - stage.y()) / stage.scaleX() -
+                dimensions.height / 2;
             putImageOnCanvas(x, y);
         }
     };

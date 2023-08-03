@@ -21,7 +21,6 @@ export const StageViewManager = (canvas_size: {
 
     function handleKeyDown(e: KeyboardEvent) {
         if (e.key === "Meta") metaPressed = true;
-        console.log("keyDown");
 
         // Zoom shortcuts (shift/meta +, shift/meta -, shift/meta 0)
         // if (canZoom) {
@@ -42,7 +41,6 @@ export const StageViewManager = (canvas_size: {
 
     function handleKeyUp(e: KeyboardEvent) {
         metaPressed = false;
-        console.log("keyUp");
     }
 
     document.addEventListener("keydown", handleKeyDown);
@@ -54,8 +52,6 @@ export const StageViewManager = (canvas_size: {
     let lastDist = 0;
 
     function zoomStage(event: Konva.KonvaEventObject<WheelEvent>) {
-        console.log("wheel");
-
         event.evt.preventDefault();
 
         if (stageRef.current !== null) {
@@ -81,13 +77,6 @@ export const StageViewManager = (canvas_size: {
 
             stage.position(newPos);
             stage.batchDraw();
-        }
-    }
-
-    function formatZoomLevel() {
-        if (stageRef.current !== null) {
-            const zoomAsInt = Math.floor(stageRef.current.scaleX() * 100);
-            setZoomLevel(zoomAsInt);
         }
     }
 
@@ -237,8 +226,6 @@ export const StageViewManager = (canvas_size: {
 
             // panning has integers in dx and dy, zooming has float in dy
             if (Number.isInteger(dy)) {
-                console.log("pan");
-
                 if (stage.isDragging()) {
                     stage.stopDrag();
                 }
@@ -251,8 +238,6 @@ export const StageViewManager = (canvas_size: {
                 stage.position(newPos);
                 stage.batchDraw();
             } else {
-                console.log("zoom:", dy);
-
                 const oldScale = stage.scaleX();
 
                 // get point to zoom in on
@@ -290,8 +275,8 @@ export const StageViewManager = (canvas_size: {
         setView,
         stageRef,
         zoomStage,
-        handleTouchMove,
-        handleTouchEnd,
+        // handleTouchMove,
+        // handleTouchEnd,
         handleWheel,
         zoomLevel,
         zoomIn,
