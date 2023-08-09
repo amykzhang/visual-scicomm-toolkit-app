@@ -129,13 +129,32 @@ export default function App() {
     };
 
     function printPosition(e: Konva.KonvaEventObject<MouseEvent>) {
-        console.log("mouse pos: ", e.evt.clientX, e.evt.clientY);
-        console.log(
-            "konva pos: ",
-            stageRef?.current?.x(),
-            stageRef?.current?.y()
-        );
-        console.log("zoom:, ", stageRef.current?.scale());
+        if (stageRef.current !== null) {
+            const stage = stageRef.current;
+
+            console.log("Stage Coord: ", stage.x(), stage.y());
+
+            const pointer = stage.getPointerPosition();
+            console.log(
+                "Pointer Coord: ",
+                pointer?.x as number,
+                pointer?.y as number
+            );
+
+            console.log(
+                "Pointer relative to stage:",
+                -stage.x() + (pointer?.x as number),
+                -stage.y() + (pointer?.y as number)
+            );
+
+            console.log("Zoom: ", stageRef.current?.scale());
+
+            console.log(
+                "Window Dimensions: ",
+                window.innerWidth,
+                window.innerHeight
+            );
+        }
     }
 
     return (
