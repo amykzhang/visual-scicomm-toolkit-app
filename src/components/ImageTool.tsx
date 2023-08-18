@@ -21,7 +21,7 @@ const StyledImage = styled.img`
 interface ImageToolProps {
     src: string;
     name: string;
-    size: { width: number; height: number };
+    dimensions: { width: number; height: number };
     images: ImageProp[];
     setImages: React.Dispatch<React.SetStateAction<ImageProp[]>>;
     stageRef: React.MutableRefObject<Konva.Stage | null>;
@@ -30,17 +30,14 @@ interface ImageToolProps {
 export const ImageTool: FC<ImageToolProps> = ({
     src,
     name,
-    size,
+    dimensions,
     images,
     setImages,
     stageRef,
 }) => {
-    console.log(size);
-    const dimensions = size;
     const [image] = useImage(src);
 
     function putImageOnCanvas(x: number, y: number) {
-        console.log(src, dimensions.width, dimensions.height);
         if (image !== undefined) {
             image.width = dimensions.width;
             image.height = dimensions.height;

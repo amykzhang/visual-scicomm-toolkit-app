@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Stage, Layer, Circle, Image } from "react-konva";
 import Konva from "konva";
 import styled from "styled-components";
@@ -18,6 +18,7 @@ import activity_visual_strategies from "./activity/activity";
 import { CommentViewProp, ImageProp } from "./utils/interfaces";
 
 const activity = activity_visual_strategies;
+const localKey = "konva-canvas";
 
 const AppContainer = styled.div``;
 
@@ -32,17 +33,13 @@ const PanelsContainer = styled.div`
     pointer-events: none;
 `;
 
-function generateShapes() {
-    return [...Array(10)].map((_, i) => ({
-        id: i.toString(),
-        x: (0.2 + Math.random() * 0.6) * window.innerWidth,
-        y: (0.2 + Math.random() * 0.6) * window.innerHeight,
-        rotation: 0,
-        isDragging: false,
-    }));
+function saveCanvasState(elements: any[]) {
+    localStorage.setItem(localKey, JSON.stringify(elements));
 }
 
-const initial_state = generateShapes();
+function getCanvasState() {
+    return localStorage.getItem(localKey);
+}
 
 export default function App() {
     // Images
@@ -55,22 +52,19 @@ export default function App() {
         setElements: React.Dispatch<React.SetStateAction<any>>
     ) => {
         return (e: Konva.KonvaEventObject<DragEvent>) => {
+            console.log("DragStart");
             console.log(e.target.x(), e.target.y());
-            console.log("start");
 
             const id = e.target.id();
 
             startX = e.target.x();
             startY = e.target.y();
 
-            setElements(
-                elements.map((element) => {
-                    return {
-                        ...element,
-                        isDragging: element.id === id,
-                    };
-                })
-            );
+            const newElements = elements.map((element) => {
+                return { ...element, isDragging: element.id === id };
+            });
+
+            setElements(newElements);
         };
     };
 
@@ -79,31 +73,30 @@ export default function App() {
         setElements: React.Dispatch<React.SetStateAction<any>>
     ) => {
         return (e: Konva.KonvaEventObject<DragEvent>) => {
-            console.log("end");
+            console.log("DragEnd");
             console.log(e.target.x(), e.target.y());
-
+            console.log(e.target.getAbsolutePosition());
             const id = e.target.id();
 
             const endX = e.target.x();
             const endY = e.target.y();
-            const diffX = endX - startX;
-            const diffY = endY - startY;
 
-            setElements(
-                elements
-                    .filter((element) => element.isDragging)
-                    .map((element) => {
-                        console.log(element);
-                        return {
-                            ...element,
-                            x: element.x - diffX,
-                            y: element.y - diffY,
-                            isDragging: false,
-                        };
-                    })
-            );
+            const newElements = elements.map((element) => {
+                console.log("filtered", element);
+                if (element.isDragging) {
+                    return {
+                        ...element,
+                        x: endX,
+                        y: endY,
+                        isDragging: false,
+                    };
+                } else {
+                    return element;
+                }
+            });
 
-            console.log(elements.find((el) => el.id === id));
+            setElements(newElements);
+            // saveCanvasState(newElements);
         };
     };
 
@@ -132,7 +125,7 @@ export default function App() {
         if (stageRef.current !== null) {
             const stage = stageRef.current;
 
-            console.log("Stage Coord: ", stage.x(), stage.y());
+            //     console.log("Stage Coord: ", stage.x(), stage.y());
 
             const pointer = stage.getPointerPosition();
             console.log(
@@ -141,21 +134,30 @@ export default function App() {
                 pointer?.y as number
             );
 
-            console.log(
-                "Pointer relative to stage:",
-                -stage.x() + (pointer?.x as number),
-                -stage.y() + (pointer?.y as number)
-            );
+            //     console.log(
+            //         "Pointer relative to stage:",
+            //         -stage.x() + (pointer?.x as number),
+            //         -stage.y() + (pointer?.y as number)
+            //     );
 
-            console.log("Zoom: ", stageRef.current?.scale());
+            //     console.log("Zoom: ", stageRef.current?.scale());
 
-            console.log(
-                "Window Dimensions: ",
-                window.innerWidth,
-                window.innerHeight
-            );
+            //     console.log(
+            //         "Window Dimensions: ",
+            //         window.innerWidth,
+            //         window.innerHeight
+            //     );
         }
+        console.log(images);
     }
+
+    // Load Images from Local Storage
+    useEffect(() => {
+        const canvasState = getCanvasState();
+        if (canvasState !== null) {
+            setImages(JSON.parse(canvasState));
+        }
+    }, []);
 
     return (
         <AppContainer>
@@ -214,8 +216,8 @@ export default function App() {
                         );
                     })}
                 </Layer>
-                <Layer id="elements-layer"></Layer>
-                <Layer id="comment-layer"></Layer>
+                {/* <Layer id="elements-layer"></Layer>
+                <Layer id="comment-layer"></Layer> */}
             </Stage>
         </AppContainer>
     );
