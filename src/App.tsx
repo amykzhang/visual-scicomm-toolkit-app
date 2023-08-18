@@ -195,8 +195,10 @@ export default function App() {
                 fill={commentView.state.backgroundColor}
                 onClick={printPosition}
             >
-                <Layer>
+                <Layer id="export-layer">
                     <ExportArea {...activity.canvas_size} />
+                </Layer>
+                <Layer id="image-layer">
                     {images.map((image) => {
                         return (
                             <Image
@@ -212,6 +214,10 @@ export default function App() {
                         );
                     })}
                 </Layer>
+                <Layer id="shape-layer"></Layer>
+                <Layer id="text-layer"></Layer>
+                <Layer id="draw-layer"></Layer>
+                <Layer id="comment-layer"></Layer>
             </Stage>
         </AppContainer>
     );

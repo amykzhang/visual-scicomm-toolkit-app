@@ -15,27 +15,20 @@ export type Activity = {
     elements: {
         text: {
             heading: string;
-            tools: {
-                name: string;
-                icon: string;
-                toolid: string;
-            }[];
+            text: string[];
+            icons: string[];
+            srcs: string[];
         };
         lines: {
             heading: string;
-            tools: {
-                name: string;
-                icon: string;
-                toolid: string;
-            }[];
+            icons: string[];
+            srcs: string[];
         };
         shapes: {
             heading: string;
-            tools: {
-                name: string;
-                icon: string;
-                toolid: string;
-            }[];
+            shapes: string[];
+            icons: string[];
+            srcs: string[];
         };
         images: {
             heading: string;
@@ -57,17 +50,17 @@ const activity_visual_strategies: Activity = {
     task: [
         {
             container: "paragraph",
-            body: "You’re a researcher who wants to describe the following process in a <b>visual diagram</b>. Can you design a communication piece using the elements provided in this activity?",
+            body: "You're a researcher who wants to describe the following process in a <b>visual diagram</b>. Can you design a communication piece using the elements provided in this activity?",
         },
         {
-            container: "focused-paragraph",
+            container: "focused_paragraph",
             body: "The receptor Y is found in the cell membrane. The molecule X binds to the receptor. This triggers the release of proteins by an organelle in the cell.",
         },
     ],
     instructions: [
         {
             step: "1. Understand the science",
-            body: "We start by researching the topic if we’re unfamiliar with the science. This includes searching and referencing visuals, such as diagrams, created by others.",
+            body: "We start by researching the topic if we're unfamiliar with the science. This includes searching and referencing visuals, such as diagrams, created by others.",
         },
         {
             step: "2. Design a communication piece",
@@ -75,33 +68,73 @@ const activity_visual_strategies: Activity = {
         },
         {
             step: "3. Support your design choices",
-            body: "Place a comment next to different parts of your diagram and explain how you’ve made your design as effective as possible.",
+            body: "Place a comment next to different parts of your diagram and explain how you've made your design as effective as possible.",
         },
     ],
     elements: {
         text: {
             heading: "Text",
-            tools: [
-                {
-                    name: "Text Box",
-                    icon: "text-box",
-                    toolid: "text",
-                },
-            ],
+            text: ["TextBox"],
+            icons: ["text_box"],
+            srcs: ["/activity/assets/text_box.png"],
         },
         lines: {
             heading: "Lines",
-            tools: [
-                {
-                    name: "freehand",
-                    icon: "freehand",
-                    toolid: "draw",
-                },
+            icons: [
+                "label_left_dot",
+                "label_right_dot",
+                "label_left_arrow",
+                "label_right_arrow",
+                "label_left_bent_dot",
+                "label_right_bent_dot",
+                "label_left_bent_arrow",
+                "label_right_bent_arrow",
+                "label_left_curve1_arrow",
+                "label_right_curve1_arrow",
+                "label_left_curve2_arrow",
+                "label_right_curve2_arrow",
+            ],
+            srcs: [
+                "/activity/assets/label_left_dot.png",
+                "/activity/assets/label_right_dot.png",
+                "/activity/assets/label_left_arrow.png",
+                "/activity/assets/label_right_arrow.png",
+                "/activity/assets/label_left_bent_dot.png",
+                "/activity/assets/label_right_bent_dot.png",
+                "/activity/assets/label_left_bent_arrow.png",
+                "/activity/assets/label_right_bent_arrow.png",
+                "/activity/assets/label_left_curve1_arrow.png",
+                "/activity/assets/label_right_curve1_arrow.png",
+                "/activity/assets/label_left_curve2_arrow.png",
+                "/activity/assets/label_right_curve2_arrow.png",
             ],
         },
         shapes: {
             heading: "Shapes",
-            tools: [],
+            shapes: [
+                "rectangle_filled",
+                "circle_filled",
+                "triangle_filled",
+                "rectangle_outline",
+                "circle_outline",
+                "triangle_outline",
+            ],
+            icons: [
+                "rectangle_filled",
+                "circle_filled",
+                "triangle_filled",
+                "rectangle_outline",
+                "circle_outline",
+                "triangle_outline",
+            ],
+            srcs: [
+                "/activity/assets/rectangle_filled.png",
+                "/activity/assets/circle_filled.png",
+                "/activity/assets/triangle_filled.png",
+                "/activity/assets/rectangle_outline.png",
+                "/activity/assets/circle_outline.png",
+                "/activity/assets/triangle_outline.png",
+            ],
         },
         images: {
             heading: "Images",
@@ -109,86 +142,168 @@ const activity_visual_strategies: Activity = {
                 {
                     subheading: "Molecule X",
                     icons: [
-                        "molecule-x-purple",
-                        "molecule-x-blue",
-                        "molecule-x-pink",
-                        "molecule-x-orange",
-                        "molecule-x-white",
-                        "molecule-x-grey",
+                        "molecule_purple",
+                        "molecule_blue",
+                        "molecule_pink",
+                        "molecule_yellow",
+                        "molecule_white",
+                        "molecule_gray",
                     ],
                     srcs: [
-                        "/activity/assets/molecule-x-purple.png",
-                        "/activity/assets/molecule-x-blue.png",
-                        "/activity/assets/molecule-x-pink.png",
-                        "/activity/assets/molecule-x-orange.png",
-                        "/activity/assets/molecule-x-white.png",
-                        "/activity/assets/molecule-x-grey.png",
+                        "/activity/assets/molecule_purple.png",
+                        "/activity/assets/molecule_blue.png",
+                        "/activity/assets/molecule_pink.png",
+                        "/activity/assets/molecule_yellow.png",
+                        "/activity/assets/molecule_white.png",
+                        "/activity/assets/molecule_gray.png",
                     ],
                 },
                 {
                     subheading: "Receptor Y",
                     icons: [
-                        "receptor-y-purple",
-                        "receptor-y-blue",
-                        "receptor-y-pink",
-                        "receptor-y-orange",
-                        "receptor-y-white",
-                        "receptor-y-grey",
+                        "receptor_purple",
+                        "receptor_blue",
+                        "receptor_pink",
+                        "receptor_yellow",
+                        "receptor_white",
+                        "receptor_gray",
                     ],
                     srcs: [
-                        "/activity/assets/receptor-y-purple.png",
-                        "/activity/assets/receptor-y-blue.png",
-                        "/activity/assets/receptor-y-pink.png",
-                        "/activity/assets/receptor-y-orange.png",
-                        "/activity/assets/receptor-y-white.png",
-                        "/activity/assets/receptor-y-grey.png",
+                        "/activity/assets/receptor_purple.png",
+                        "/activity/assets/receptor_blue.png",
+                        "/activity/assets/receptor_pink.png",
+                        "/activity/assets/receptor_yellow.png",
+                        "/activity/assets/receptor_white.png",
+                        "/activity/assets/receptor_gray.png",
                     ],
                 },
                 {
                     subheading: "Organelle",
                     icons: [
-                        "organelle-purple",
-                        "organelle-blue",
-                        "organelle-pink",
-                        "organelle-yellow",
+                        "organelle_purple",
+                        "organelle_blue",
+                        "organelle_pink",
+                        "organelle_yellow",
                     ],
                     srcs: [
-                        "/activity/assets/organelle-purple.png",
-                        "/activity/assets/organelle-blue.png",
-                        "/activity/assets/organelle-pink.png",
-                        "/activity/assets/organelle-yellow.png",
+                        "/activity/assets/organelle_purple.png",
+                        "/activity/assets/organelle_blue.png",
+                        "/activity/assets/organelle_pink.png",
+                        "/activity/assets/organelle_yellow.png",
                     ],
                 },
                 {
                     subheading: "Protein",
                     icons: [
-                        "protein-purple",
-                        "protein-blue",
-                        "protein-pink",
-                        "protein-orange",
-                        "protein-white",
-                        "protein-grey",
+                        "protein_purple",
+                        "protein_blue",
+                        "protein_pink",
+                        "protein_yellow",
+                        "protein_white",
+                        "protein_gray",
                     ],
                     srcs: [
-                        "/activity/assets/protein-purple.png",
-                        "/activity/assets/protein-blue.png",
-                        "/activity/assets/protein-pink.png",
-                        "/activity/assets/protein-orange.png",
-                        "/activity/assets/protein-white.png",
-                        "/activity/assets/protein-grey.png",
+                        "/activity/assets/protein_purple.png",
+                        "/activity/assets/protein_blue.png",
+                        "/activity/assets/protein_pink.png",
+                        "/activity/assets/protein_yellow.png",
+                        "/activity/assets/protein_white.png",
+                        "/activity/assets/protein_gray.png",
                     ],
                 },
                 {
                     subheading: "Cell membranes",
                     icons: [
-                        "cell-membrane-purple",
-                        "cell-membrane-blue",
-                        "cell-membrane-pink",
+                        "membrane_1_purple",
+                        "membrane_1_blue",
+                        "membrane_1_pink",
+                        "membrane_1_yellow",
+                        "membrane_1_white",
+                        "membrane_1_gray",
                     ],
                     srcs: [
-                        "/activity/assets/cell-membrane-purple.png",
-                        "/activity/assets/cell-membrane-blue.png",
-                        "/activity/assets/cell-membrane-pink.png",
+                        "/activity/assets/membrane_1_purple.png",
+                        "/activity/assets/membrane_1_blue.png",
+                        "/activity/assets/membrane_1_pink.png",
+                        "/activity/assets/membrane_1_yellow.png",
+                        "/activity/assets/membrane_1_white.png",
+                        "/activity/assets/membrane_1_gray.png",
+                    ],
+                },
+                {
+                    subheading: "",
+                    icons: [
+                        "membrane_2_purple",
+                        "membrane_2_blue",
+                        "membrane_2_pink",
+                        "membrane_2_yellow",
+                        "membrane_2_white",
+                        "membrane_2_gray",
+                    ],
+                    srcs: [
+                        "/activity/assets/membrane_2_purple.png",
+                        "/activity/assets/membrane_2_blue.png",
+                        "/activity/assets/membrane_2_pink.png",
+                        "/activity/assets/membrane_2_yellow.png",
+                        "/activity/assets/membrane_2_white.png",
+                        "/activity/assets/membrane_2_gray.png",
+                    ],
+                },
+                {
+                    subheading: "",
+                    icons: [
+                        "membrane_3_purple",
+                        "membrane_3_blue",
+                        "membrane_3_pink",
+                        "membrane_3_yellow",
+                        "membrane_3_white",
+                        "membrane_3_gray",
+                    ],
+                    srcs: [
+                        "/activity/assets/membrane_3_purple.png",
+                        "/activity/assets/membrane_3_blue.png",
+                        "/activity/assets/membrane_3_pink.png",
+                        "/activity/assets/membrane_3_yellow.png",
+                        "/activity/assets/membrane_3_white.png",
+                        "/activity/assets/membrane_3_gray.png",
+                    ],
+                },
+                {
+                    subheading: "",
+                    icons: [
+                        "membrane_4_purple",
+                        "membrane_4_blue",
+                        "membrane_4_pink",
+                        "membrane_4_yellow",
+                        "membrane_4_white",
+                        "membrane_4_gray",
+                    ],
+                    srcs: [
+                        "/activity/assets/membrane_4_purple.png",
+                        "/activity/assets/membrane_4_blue.png",
+                        "/activity/assets/membrane_4_pink.png",
+                        "/activity/assets/membrane_4_yellow.png",
+                        "/activity/assets/membrane_4_white.png",
+                        "/activity/assets/membrane_4_gray.png",
+                    ],
+                },
+                {
+                    subheading: "",
+                    icons: [
+                        "membrane_5_purple",
+                        "membrane_5_blue",
+                        "membrane_5_pink",
+                        "membrane_5_yellow",
+                        "membrane_5_white",
+                        "membrane_5_gray",
+                    ],
+                    srcs: [
+                        "/activity/assets/membrane_5_purple.png",
+                        "/activity/assets/membrane_5_blue.png",
+                        "/activity/assets/membrane_5_pink.png",
+                        "/activity/assets/membrane_5_yellow.png",
+                        "/activity/assets/membrane_5_white.png",
+                        "/activity/assets/membrane_5_gray.png",
                     ],
                 },
             ],

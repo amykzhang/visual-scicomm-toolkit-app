@@ -82,12 +82,68 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     const Arrow = isExpanded ? RightArrow : LeftArrow;
 
     const elements = activity.elements;
-    const sections = activity.elements.images.sections;
+    const image_sections = activity.elements.images.sections;
+    const shapes = activity.elements.shapes;
+    const lines = activity.elements.lines;
+
+    const TextSection = () => {
+        return (
+            <>
+                <ImageSubheadingText>
+                    {elements.text.heading}
+                </ImageSubheadingText>
+                <ElementsRow>
+                    <TextTool />
+                </ElementsRow>
+            </>
+        );
+    };
+
+    const LinesSection = () => {
+        return (
+            <>
+                <ImageSubheadingText>{lines.heading}</ImageSubheadingText>
+                <ElementsRow>
+                    {lines.srcs.map((src, i) => (
+                        <ImageTool
+                            key={i}
+                            src={src}
+                            name={lines.icons[i]}
+                            images={images}
+                            setImages={setImages}
+                            stageRef={stageRef}
+                        />
+                    ))}
+                    <Doodle />
+                </ElementsRow>
+            </>
+        );
+    };
+
+    const ShapeSection = () => {
+        return (
+            <>
+                <ImageSubheadingText>{shapes.heading}</ImageSubheadingText>
+                <ElementsRow>
+                    {shapes.srcs.map((src, i) => (
+                        <ImageTool
+                            key={i}
+                            src={src}
+                            name={lines.icons[i]}
+                            images={images}
+                            setImages={setImages}
+                            stageRef={stageRef}
+                        />
+                    ))}
+                </ElementsRow>
+            </>
+        );
+    };
 
     const ImageSection = () => {
         return (
             <>
-                {sections.map((section, i) => (
+                {image_sections.map((section, i) => (
                     <div key={i}>
                         <ImageSubheadingText>
                             {section.subheading}
@@ -98,7 +154,7 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
                                 <ImageTool
                                     key={j}
                                     src={src}
-                                    name={section.icons[i]}
+                                    name={section.icons[j]}
                                     images={images}
                                     setImages={setImages}
                                     stageRef={stageRef}
@@ -121,18 +177,10 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
                     <PenAndRuler />
                     <typography.LargeText>Elements</typography.LargeText>
                 </SideBarHeader>
-                <typography.BoldMediumText>Text</typography.BoldMediumText>
-                <TextTool />
-                <typography.BoldMediumText>Lines</typography.BoldMediumText>
-                <ElementTool
-                // data-isactive={app.currentToolId === "draw"}
-                // onClick={() => app.setSelectedTool("draw")}
-                >
-                    <Doodle />
-                </ElementTool>
-                <typography.BoldMediumText>Shapes</typography.BoldMediumText>
-                todo
-                <typography.BoldMediumText>Images</typography.BoldMediumText>
+
+                <TextSection />
+                <LinesSection />
+                <ShapeSection />
                 <ImageSection />
             </ElementsMenuContainer>
         </ElementsPanelContainer>
