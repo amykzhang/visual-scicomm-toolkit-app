@@ -214,9 +214,7 @@ export default function App() {
                         );
                     })}
                 </Layer>
-                <Layer id="shape-layer"></Layer>
-                <Layer id="text-layer"></Layer>
-                <Layer id="draw-layer"></Layer>
+                <Layer id="elements-layer"></Layer>
                 <Layer id="comment-layer"></Layer>
             </Stage>
         </AppContainer>

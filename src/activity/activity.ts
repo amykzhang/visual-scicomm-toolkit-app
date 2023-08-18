@@ -18,17 +18,29 @@ export type Activity = {
             text: string[];
             icons: string[];
             srcs: string[];
+            sizes: {
+                width: number;
+                height: number;
+            }[];
         };
         lines: {
             heading: string;
             icons: string[];
             srcs: string[];
+            sizes: {
+                width: number;
+                height: number;
+            }[];
         };
         shapes: {
             heading: string;
             shapes: string[];
             icons: string[];
             srcs: string[];
+            sizes: {
+                width: number;
+                height: number;
+            }[];
         };
         images: {
             heading: string;
@@ -36,6 +48,10 @@ export type Activity = {
                 subheading: string;
                 icons: string[];
                 srcs: string[];
+                sizes: {
+                    width: number;
+                    height: number;
+                }[];
             }[];
         };
     };
@@ -77,6 +93,7 @@ const activity_visual_strategies: Activity = {
             text: ["TextBox"],
             icons: ["text_box"],
             srcs: ["/activity/assets/text_box.png"],
+            sizes: [{ width: 78, height: 27 }],
         },
         lines: {
             heading: "Lines",
@@ -108,6 +125,20 @@ const activity_visual_strategies: Activity = {
                 "/activity/assets/label_left_curve2_arrow.png",
                 "/activity/assets/label_right_curve2_arrow.png",
             ],
+            sizes: [
+                { width: 65, height: 10 },
+                { width: 65, height: 10 },
+                { width: 65, height: 10 },
+                { width: 65, height: 10 },
+                { width: 65, height: 25 },
+                { width: 65, height: 25 },
+                { width: 65, height: 35 },
+                { width: 65, height: 35 },
+                { width: 65, height: 30 },
+                { width: 65, height: 30 },
+                { width: 50, height: 50 },
+                { width: 50, height: 50 },
+            ],
         },
         shapes: {
             heading: "Shapes",
@@ -135,6 +166,14 @@ const activity_visual_strategies: Activity = {
                 "/activity/assets/circle_outline.png",
                 "/activity/assets/triangle_outline.png",
             ],
+            sizes: [
+                { width: 20, height: 20 },
+                { width: 20, height: 20 },
+                { width: 20, height: 20 },
+                { width: 20, height: 20 },
+                { width: 20, height: 20 },
+                { width: 20, height: 20 },
+            ],
         },
         images: {
             heading: "Images",
@@ -157,6 +196,14 @@ const activity_visual_strategies: Activity = {
                         "/activity/assets/molecule_white.png",
                         "/activity/assets/molecule_gray.png",
                     ],
+                    sizes: [
+                        { width: 42, height: 42 },
+                        { width: 42, height: 42 },
+                        { width: 42, height: 42 },
+                        { width: 42, height: 42 },
+                        { width: 42, height: 42 },
+                        { width: 42, height: 42 },
+                    ],
                 },
                 {
                     subheading: "Receptor Y",
@@ -176,6 +223,14 @@ const activity_visual_strategies: Activity = {
                         "/activity/assets/receptor_white.png",
                         "/activity/assets/receptor_gray.png",
                     ],
+                    sizes: [
+                        { width: 42, height: 82 },
+                        { width: 42, height: 82 },
+                        { width: 42, height: 82 },
+                        { width: 42, height: 82 },
+                        { width: 42, height: 82 },
+                        { width: 42, height: 82 },
+                    ],
                 },
                 {
                     subheading: "Organelle",
@@ -190,6 +245,12 @@ const activity_visual_strategies: Activity = {
                         "/activity/assets/organelle_blue.png",
                         "/activity/assets/organelle_pink.png",
                         "/activity/assets/organelle_yellow.png",
+                    ],
+                    sizes: [
+                        { width: 65, height: 72 },
+                        { width: 65, height: 72 },
+                        { width: 65, height: 72 },
+                        { width: 65, height: 72 },
                     ],
                 },
                 {
@@ -210,6 +271,14 @@ const activity_visual_strategies: Activity = {
                         "/activity/assets/protein_white.png",
                         "/activity/assets/protein_gray.png",
                     ],
+                    sizes: [
+                        { width: 28, height: 28 },
+                        { width: 28, height: 28 },
+                        { width: 28, height: 28 },
+                        { width: 28, height: 28 },
+                        { width: 28, height: 28 },
+                        { width: 28, height: 28 },
+                    ],
                 },
                 {
                     subheading: "Cell membranes",
@@ -220,76 +289,28 @@ const activity_visual_strategies: Activity = {
                         "membrane_1_yellow",
                         "membrane_1_white",
                         "membrane_1_gray",
-                    ],
-                    srcs: [
-                        "/activity/assets/membrane_1_purple.png",
-                        "/activity/assets/membrane_1_blue.png",
-                        "/activity/assets/membrane_1_pink.png",
-                        "/activity/assets/membrane_1_yellow.png",
-                        "/activity/assets/membrane_1_white.png",
-                        "/activity/assets/membrane_1_gray.png",
-                    ],
-                },
-                {
-                    subheading: "",
-                    icons: [
+
                         "membrane_2_purple",
                         "membrane_2_blue",
                         "membrane_2_pink",
                         "membrane_2_yellow",
                         "membrane_2_white",
                         "membrane_2_gray",
-                    ],
-                    srcs: [
-                        "/activity/assets/membrane_2_purple.png",
-                        "/activity/assets/membrane_2_blue.png",
-                        "/activity/assets/membrane_2_pink.png",
-                        "/activity/assets/membrane_2_yellow.png",
-                        "/activity/assets/membrane_2_white.png",
-                        "/activity/assets/membrane_2_gray.png",
-                    ],
-                },
-                {
-                    subheading: "",
-                    icons: [
+
                         "membrane_3_purple",
                         "membrane_3_blue",
                         "membrane_3_pink",
                         "membrane_3_yellow",
                         "membrane_3_white",
                         "membrane_3_gray",
-                    ],
-                    srcs: [
-                        "/activity/assets/membrane_3_purple.png",
-                        "/activity/assets/membrane_3_blue.png",
-                        "/activity/assets/membrane_3_pink.png",
-                        "/activity/assets/membrane_3_yellow.png",
-                        "/activity/assets/membrane_3_white.png",
-                        "/activity/assets/membrane_3_gray.png",
-                    ],
-                },
-                {
-                    subheading: "",
-                    icons: [
+
                         "membrane_4_purple",
                         "membrane_4_blue",
                         "membrane_4_pink",
                         "membrane_4_yellow",
                         "membrane_4_white",
                         "membrane_4_gray",
-                    ],
-                    srcs: [
-                        "/activity/assets/membrane_4_purple.png",
-                        "/activity/assets/membrane_4_blue.png",
-                        "/activity/assets/membrane_4_pink.png",
-                        "/activity/assets/membrane_4_yellow.png",
-                        "/activity/assets/membrane_4_white.png",
-                        "/activity/assets/membrane_4_gray.png",
-                    ],
-                },
-                {
-                    subheading: "",
-                    icons: [
+
                         "membrane_5_purple",
                         "membrane_5_blue",
                         "membrane_5_pink",
@@ -298,12 +319,76 @@ const activity_visual_strategies: Activity = {
                         "membrane_5_gray",
                     ],
                     srcs: [
+                        "/activity/assets/membrane_1_purple.png",
+                        "/activity/assets/membrane_1_blue.png",
+                        "/activity/assets/membrane_1_pink.png",
+                        "/activity/assets/membrane_1_yellow.png",
+                        "/activity/assets/membrane_1_white.png",
+                        "/activity/assets/membrane_1_gray.png",
+
+                        "/activity/assets/membrane_2_purple.png",
+                        "/activity/assets/membrane_2_blue.png",
+                        "/activity/assets/membrane_2_pink.png",
+                        "/activity/assets/membrane_2_yellow.png",
+                        "/activity/assets/membrane_2_white.png",
+                        "/activity/assets/membrane_2_gray.png",
+
+                        "/activity/assets/membrane_3_purple.png",
+                        "/activity/assets/membrane_3_blue.png",
+                        "/activity/assets/membrane_3_pink.png",
+                        "/activity/assets/membrane_3_yellow.png",
+                        "/activity/assets/membrane_3_white.png",
+                        "/activity/assets/membrane_3_gray.png",
+
+                        "/activity/assets/membrane_4_purple.png",
+                        "/activity/assets/membrane_4_blue.png",
+                        "/activity/assets/membrane_4_pink.png",
+                        "/activity/assets/membrane_4_yellow.png",
+                        "/activity/assets/membrane_4_white.png",
+                        "/activity/assets/membrane_4_gray.png",
+
                         "/activity/assets/membrane_5_purple.png",
                         "/activity/assets/membrane_5_blue.png",
                         "/activity/assets/membrane_5_pink.png",
                         "/activity/assets/membrane_5_yellow.png",
                         "/activity/assets/membrane_5_white.png",
                         "/activity/assets/membrane_5_gray.png",
+                    ],
+                    sizes: [
+                        { width: 92, height: 48 },
+                        { width: 92, height: 48 },
+                        { width: 92, height: 48 },
+                        { width: 92, height: 48 },
+                        { width: 92, height: 48 },
+                        { width: 92, height: 48 },
+
+                        { width: 92, height: 50 },
+                        { width: 92, height: 50 },
+                        { width: 92, height: 50 },
+                        { width: 92, height: 50 },
+                        { width: 92, height: 50 },
+                        { width: 92, height: 50 },
+
+                        { width: 92, height: 24 },
+                        { width: 92, height: 24 },
+                        { width: 92, height: 24 },
+                        { width: 92, height: 24 },
+                        { width: 92, height: 24 },
+                        { width: 92, height: 24 },
+
+                        { width: 92, height: 36 },
+                        { width: 92, height: 36 },
+                        { width: 92, height: 36 },
+                        { width: 92, height: 36 },
+                        { width: 92, height: 36 },
+                        { width: 92, height: 36 },
+
+                        { width: 92, height: 92 },
+                        { width: 92, height: 92 },
+                        { width: 92, height: 92 },
+                        { width: 92, height: 92 },
+                        { width: 92, height: 92 },
+                        { width: 92, height: 92 },
                     ],
                 },
             ],

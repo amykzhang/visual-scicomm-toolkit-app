@@ -1,4 +1,4 @@
-import { FC, SyntheticEvent, useEffect, useState } from "react";
+import { FC } from "react";
 import Konva from "konva";
 import styled from "styled-components";
 import { ImageProp } from "../utils/interfaces";
@@ -21,6 +21,7 @@ const StyledImage = styled.img`
 interface ImageToolProps {
     src: string;
     name: string;
+    size: { width: number; height: number };
     images: ImageProp[];
     setImages: React.Dispatch<React.SetStateAction<ImageProp[]>>;
     stageRef: React.MutableRefObject<Konva.Stage | null>;
@@ -29,38 +30,36 @@ interface ImageToolProps {
 export const ImageTool: FC<ImageToolProps> = ({
     src,
     name,
+    size,
     images,
     setImages,
     stageRef,
 }) => {
-    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+    console.log(size);
+    const dimensions = size;
     const [image] = useImage(src);
 
     function putImageOnCanvas(x: number, y: number) {
-        console.log(src);
+        console.log(src, dimensions.width, dimensions.height);
+        if (image !== undefined) {
+            image.width = dimensions.width;
+            image.height = dimensions.height;
 
-        setImages([
-            ...images,
-            {
-                id: uuid(),
-                x: x,
-                y: y,
-                width: dimensions.width,
-                height: dimensions.height,
-                rotation: 0,
-                isDragging: false,
-                image: image,
-            },
-        ]);
+            setImages([
+                ...images,
+                {
+                    id: uuid(),
+                    x: x,
+                    y: y,
+                    width: dimensions.width,
+                    height: dimensions.height,
+                    rotation: 0,
+                    isDragging: false,
+                    image: image,
+                },
+            ]);
+        }
     }
-
-    const handleImageLoad = (e: SyntheticEvent) => {
-        setDimensions({
-            width: e.currentTarget.clientWidth,
-            height: e.currentTarget.clientHeight,
-        });
-    };
-
     const handleImageClick = () => {
         console.log("handleImageClick", dimensions.width, dimensions.height);
     };
@@ -87,7 +86,8 @@ export const ImageTool: FC<ImageToolProps> = ({
         <StyledImage
             src={src}
             title={name}
-            onLoad={handleImageLoad}
+            width={dimensions.width}
+            height={dimensions.height}
             onClick={handleImageClick}
             onDragStart={handleImageDragStart}
             onDragEnd={handleImageDragEnd}

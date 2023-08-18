@@ -36,7 +36,7 @@ const ElementsRow = styled.div`
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-between;
-    gap: 3px;
+    gap: 12px 3px;
     width: 288px;
 `;
 
@@ -100,15 +100,17 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     };
 
     const LinesSection = () => {
+        const { srcs, icons, sizes } = lines;
         return (
             <>
                 <ImageSubheadingText>{lines.heading}</ImageSubheadingText>
                 <ElementsRow>
-                    {lines.srcs.map((src, i) => (
+                    {srcs.map((src, i) => (
                         <ImageTool
                             key={i}
                             src={src}
-                            name={lines.icons[i]}
+                            name={icons[i]}
+                            size={sizes[i]}
                             images={images}
                             setImages={setImages}
                             stageRef={stageRef}
@@ -121,15 +123,17 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     };
 
     const ShapeSection = () => {
+        const { heading, srcs, icons, sizes } = shapes;
         return (
             <>
-                <ImageSubheadingText>{shapes.heading}</ImageSubheadingText>
+                <ImageSubheadingText>{heading}</ImageSubheadingText>
                 <ElementsRow>
-                    {shapes.srcs.map((src, i) => (
+                    {srcs.map((src, i) => (
                         <ImageTool
                             key={i}
                             src={src}
-                            name={lines.icons[i]}
+                            name={icons[i]}
+                            size={sizes[i]}
                             images={images}
                             setImages={setImages}
                             stageRef={stageRef}
@@ -154,6 +158,7 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
                                 <ImageTool
                                     key={j}
                                     src={src}
+                                    size={section.sizes[j]}
                                     name={section.icons[j]}
                                     images={images}
                                     setImages={setImages}
