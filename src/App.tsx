@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Stage, Layer, Circle, Image } from "react-konva";
+import { Stage, Layer, Image } from "react-konva";
 import Konva from "konva";
 import styled from "styled-components";
 import { StageViewManager } from "./functions";
@@ -15,7 +15,12 @@ import typography from "./styles/typography";
 import { ExportArea } from "./components/ExportArea";
 import { ExitCommentViewButton } from "./components/Components";
 import activity_visual_strategies from "./activity/activity";
-import { CommentViewProp, ImageProp } from "./utils/interfaces";
+import {
+    CommentViewProp,
+    ImageProp,
+    canvasStateProp,
+    uiStateProp,
+} from "./utils/interfaces";
 
 const activity = activity_visual_strategies;
 const localKey = "konva-canvas";
@@ -32,14 +37,6 @@ const PanelsContainer = styled.div`
     z-index: 300;
     pointer-events: none;
 `;
-
-function saveCanvasState(elements: any[]) {
-    localStorage.setItem(localKey, JSON.stringify(elements));
-}
-
-function getCanvasState() {
-    return localStorage.getItem(localKey);
-}
 
 export default function App() {
     // Images
@@ -121,43 +118,110 @@ export default function App() {
         draggable: view === STAGE_VIEW.select,
     };
 
-    function printPosition(e: Konva.KonvaEventObject<MouseEvent>) {
+    function debug(e: KeyboardEvent) {
+        if (e.key === "1") {
+            console.log("save to local storage");
+            const str = saveToLocalStorage();
+            console.log(str);
+        } else if (e.key === "2") {
+            console.log("load from local storage");
+            const canvasState = loadFromLocalStorage();
+            setCanvasState(canvasState);
+        } else if (e.key === "3") {
+            console.log("clear local storage");
+            window.localStorage.removeItem(localKey);
+        } else if (e.key === "4") {
+            console.log("print uistate");
+            console.log(uiState);
+        }
+    }
+
+    document.addEventListener("keydown", debug);
+
+    // UI State
+    const [uiState, setUiState] = useState<uiStateProp>({
+        view: STAGE_VIEW.select,
+        isLeftPanelOpen: true,
+        isRightPanelOpen: true,
+    });
+
+    function toJSON(elements: ImageProp[]) {
+        return JSON.stringify(elements);
+    }
+
+    function reconstructImagesFromJSON(imagesJSON: string) {
+        const images = JSON.parse(imagesJSON);
+        const reconstructedImages = images.map((image: ImageProp) => {
+            const imageElement = new window.Image();
+            imageElement.width = image.width;
+            imageElement.height = image.height;
+            imageElement.src = image.src;
+            return {
+                ...image,
+                image: imageElement,
+            };
+        });
+        return reconstructedImages;
+    }
+
+    function saveToLocalStorage() {
         if (stageRef.current !== null) {
             const stage = stageRef.current;
 
-            //     console.log("Stage Coord: ", stage.x(), stage.y());
+            const canvasState = {
+                images: toJSON(images),
+                stagePosition: stage.getAbsolutePosition(),
+                zoomLevel: zoomLevel,
+                uiState: uiState,
+            };
+            const canvasStateJSON = JSON.stringify(canvasState);
 
-            const pointer = stage.getPointerPosition();
-            console.log(
-                "Pointer Coord: ",
-                pointer?.x as number,
-                pointer?.y as number
-            );
-
-            //     console.log(
-            //         "Pointer relative to stage:",
-            //         -stage.x() + (pointer?.x as number),
-            //         -stage.y() + (pointer?.y as number)
-            //     );
-
-            //     console.log("Zoom: ", stageRef.current?.scale());
-
-            //     console.log(
-            //         "Window Dimensions: ",
-            //         window.innerWidth,
-            //         window.innerHeight
-            //     );
+            window.localStorage.setItem(localKey, canvasStateJSON);
+            return canvasStateJSON;
         }
-        console.log(images);
+    }
+
+    function loadFromLocalStorage() {
+        const canvasStateJSON = window.localStorage.getItem(localKey);
+        if (canvasStateJSON !== null) {
+            const canvasState = JSON.parse(canvasStateJSON);
+            return canvasState;
+        }
+    }
+
+    function setCanvasState(canvasState: canvasStateProp) {
+        const reconstructedImages = reconstructImagesFromJSON(
+            canvasState.images
+        );
+        setImages(reconstructedImages);
+        setView(canvasState.uiState.view);
+        setUiState(canvasState.uiState);
+
+        if (stageRef.current !== null) {
+            const stage = stageRef.current;
+            stage.setAbsolutePosition(canvasState.stagePosition);
+            stage.scale({
+                x: canvasState.zoomLevel / 100,
+                y: canvasState.zoomLevel / 100,
+            });
+        }
     }
 
     // Load Images from Local Storage
     useEffect(() => {
-        const canvasState = getCanvasState();
-        if (canvasState !== null) {
-            setImages(JSON.parse(canvasState));
+        const canvasState = loadFromLocalStorage();
+        if (canvasState !== undefined) {
+            setCanvasState(canvasState);
         }
     }, []);
+
+    const toggleLeftPanel = () => {
+        setUiState({ ...uiState, isLeftPanelOpen: !uiState.isLeftPanelOpen });
+    };
+
+    const toggleRightPanel = () => {
+        setUiState({ ...uiState, isRightPanelOpen: !uiState.isRightPanelOpen });
+    };
 
     return (
         <AppContainer>
@@ -171,12 +235,18 @@ export default function App() {
                     />
                     <ExitCommentView commentView={commentView} />
                 </TopZone>
-                <ActivityPanel activity={activity} />
+                <ActivityPanel
+                    activity={activity}
+                    isOpen={uiState.isLeftPanelOpen}
+                    handleToggle={toggleLeftPanel}
+                />
                 <ElementsPanel
                     activity={activity}
                     images={images}
                     setImages={setImages}
                     stageRef={stageRef}
+                    isOpen={uiState.isRightPanelOpen}
+                    handleToggle={toggleRightPanel}
                 />
                 <BottomZone>
                     <ZoomPanel
@@ -195,7 +265,6 @@ export default function App() {
                 onWheel={handleWheel}
                 ref={stageRef}
                 fill={commentView.state.backgroundColor}
-                onClick={printPosition}
             >
                 <Layer id="export-layer">
                     <ExportArea {...activity.canvas_size} />
@@ -208,6 +277,7 @@ export default function App() {
                                 id={image.id}
                                 x={image.x}
                                 y={image.y}
+                                offset={image.offset}
                                 image={image.image}
                                 onDragStart={handleDragStart(images, setImages)}
                                 onDragEnd={handleDragEnd(images, setImages)}
@@ -216,8 +286,7 @@ export default function App() {
                         );
                     })}
                 </Layer>
-                {/* <Layer id="elements-layer"></Layer>
-                <Layer id="comment-layer"></Layer> */}
+                <Layer id="comment-layer"></Layer>
             </Stage>
         </AppContainer>
     );

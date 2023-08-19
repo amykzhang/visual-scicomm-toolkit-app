@@ -68,6 +68,8 @@ interface ElementsMenuProps {
     images: ImageProp[];
     setImages: React.Dispatch<React.SetStateAction<ImageProp[]>>;
     stageRef: React.MutableRefObject<Konva.Stage | null>;
+    isOpen: boolean;
+    handleToggle: () => void;
 }
 
 export const ElementsPanel: FC<ElementsMenuProps> = ({
@@ -75,11 +77,11 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     images,
     setImages,
     stageRef,
+    isOpen,
+    handleToggle,
 }) => {
     // For expanding and collapsing the sidebar
-    const [isExpanded, setIsExpanded] = useState(true);
-    const toggleDisplay = () => setIsExpanded(!isExpanded);
-    const Arrow = isExpanded ? RightArrow : LeftArrow;
+    const Arrow = isOpen ? RightArrow : LeftArrow;
 
     const elements = activity.elements;
     const image_sections = activity.elements.images.sections;
@@ -173,8 +175,8 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     };
 
     return (
-        <ElementsPanelContainer className={isExpanded ? "" : "slide-right"}>
-            <ElementsToggle onClick={toggleDisplay}>
+        <ElementsPanelContainer className={isOpen ? "" : "slide-right"}>
+            <ElementsToggle onClick={handleToggle}>
                 <Arrow />
             </ElementsToggle>
             <ElementsMenuContainer>

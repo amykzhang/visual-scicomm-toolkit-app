@@ -17,6 +17,8 @@ import { ReactComponent as Notebook } from "../assets/notebook.svg";
 
 interface ActivityPanelProps {
     activity: Activity;
+    isOpen: boolean;
+    handleToggle: () => void;
 }
 
 const ActivityPanelContainer = styled(SideBar)`
@@ -88,14 +90,16 @@ const Instructions = (activity: Activity) => {
     );
 };
 
-export const ActivityPanel: React.FC<ActivityPanelProps> = ({ activity }) => {
+export const ActivityPanel: React.FC<ActivityPanelProps> = ({
+    activity,
+    isOpen,
+    handleToggle,
+}) => {
     // For expanding and collapsing the sidebar
-    const [isExpanded, setIsExpanded] = useState(true);
-    const Arrow = isExpanded ? LeftArrow : RightArrow;
-    const toggleDisplay = () => setIsExpanded(!isExpanded);
+    const Arrow = isOpen ? LeftArrow : RightArrow;
 
     return (
-        <ActivityPanelContainer className={isExpanded ? "" : "slide-left"}>
+        <ActivityPanelContainer className={isOpen ? "" : "slide-left"}>
             <ActivityContentContainer>
                 <SideBarHeader>
                     <Notebook />
@@ -135,7 +139,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({ activity }) => {
                     <Instructions {...activity} />
                 </Top30>
             </ActivityContentContainer>
-            <ActivityToggle onClick={toggleDisplay}>
+            <ActivityToggle onClick={handleToggle}>
                 <Arrow />
             </ActivityToggle>
         </ActivityPanelContainer>
