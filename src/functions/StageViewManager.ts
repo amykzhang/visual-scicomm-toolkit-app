@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import Konva from "konva";
 import { STAGE_VIEW } from "../utils/enums";
 
-const zoomScale = 1.03;
+const zoomScale = 1.1;
 const zoomConstants = [
     2, 3, 6, 13, 25, 50, 100, 200, 300, 400, 800, 1600, 3200, 6400, 12800,
     25600,
@@ -48,37 +48,6 @@ export const StageViewManager = (canvas_size: {
 
     // Zooming
     const stageRef = useRef<Konva.Stage | null>(null);
-    // let lastCenter: { x: number; y: number } | null;
-    // let lastDist = 0;
-
-    // function zoomStage(event: Konva.KonvaEventObject<WheelEvent>) {
-    //     event.evt.preventDefault();
-
-    //     if (stageRef.current !== null) {
-    //         const stage = stageRef.current;
-    //         const oldScale = stage.scaleX();
-    //         const pointer = stage.getPointerPosition();
-    //         const pointerX = pointer?.x as number;
-    //         const pointerY = pointer?.y as number;
-    //         const mousePointTo = {
-    //             x: (pointerX - stage.x()) / oldScale,
-    //             y: (pointerY - stage.y()) / oldScale,
-    //         };
-    //         const newScale =
-    //             event.evt.deltaY > 0
-    //                 ? oldScale * zoomScale
-    //                 : oldScale / zoomScale;
-    //         stage.scale({ x: newScale, y: newScale });
-
-    //         const newPos = {
-    //             x: pointerX - mousePointTo.x * newScale,
-    //             y: pointerY - mousePointTo.y * newScale,
-    //         };
-
-    //         stage.position(newPos);
-    //         stage.batchDraw();
-    //     }
-    // }
 
     function handleZoom(
         oldScale: number,
@@ -215,77 +184,6 @@ export const StageViewManager = (canvas_size: {
         }
     }
 
-    // function handleTouchMove(e: Konva.KonvaEventObject<TouchEvent>) {
-    //     console.log("touchmove");
-    //     e.evt.preventDefault();
-
-    //     var touch1 = e.evt.touches[0];
-    //     var touch2 = e.evt.touches[1];
-
-    //     if (stageRef.current !== null) {
-    //         const stage = stageRef.current;
-
-    //         if (touch1 && touch2) {
-    //             if (stage.isDragging()) {
-    //                 stage.stopDrag();
-    //             }
-
-    //             var p1 = {
-    //                 x: touch1.clientX,
-    //                 y: touch1.clientY,
-    //             };
-    //             var p2 = {
-    //                 x: touch2.clientX,
-    //                 y: touch2.clientY,
-    //             };
-
-    //             if (!lastCenter) {
-    //                 lastCenter = getCenter(p1, p2);
-    //                 return;
-    //             }
-    //             var newCenter = getCenter(p1, p2);
-
-    //             var dist = getDistance(p1, p2);
-
-    //             if (!lastDist) {
-    //                 lastDist = dist;
-    //             }
-
-    //             // local coordinates of center point
-    //             var pointTo = {
-    //                 x: (newCenter.x - stage.x()) / stage.scaleX(),
-    //                 y: (newCenter.y - stage.y()) / stage.scaleX(),
-    //             };
-
-    //             var scale = stage.scaleX() * (dist / lastDist);
-
-    //             stage.scaleX(scale);
-    //             stage.scaleY(scale);
-
-    //             // calculate new position of the stage
-    //             var dx = newCenter.x - lastCenter.x;
-    //             var dy = newCenter.y - lastCenter.y;
-
-    //             var newPos = {
-    //                 x: newCenter.x - pointTo.x * scale + dx,
-    //                 y: newCenter.y - pointTo.y * scale + dy,
-    //             };
-
-    //             stage.position(newPos);
-    //             stage.batchDraw();
-
-    //             lastDist = dist;
-    //             lastCenter = newCenter;
-    //         }
-    //     }
-    // }
-
-    // function handleTouchEnd() {
-    //     console.log("touchend");
-    //     lastCenter = null;
-    //     lastDist = 0;
-    // }
-
     // TODO: center stage or last known positon, zoom,
     useEffect(() => {
         zoomFit();
@@ -295,9 +193,6 @@ export const StageViewManager = (canvas_size: {
         view,
         setView,
         stageRef,
-        // zoomStage,
-        // handleTouchMove,
-        // handleTouchEnd,
         handleWheel,
         zoomLevel,
         zoomIn,
