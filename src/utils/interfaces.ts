@@ -1,3 +1,5 @@
+import { STAGE_VIEW } from "./enums";
+
 export interface CommentStateProp {
     active: boolean;
     backgroundColor: string;
@@ -19,4 +21,22 @@ export interface ImageProp {
     rotation: number;
     isDragging: boolean;
     image: HTMLImageElement | undefined;
+    src: string;
+    offset?: {
+        x: number;
+        y: number;
+    };
+}
+
+export interface canvasStateProp {
+    images: string;
+    stagePosition: { x: number; y: number };
+    zoomLevel: number;
+    uiState: uiStateProp;
+}
+
+export interface uiStateProp {
+    view: STAGE_VIEW;
+    isLeftPanelOpen: boolean;
+    isRightPanelOpen: boolean;
 }
