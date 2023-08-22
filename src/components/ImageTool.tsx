@@ -60,17 +60,9 @@ export const ImageTool: FC<ImageToolProps> = ({
             },
         ]);
     }
-    const handleImageClick = () => {
-        console.log("handleImageClick", dimensions.width, dimensions.height);
-    };
-
-    const handleImageDragStart = (e: React.DragEvent) => {
-        console.log("handleImageDragStart");
-    };
 
     const handleImageDragEnd = (e: React.DragEvent) => {
         e.preventDefault();
-        console.log("handleImageDragEnd");
         if (stageRef.current !== null) {
             const stage = stageRef.current;
             const x = (e.clientX - stage.x()) / stage.scaleX();
@@ -88,8 +80,6 @@ export const ImageTool: FC<ImageToolProps> = ({
             title={name}
             width={dimensions.width}
             height={dimensions.height}
-            onClick={handleImageClick}
-            onDragStart={handleImageDragStart}
             onDragEnd={handleImageDragEnd}
         />
     );

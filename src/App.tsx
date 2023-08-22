@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Stage, Layer, Image } from "react-konva";
 import Konva from "konva";
 import styled from "styled-components";
 import { StageViewManager } from "./functions";
 import { CommentViewManager } from "./functions";
-import { STAGE_VIEW } from "./utils/enums";
+import { APP_VIEW } from "./utils/enums";
 import { ElementsPanel } from "./Panels/ElementsPanel";
 import { ToolbarPanel } from "./Panels/ToolbarPanel";
 import { ActivityPanel } from "./Panels/ActivityPanel";
@@ -18,14 +18,16 @@ import activity_visual_strategies from "./activity/activity";
 import {
     CommentViewProp,
     ImageProp,
-    canvasStateProp,
-    uiStateProp,
+    CanvasStateProp,
+    AppStateProp,
+    CanvasStateStringsProp,
 } from "./utils/interfaces";
 
 const activity = activity_visual_strategies;
-const localKey = "konva-canvas";
 
-const AppContainer = styled.div``;
+// TODO: move to utils
+const LOCALSTORAGE_CANVAS_STATE_KEY = "visual-toolkit-canvas";
+const LOCALSTORAGE_APP_STATE_KEY = "visual-toolkit-ui";
 
 const PanelsContainer = styled.div`
     position: fixed;
@@ -39,10 +41,27 @@ const PanelsContainer = styled.div`
 `;
 
 export default function App() {
-    // Images
-    const [images, setImages] = useState<ImageProp[]>([]);
-    let startX = 0;
-    let startY = 0;
+    // Canvas State (images)
+    const [images, setImages] = useState<ImageProp[]>(() => {
+        const saved = retrieveCanvasState();
+        if (saved !== undefined) {
+            return saved.images;
+        } else return [];
+    });
+
+    // App State (stage position, zoom, view, panels)
+    // Center Canvas
+    const { width, height } = activity_visual_strategies.canvas_size;
+    const offsetX = -(window.innerWidth - width) / 2;
+    const offsetY = -(window.innerHeight - height) / 2;
+
+    const [appState, setAppState] = useState<AppStateProp>({
+        stagePosition: { x: -offsetX, y: -offsetY },
+        scaleX: 1,
+        view: APP_VIEW.select,
+        isLeftPanelOpen: true,
+        isRightPanelOpen: true,
+    });
 
     const handleDragStart = (
         elements: any[],
@@ -53,9 +72,6 @@ export default function App() {
             console.log(e.target.x(), e.target.y());
 
             const id = e.target.id();
-
-            startX = e.target.x();
-            startY = e.target.y();
 
             const newElements = elements.map((element) => {
                 return { ...element, isDragging: element.id === id };
@@ -79,7 +95,6 @@ export default function App() {
             const endY = e.target.y();
 
             const newElements = elements.map((element) => {
-                console.log("filtered", element);
                 if (element.isDragging) {
                     return {
                         ...element,
@@ -93,9 +108,16 @@ export default function App() {
             });
 
             setElements(newElements);
-            // saveCanvasState(newElements);
         };
     };
+
+    // function persistCanvasActionWrapper(canvasAction: Function) {
+    //     return (input: any) => {
+    //         console.log("persisting canvas action");
+    //         canvasAction(input);
+    //         persistCanvasState(stateRef.current);
+    //     };
+    // }
 
     // Stage View
     const {
@@ -115,116 +137,176 @@ export default function App() {
 
     const canvasElementConstants = {
         perfectDrawEnabled: false,
-        draggable: view === STAGE_VIEW.select,
+        draggable: view !== APP_VIEW.pan,
     };
 
     function debug(e: KeyboardEvent) {
-        if (e.key === "1") {
-            console.log("save to local storage");
-            const str = saveToLocalStorage();
-            console.log(str);
-        } else if (e.key === "2") {
-            console.log("load from local storage");
-            const canvasState = loadFromLocalStorage();
-            setCanvasState(canvasState);
-        } else if (e.key === "3") {
+        if (e.key === "0") {
             console.log("clear local storage");
-            window.localStorage.removeItem(localKey);
+            window.localStorage.removeItem(LOCALSTORAGE_CANVAS_STATE_KEY);
+            window.localStorage.removeItem(LOCALSTORAGE_APP_STATE_KEY);
+        } else if (e.key === "1") {
+            console.log("saving canvas to local storage");
+            persistCanvasState(images);
+        } else if (e.key === "2") {
+            console.log("save app state to local storage");
+            persistAppState();
+        } else if (e.key === "3") {
+            console.log("load canvas from local storage");
+            const canvasState = retrieveCanvasState();
+
+            if (canvasState !== undefined) {
+                updateCanvasState(canvasState);
+            }
         } else if (e.key === "4") {
-            console.log("print uistate");
-            console.log(uiState);
+            console.log("load app state from local storage");
+            const appState = retrieveAppState();
+            updateAppState(appState);
+        } else if (e.key === "5") {
+            console.log("print canvas state and app state");
+            console.log(images);
+            console.log(appState);
         }
     }
 
     document.addEventListener("keydown", debug);
 
-    // UI State
-    const [uiState, setUiState] = useState<uiStateProp>({
-        view: STAGE_VIEW.select,
-        isLeftPanelOpen: true,
-        isRightPanelOpen: true,
-    });
-
-    function toJSON(elements: ImageProp[]) {
-        return JSON.stringify(elements);
-    }
-
-    function reconstructImagesFromJSON(imagesJSON: string) {
+    function reconstructImagesFromJSON(imagesJSON: string): ImageProp[] {
         const images = JSON.parse(imagesJSON);
-        const reconstructedImages = images.map((image: ImageProp) => {
-            const imageElement = new window.Image();
-            imageElement.width = image.width;
-            imageElement.height = image.height;
-            imageElement.src = image.src;
-            return {
-                ...image,
-                image: imageElement,
-            };
-        });
+        const reconstructedImages: ImageProp[] = images.map(
+            (image: ImageProp) => {
+                const imageElement = new window.Image();
+                imageElement.width = image.width;
+                imageElement.height = image.height;
+                imageElement.src = image.src;
+                return {
+                    ...image,
+                    image: imageElement,
+                };
+            }
+        );
         return reconstructedImages;
     }
 
-    function saveToLocalStorage() {
-        if (stageRef.current !== null) {
-            const stage = stageRef.current;
-
-            const canvasState = {
-                images: toJSON(images),
-                stagePosition: stage.getAbsolutePosition(),
-                zoomLevel: zoomLevel,
-                uiState: uiState,
-            };
-            const canvasStateJSON = JSON.stringify(canvasState);
-
-            window.localStorage.setItem(localKey, canvasStateJSON);
-            return canvasStateJSON;
-        }
-    }
-
-    function loadFromLocalStorage() {
-        const canvasStateJSON = window.localStorage.getItem(localKey);
-        if (canvasStateJSON !== null) {
-            const canvasState = JSON.parse(canvasStateJSON);
-            return canvasState;
-        }
-    }
-
-    function setCanvasState(canvasState: canvasStateProp) {
-        const reconstructedImages = reconstructImagesFromJSON(
-            canvasState.images
+    // Saves each canvas layer/group as string, then stringify canvasState and save to local storage
+    function persistCanvasState(images: ImageProp[]) {
+        window.localStorage.setItem(
+            LOCALSTORAGE_CANVAS_STATE_KEY,
+            JSON.stringify({
+                images: JSON.stringify(images),
+            })
         );
-        setImages(reconstructedImages);
-        setView(canvasState.uiState.view);
-        setUiState(canvasState.uiState);
+    }
 
+    // Returns reconstructed canvas state from local storage
+    function retrieveCanvasState() {
+        const canvasStateJSON = window.localStorage.getItem(
+            LOCALSTORAGE_CANVAS_STATE_KEY
+        );
+
+        if (canvasStateJSON !== null) {
+            const canvasStateStringFields: CanvasStateStringsProp =
+                JSON.parse(canvasStateJSON);
+
+            const persistedCanvasState = {
+                images: reconstructImagesFromJSON(
+                    canvasStateStringFields.images
+                ),
+            };
+
+            return persistedCanvasState;
+        }
+    }
+
+    // update app's current canvas
+    function updateCanvasState(canvasState: CanvasStateProp) {
+        setImages(canvasState.images);
+    }
+
+    // save app state to local storage
+    function persistAppState() {
+        window.localStorage.setItem(
+            LOCALSTORAGE_APP_STATE_KEY,
+            JSON.stringify(appState)
+        );
+    }
+
+    function retrieveAppState(): AppStateProp {
+        const appStateJSON = window.localStorage.getItem(
+            LOCALSTORAGE_APP_STATE_KEY
+        );
+        if (appStateJSON !== null) {
+            const persistedAppState = JSON.parse(appStateJSON);
+            return persistedAppState;
+        } else return appState;
+    }
+
+    function updateAppState(appState: AppStateProp) {
+        setAppState(appState);
+
+        setView(appState.view);
         if (stageRef.current !== null) {
             const stage = stageRef.current;
-            stage.setAbsolutePosition(canvasState.stagePosition);
+            stage.setAbsolutePosition(appState.stagePosition);
             stage.scale({
-                x: canvasState.zoomLevel / 100,
-                y: canvasState.zoomLevel / 100,
+                x: appState.scaleX,
+                y: appState.scaleX,
             });
         }
     }
 
-    // Load Images from Local Storage
+    // Load local storage on inital render
     useEffect(() => {
-        const canvasState = loadFromLocalStorage();
+        console.log("loading from local storage");
+
+        const canvasState = retrieveCanvasState();
         if (canvasState !== undefined) {
-            setCanvasState(canvasState);
+            console.log("canvas state found", canvasState);
+            updateCanvasState(canvasState);
         }
+
+        zoomFit();
+        // const appState = retrieveAppState();
+        // if (appState !== undefined) {
+        //     persistAppState();
+        //     updateAppState(appState);
+        // }
     }, []);
 
+    useEffect(() => {
+        console.log("saving canvas state to local storage");
+
+        persistCanvasState(images);
+    }, [images]);
+
+    // Saves current canvas state
+    // useEffect(() => {
+    //     console.log("saving canvas state to local storage");
+    //     persistCanvasState();
+    // }, [images /* comments, shapes, etc */]);
+
+    // Saves current app state
+    // useEffect(() => {
+    //     console.log("saving app state to local storage");
+    //     persistAppState();
+    // }, [appState]);
+
     const toggleLeftPanel = () => {
-        setUiState({ ...uiState, isLeftPanelOpen: !uiState.isLeftPanelOpen });
+        setAppState({
+            ...appState,
+            isLeftPanelOpen: !appState.isLeftPanelOpen,
+        });
     };
 
     const toggleRightPanel = () => {
-        setUiState({ ...uiState, isRightPanelOpen: !uiState.isRightPanelOpen });
+        setAppState({
+            ...appState,
+            isRightPanelOpen: !appState.isRightPanelOpen,
+        });
     };
 
     return (
-        <AppContainer>
+        <div>
             <PanelsContainer>
                 <TopZone>
                     <TitlePanel {...activity} />
@@ -237,7 +319,7 @@ export default function App() {
                 </TopZone>
                 <ActivityPanel
                     activity={activity}
-                    isOpen={uiState.isLeftPanelOpen}
+                    isOpen={appState.isLeftPanelOpen}
                     handleToggle={toggleLeftPanel}
                 />
                 <ElementsPanel
@@ -245,7 +327,7 @@ export default function App() {
                     images={images}
                     setImages={setImages}
                     stageRef={stageRef}
-                    isOpen={uiState.isRightPanelOpen}
+                    isOpen={appState.isRightPanelOpen}
                     handleToggle={toggleRightPanel}
                 />
                 <BottomZone>
@@ -288,7 +370,7 @@ export default function App() {
                 </Layer>
                 <Layer id="comment-layer"></Layer>
             </Stage>
-        </AppContainer>
+        </div>
     );
 }
 

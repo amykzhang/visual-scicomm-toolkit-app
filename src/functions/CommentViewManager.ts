@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { CommentStateProp } from "../utils/interfaces";
-import { STAGE_VIEW } from "../utils/enums";
+import { APP_VIEW } from "../utils/enums";
 
 const initial_comment_view: CommentStateProp = {
     active: false,
@@ -8,16 +8,16 @@ const initial_comment_view: CommentStateProp = {
 };
 
 interface CommentViewManagerProp {
-    setView: React.Dispatch<React.SetStateAction<STAGE_VIEW>>;
+    setView: React.Dispatch<React.SetStateAction<APP_VIEW>>;
 }
 
 export const CommentViewManager = (
-    setView: React.Dispatch<React.SetStateAction<STAGE_VIEW>>
+    setView: React.Dispatch<React.SetStateAction<APP_VIEW>>
 ) => {
     const [state, setState] = useState<CommentStateProp>(initial_comment_view);
 
     function enter() {
-        setView(STAGE_VIEW.comment);
+        setView(APP_VIEW.comment);
         setState((prev) => {
             return {
                 ...prev,
@@ -27,7 +27,7 @@ export const CommentViewManager = (
     }
 
     function exit() {
-        setView(STAGE_VIEW.select);
+        setView(APP_VIEW.select);
         setState((prev) => {
             return {
                 ...prev,

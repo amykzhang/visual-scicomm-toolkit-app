@@ -47,7 +47,7 @@ interface TitlePanelProps {
 export const TitlePanel: React.FC<TitlePanelProps> = ({ name }) => {
     return (
         <TitlePanelContainer>
-            <Logo>hello</Logo>
+            <Logo>LOGO</Logo>
             <StyledName>
                 <typography.LargeText>{name}</typography.LargeText>
             </StyledName>

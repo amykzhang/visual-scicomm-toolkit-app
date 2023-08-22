@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import Konva from "konva";
-import { STAGE_VIEW } from "../utils/enums";
+import { APP_VIEW } from "../utils/enums";
 
 const zoomScale = 1.1;
 const zoomConstants = [
@@ -12,7 +12,7 @@ export const StageViewManager = (canvas_size: {
     width: number;
     height: number;
 }) => {
-    const [view, setView] = useState(STAGE_VIEW.select);
+    const [view, setView] = useState(APP_VIEW.select);
     const [zoomLevel, setZoomLevel] = useState(100);
 
     // Keyboard shortcuts
@@ -183,11 +183,6 @@ export const StageViewManager = (canvas_size: {
             document.body.requestFullscreen();
         }
     }
-
-    // TODO: center stage or last known positon, zoom,
-    useEffect(() => {
-        zoomFit();
-    }, []);
 
     return {
         view,

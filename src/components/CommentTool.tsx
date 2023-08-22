@@ -1,11 +1,11 @@
-import { STAGE_VIEW } from "../utils/enums";
+import { APP_VIEW } from "../utils/enums";
 import { CommentViewProp } from "../utils/interfaces";
 import { SquareButton } from "./Components";
 import { ReactComponent as CommentIcon } from "../assets/comment.svg";
 
 interface CommentToolProp {
-    view: STAGE_VIEW;
-    setView: React.Dispatch<React.SetStateAction<STAGE_VIEW>>;
+    view: APP_VIEW;
+    setView: React.Dispatch<React.SetStateAction<APP_VIEW>>;
     commentView: CommentViewProp;
 }
 
@@ -14,7 +14,7 @@ export const CommentTool: React.FC<CommentToolProp> = ({
     setView,
     commentView,
 }) => {
-    const isCommentView = view === STAGE_VIEW.comment;
+    const isCommentView = view === APP_VIEW.comment;
 
     function handleToggle() {
         if (isCommentView) {

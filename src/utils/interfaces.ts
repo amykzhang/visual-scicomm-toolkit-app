@@ -1,4 +1,4 @@
-import { STAGE_VIEW } from "./enums";
+import { APP_VIEW } from "./enums";
 
 export interface CommentStateProp {
     active: boolean;
@@ -28,15 +28,21 @@ export interface ImageProp {
     };
 }
 
-export interface canvasStateProp {
-    images: string;
-    stagePosition: { x: number; y: number };
-    zoomLevel: number;
-    uiState: uiStateProp;
+export interface CanvasStateProp {
+    images: ImageProp[];
 }
 
-export interface uiStateProp {
-    view: STAGE_VIEW;
+export interface CanvasStateStringsProp {
+    images: string;
+}
+
+export interface AppStateProp {
+    stagePosition: {
+        x: number;
+        y: number;
+    };
+    scaleX: number;
+    view: APP_VIEW;
     isLeftPanelOpen: boolean;
     isRightPanelOpen: boolean;
 }

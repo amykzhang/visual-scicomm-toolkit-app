@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { STAGE_VIEW } from "../utils/enums";
+import { APP_VIEW } from "../utils/enums";
 import { CommentViewProp } from "../utils/interfaces";
 import { CommentViewManager } from "../functions";
 import { SquareButton } from "../components/Components";
@@ -17,8 +17,8 @@ const ToolbarPanelContainer = styled(CenterBar)`
 `;
 
 interface ToolbarPanelProps {
-    view: STAGE_VIEW;
-    setView: React.Dispatch<React.SetStateAction<STAGE_VIEW>>;
+    view: APP_VIEW;
+    setView: React.Dispatch<React.SetStateAction<APP_VIEW>>;
     commentView: CommentViewProp;
 }
 
@@ -30,15 +30,15 @@ export const ToolbarPanel: React.FC<ToolbarPanelProps> = ({
     return (
         <ToolbarPanelContainer>
             <SquareButton
-                data-isactive={view === STAGE_VIEW.select}
-                onClick={() => setView(STAGE_VIEW.select)}
+                data-isactive={view === APP_VIEW.select}
+                onClick={() => setView(APP_VIEW.select)}
             >
                 <SelectIcon />
             </SquareButton>
 
             <SquareButton
-                data-isactive={view === STAGE_VIEW.pan}
-                onClick={() => setView(STAGE_VIEW.pan)}
+                data-isactive={view === APP_VIEW.pan}
+                onClick={() => setView(APP_VIEW.pan)}
             >
                 <PanIcon />
             </SquareButton>

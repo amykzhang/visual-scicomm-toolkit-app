@@ -1,4 +1,4 @@
-export enum STAGE_VIEW {
+export enum APP_VIEW {
     "select",
     "pan",
     "comment",
