@@ -37,6 +37,15 @@ export const StageViewManager = (canvas_size: {
                 stage.scale({ x: scaleX, y: scaleX });
                 stage.batchDraw();
             }
+        } else {
+            zoomFit();
+            if (stageRef.current !== null) {
+                const stage = stageRef.current;
+                persistance.persistStageState({
+                    stagePosition: stage.getAbsolutePosition(),
+                    scaleX: stage.scaleX(),
+                });
+            }
         }
     }, []);
 
