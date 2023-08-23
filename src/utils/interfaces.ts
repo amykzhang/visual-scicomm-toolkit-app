@@ -36,13 +36,13 @@ export interface CanvasStateStringsProp {
     images: string;
 }
 
-export interface AppStateProp {
-    stagePosition: {
-        x: number;
-        y: number;
-    };
-    scaleX: number;
+export interface UiStateProp {
     view: APP_VIEW;
     isLeftPanelOpen: boolean;
     isRightPanelOpen: boolean;
+}
+
+export interface StageStateProp {
+    stagePosition: { x: number; y: number };
+    scaleX: number;
 }

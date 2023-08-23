@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { CommentStateProp } from "../utils/interfaces";
 import { APP_VIEW } from "../utils/enums";
 
@@ -7,13 +7,7 @@ const initial_comment_view: CommentStateProp = {
     backgroundColor: "white",
 };
 
-interface CommentViewManagerProp {
-    setView: React.Dispatch<React.SetStateAction<APP_VIEW>>;
-}
-
-export const CommentViewManager = (
-    setView: React.Dispatch<React.SetStateAction<APP_VIEW>>
-) => {
+export const CommentViewManager = (setView: (view: APP_VIEW) => void) => {
     const [state, setState] = useState<CommentStateProp>(initial_comment_view);
 
     function enter() {

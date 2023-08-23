@@ -18,7 +18,7 @@ const ToolbarPanelContainer = styled(CenterBar)`
 
 interface ToolbarPanelProps {
     view: APP_VIEW;
-    setView: React.Dispatch<React.SetStateAction<APP_VIEW>>;
+    setView: (view: APP_VIEW) => void;
     commentView: CommentViewProp;
 }
 

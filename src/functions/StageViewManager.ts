@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import Konva from "konva";
 import { APP_VIEW } from "../utils/enums";
+import persistance from "./persistance";
 
 const zoomScale = 1.1;
 const zoomConstants = [
@@ -12,42 +13,63 @@ export const StageViewManager = (canvas_size: {
     width: number;
     height: number;
 }) => {
-    const [view, setView] = useState(APP_VIEW.select);
-    const [zoomLevel, setZoomLevel] = useState(100);
+    const [zoomLevel, setZoomLevel] = useState(() => {
+        const saved = persistance.retrieveStageState();
+        if (saved !== undefined) {
+            const { scaleX } = saved;
+            return Math.floor(scaleX * 100);
+        } else {
+            return 100;
+        }
+    });
 
-    // Keyboard shortcuts
-    let canZoom = true;
-    let metaPressed = false;
-
-    function handleKeyDown(e: KeyboardEvent) {
-        if (e.key === "Meta") metaPressed = true;
-
-        // Zoom shortcuts (shift/meta +, shift/meta -, shift/meta 0)
-        // if (canZoom) {
-        //     if (e.key === "+" || (metaPressed && e.key === "=")) {
-        //         e.preventDefault();
-        //         zoomIn();
-        //     }
-        //     if (e.key === "_" || (metaPressed && e.key === "-")) {
-        //         e.preventDefault();
-        //         zoomOut();
-        //     }
-        //     if (e.key === ")" || (metaPressed && e.key === "0")) {
-        //         e.preventDefault();
-        //         zoomFit();
-        //     }
-        // }
-    }
-
-    function handleKeyUp(e: KeyboardEvent) {
-        metaPressed = false;
-    }
-
-    document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("keyup", handleKeyUp);
-
-    // Zooming
     const stageRef = useRef<Konva.Stage | null>(null);
+
+    // Load persisted stage state on initial load
+    useEffect(() => {
+        const saved = persistance.retrieveStageState();
+
+        if (saved !== undefined) {
+            const { stagePosition, scaleX } = saved;
+            if (stageRef.current !== null) {
+                const stage = stageRef.current;
+                stage.position(stagePosition);
+                stage.scale({ x: scaleX, y: scaleX });
+                stage.batchDraw();
+            }
+        }
+    }, []);
+
+    // // Keyboard shortcuts
+    // let canZoom = true;
+    // let metaPressed = false;
+
+    // function handleKeyDown(e: KeyboardEvent) {
+    //     if (e.key === "Meta") metaPressed = true;
+
+    //     // Zoom shortcuts (shift/meta +, shift/meta -, shift/meta 0)
+    //     // if (canZoom) {
+    //     //     if (e.key === "+" || (metaPressed && e.key === "=")) {
+    //     //         e.preventDefault();
+    //     //         zoomIn();
+    //     //     }
+    //     //     if (e.key === "_" || (metaPressed && e.key === "-")) {
+    //     //         e.preventDefault();
+    //     //         zoomOut();
+    //     //     }
+    //     //     if (e.key === ")" || (metaPressed && e.key === "0")) {
+    //     //         e.preventDefault();
+    //     //         zoomFit();
+    //     //     }
+    //     // }
+    // }
+
+    // function handleKeyUp(e: KeyboardEvent) {
+    //     metaPressed = false;
+    // }
+
+    // document.addEventListener("keydown", handleKeyDown);
+    // document.addEventListener("keyup", handleKeyUp);
 
     function handleZoom(
         oldScale: number,
@@ -104,6 +126,12 @@ export const StageViewManager = (canvas_size: {
                 const pointer = stage.getPointerPosition();
                 if (pointer !== null) handleZoom(oldScale, newScale, pointer);
             }
+
+            // persist stage state
+            persistance.persistStageState({
+                stagePosition: stage.getAbsolutePosition(),
+                scaleX: stage.scaleX(),
+            });
         }
     }
 
@@ -124,6 +152,12 @@ export const StageViewManager = (canvas_size: {
             stage.position(centerPos);
             stage.batchDraw();
             setZoomLevel(100);
+
+            // persist stage state
+            persistance.persistStageState({
+                stagePosition: stage.getAbsolutePosition(),
+                scaleX: stage.scaleX(),
+            });
         }
         return;
     }
@@ -185,8 +219,6 @@ export const StageViewManager = (canvas_size: {
     }
 
     return {
-        view,
-        setView,
         stageRef,
         handleWheel,
         zoomLevel,
