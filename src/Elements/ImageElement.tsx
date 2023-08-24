@@ -7,7 +7,7 @@ import { handleDragEnd, handleDragStart } from "../functions";
 interface ImageElementProps {
     imageProps: ImageProp;
     isSelected: boolean;
-    toggleSelect: any;
+    onSelect: any;
     onChange: any;
     images: ImageProp[];
     setImages: React.Dispatch<React.SetStateAction<ImageProp[]>>;
@@ -17,7 +17,7 @@ interface ImageElementProps {
 const ImageElement = ({
     imageProps,
     isSelected,
-    toggleSelect,
+    onSelect,
     onChange,
     images,
     setImages,
@@ -40,8 +40,8 @@ const ImageElement = ({
         <Fragment>
             <Image
                 {...imageProps}
-                onClick={toggleSelect}
-                onTap={toggleSelect}
+                onClick={onSelect}
+                onTap={onSelect}
                 ref={imageRef}
                 draggable={draggable}
                 onDragStart={handleDragStart(images, setImages)}

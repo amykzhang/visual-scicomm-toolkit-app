@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Stage, Layer, Image, StageProps } from "react-konva";
 import Konva from "konva";
 import styled from "styled-components";
-import { StageViewManager } from "./functions";
+import { KeyPressManager, StageViewManager } from "./functions";
 import { CommentViewManager } from "./functions";
 import { APP_VIEW } from "./utils/enums";
 import { ElementsPanel } from "./Panels/ElementsPanel";
@@ -19,6 +19,7 @@ import { CommentViewProp, ImageProp, UiStateProp } from "./utils/interfaces";
 import { persistance } from "./functions";
 import { ImageElement } from "./Elements";
 import { KonvaEventObject } from "konva/lib/Node";
+import { clear } from "console";
 
 // TODO: make this easier to customize, more modular for creators?
 const activity = activity_visual_strategies;
@@ -35,6 +36,8 @@ const PanelsContainer = styled.div`
 `;
 
 export default function App() {
+    const { shiftKey, ctrlKey, altKey, metaKey } = KeyPressManager();
+
     // App State (stage position, zoom, view, panels)
     const [uiState, setUiState] = useState<UiStateProp>(() => {
         const saved = persistance.retrieveUiState();
@@ -52,6 +55,9 @@ export default function App() {
     const view = uiState.view;
     const setView = (view: APP_VIEW) => {
         setUiState({ ...uiState, view: view });
+        if (view !== APP_VIEW.select) {
+            setSelectedIds([]);
+        }
     };
 
     // Canvas State (images)
@@ -74,10 +80,12 @@ export default function App() {
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
     const addSelectedId = (id: number) => {
+        console.log(id);
         setSelectedIds([...selectedIds, id]);
     };
 
     const removeSelectedId = (id: number) => {
+        console.log(id);
         setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
     };
 
@@ -89,12 +97,57 @@ export default function App() {
         }
     };
 
-    const checkDeselect = (e: KonvaEventObject<MouseEvent>) => {
-        const clickedOnEmpty = e.target === stageRef.current;
-        if (clickedOnEmpty) {
-            setSelectedIds([]);
+    const handleSelect = (id: number) => {
+        if (view === APP_VIEW.select) {
+            if (shiftKey) {
+                toggleSelectedId(id);
+            } else {
+                if (selectedIds.length === 1 && selectedIds.includes(id)) {
+                    setSelectedIds([]);
+                } else {
+                    setSelectedIds([id]);
+                }
+            }
         }
     };
+
+    const handleUnfocus = (e: KonvaEventObject<MouseEvent>) => {
+        if (view === APP_VIEW.select) {
+            const clickedOnEmpty = e.target === stageRef.current;
+            if (clickedOnEmpty) {
+                setSelectedIds([]);
+            }
+        }
+    };
+
+    const deleteSelected = () => {
+        const newImages = images.filter((_, i) => !selectedIds.includes(i));
+        setImages(newImages);
+        setSelectedIds([]);
+    };
+
+    // Key Presses
+    const handleKeyPress = (e: KeyboardEvent) => {
+        if (e.key === "d") {
+            //debug
+            console.log(selectedIds);
+            console.log(uiState);
+            console.log(images);
+        }
+        if (e.key === "Escape") {
+            setSelectedIds([]);
+        } else if (e.key === "Backspace") {
+            deleteSelected();
+        } else if (e.key === "Delete") {
+            if (selectedIds.length > 0) {
+                deleteSelected();
+            }
+        } else if (e.key === "a" && ctrlKey) {
+            e.preventDefault();
+            setSelectedIds(images.map((_, i) => i));
+        }
+    };
+
     // Stage View
     const {
         stageRef,
@@ -109,7 +162,7 @@ export default function App() {
     // Comment View
     const commentView = CommentViewManager(setView);
 
-    // Sets whether or not stage is draggable/pannable
+    // Dragging Behaviour depending on View
     const stageConstants = {
         draggable: view === APP_VIEW.pan,
     };
@@ -118,9 +171,6 @@ export default function App() {
         perfectDrawEnabled: false,
         draggable: view === APP_VIEW.select,
     };
-
-    function debug(e: KeyboardEvent) {}
-    document.addEventListener("keydown", debug);
 
     // Side effect for canvas state
     useEffect(() => {
@@ -132,25 +182,20 @@ export default function App() {
         persistance.persistUiState(uiState);
     }, [uiState]);
 
-    const toggleLeftPanel = () => {
-        setUiState({
-            ...uiState,
-            isLeftPanelOpen: !uiState.isLeftPanelOpen,
-        });
-    };
+    // Selected ID key press listeners
+    useEffect(() => {
+        window.addEventListener("keyup", handleKeyPress);
 
-    const toggleRightPanel = () => {
-        setUiState({
-            ...uiState,
-            isRightPanelOpen: !uiState.isRightPanelOpen,
-        });
-    };
+        return () => {
+            window.removeEventListener("keyup", handleKeyPress);
+        };
+    }, [selectedIds, shiftKey, ctrlKey, altKey, metaKey]);
 
     return (
         <div>
             <PanelsContainer>
                 <TopZone>
-                    <TitlePanel {...activity} />
+                    <TitlePanel name={activity.name} />
                     <ToolbarPanel
                         view={view}
                         setView={setView}
@@ -161,7 +206,12 @@ export default function App() {
                 <ActivityPanel
                     activity={activity}
                     isOpen={uiState.isLeftPanelOpen}
-                    handleToggle={toggleLeftPanel}
+                    handleToggle={() => {
+                        setUiState({
+                            ...uiState,
+                            isLeftPanelOpen: !uiState.isLeftPanelOpen,
+                        });
+                    }}
                 />
                 <ElementsPanel
                     activity={activity}
@@ -169,7 +219,12 @@ export default function App() {
                     setImages={setImages}
                     stageRef={stageRef}
                     isOpen={uiState.isRightPanelOpen}
-                    handleToggle={toggleRightPanel}
+                    handleToggle={() => {
+                        setUiState({
+                            ...uiState,
+                            isRightPanelOpen: !uiState.isRightPanelOpen,
+                        });
+                    }}
                 />
                 <BottomZone>
                     <ZoomPanel
@@ -185,7 +240,7 @@ export default function App() {
                 width={window.innerWidth}
                 height={window.innerHeight}
                 onWheel={handleWheel}
-                onClick={checkDeselect}
+                onClick={handleUnfocus}
                 ref={stageRef}
                 fill={commentView.state.backgroundColor}
                 {...stageConstants}
@@ -204,7 +259,7 @@ export default function App() {
                                 key={i}
                                 imageProps={image}
                                 isSelected={selectedIds.includes(i)}
-                                toggleSelect={() => toggleSelectedId(i)}
+                                onSelect={() => handleSelect(i)}
                                 onChange={(newAttrs: any) => {
                                     modifyImage(i, {
                                         ...image,
