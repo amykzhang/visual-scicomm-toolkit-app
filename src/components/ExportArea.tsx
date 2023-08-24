@@ -1,9 +1,10 @@
 import { Rect } from "react-konva";
 
-export const ExportArea: React.FC<{ width: number; height: number }> = ({
-    width,
-    height,
-}) => {
+export const ExportArea: React.FC<{
+    width: number;
+    height: number;
+    onClick: () => void;
+}> = ({ width, height, onClick }) => {
     return (
         <Rect
             x={0}
@@ -15,6 +16,7 @@ export const ExportArea: React.FC<{ width: number; height: number }> = ({
             fill={"transparent"}
             stroke={"#c1c1c1"}
             strokeWidth={2}
-        ></Rect>
+            onClick={onClick}
+        />
     );
 };

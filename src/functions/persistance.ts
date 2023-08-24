@@ -84,7 +84,7 @@ function retrieveStageState(): StageStateProp | undefined {
     }
 }
 
-const persistance = {
+export const persistance = {
     persistCanvasState,
     retrieveCanvasState,
     persistUiState,
@@ -92,5 +92,3 @@ const persistance = {
     persistStageState,
     retrieveStageState,
 };
-
-export default persistance;

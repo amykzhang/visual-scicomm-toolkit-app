@@ -16,7 +16,9 @@ import { ExportArea } from "./components/ExportArea";
 import { ExitCommentViewButton } from "./components/Components";
 import activity_visual_strategies from "./activity/activity";
 import { CommentViewProp, ImageProp, UiStateProp } from "./utils/interfaces";
-import persistance from "./functions/persistance";
+import { persistance } from "./functions";
+import { ImageElement } from "./Elements";
+import { KonvaEventObject } from "konva/lib/Node";
 
 // TODO: make this easier to customize, more modular for creators?
 const activity = activity_visual_strategies;
@@ -61,6 +63,38 @@ export default function App() {
         } else return [];
     });
 
+    // Splices the indexed imaged with the new image
+    const modifyImage = (idx: number, newImage: ImageProp) => {
+        const newImages = images.slice();
+        newImages[idx] = newImage;
+        setImages(newImages);
+    };
+
+    // selected Ids
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
+
+    const addSelectedId = (id: number) => {
+        setSelectedIds([...selectedIds, id]);
+    };
+
+    const removeSelectedId = (id: number) => {
+        setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
+    };
+
+    const toggleSelectedId = (id: number) => {
+        if (selectedIds.includes(id)) {
+            removeSelectedId(id);
+        } else {
+            addSelectedId(id);
+        }
+    };
+
+    const checkDeselect = (e: KonvaEventObject<MouseEvent>) => {
+        const clickedOnEmpty = e.target === stageRef.current;
+        if (clickedOnEmpty) {
+            setSelectedIds([]);
+        }
+    };
     // Stage View
     const {
         stageRef,
@@ -80,66 +114,16 @@ export default function App() {
         draggable: view === APP_VIEW.pan,
     };
 
-    const handleDragStart = (
-        elements: any[],
-        setElements: React.Dispatch<React.SetStateAction<any>>
-    ) => {
-        return (e: Konva.KonvaEventObject<DragEvent>) => {
-            console.log("DragStart");
-            console.log(e.target.x(), e.target.y());
-
-            const id = e.target.id();
-
-            const newElements = elements.map((element) => {
-                return { ...element, isDragging: element.id === id };
-            });
-
-            setElements(newElements);
-        };
-    };
-
-    const handleDragEnd = (
-        elements: any[],
-        setElements: React.Dispatch<React.SetStateAction<any>>
-    ) => {
-        return (e: Konva.KonvaEventObject<DragEvent>) => {
-            console.log("DragEnd");
-            console.log(e.target.x(), e.target.y());
-            console.log(e.target.getAbsolutePosition());
-
-            const endX = e.target.x();
-            const endY = e.target.y();
-
-            const newElements = elements.map((element) => {
-                if (element.isDragging) {
-                    return {
-                        ...element,
-                        x: endX,
-                        y: endY,
-                        isDragging: false,
-                    };
-                } else {
-                    return element;
-                }
-            });
-
-            setElements(newElements);
-        };
-    };
-
     const canvasElementConstants = {
         perfectDrawEnabled: false,
         draggable: view === APP_VIEW.select,
     };
 
     function debug(e: KeyboardEvent) {}
-
     document.addEventListener("keydown", debug);
 
     // Side effect for canvas state
     useEffect(() => {
-        console.log("saving canvas state to local storage");
-
         persistance.persistCanvasState(images);
     }, [images]);
 
@@ -201,26 +185,34 @@ export default function App() {
                 width={window.innerWidth}
                 height={window.innerHeight}
                 onWheel={handleWheel}
+                onClick={checkDeselect}
                 ref={stageRef}
                 fill={commentView.state.backgroundColor}
                 {...stageConstants}
             >
                 <Layer id="export-layer">
-                    <ExportArea {...activity.canvas_size} />
+                    <ExportArea
+                        {...activity.canvas_size}
+                        onClick={() => setSelectedIds([])}
+                    />
                 </Layer>
                 <Layer id="image-layer">
-                    {images.map((image) => {
+                    {images.map((image, i) => {
                         return (
-                            <Image
-                                key={image.id}
-                                id={image.id}
-                                x={image.x}
-                                y={image.y}
-                                offset={image.offset}
-                                image={image.image}
-                                onDragStart={handleDragStart(images, setImages)}
-                                onDragEnd={handleDragEnd(images, setImages)}
+                            <ImageElement
                                 {...canvasElementConstants}
+                                key={i}
+                                imageProps={image}
+                                isSelected={selectedIds.includes(i)}
+                                toggleSelect={() => toggleSelectedId(i)}
+                                onChange={(newAttrs: any) => {
+                                    modifyImage(i, {
+                                        ...image,
+                                        ...newAttrs,
+                                    });
+                                }}
+                                images={images}
+                                setImages={setImages}
                             />
                         );
                     })}
