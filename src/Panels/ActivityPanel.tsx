@@ -47,6 +47,7 @@ const ParagraphContainer = styled.div`
 const FocusedParagraphContainer = styled.div`
     width: 100%;
     padding: 18px 18px;
+    background-color: #fff6e3;
 `;
 
 const InstructionContainer = styled.div`
@@ -66,12 +67,54 @@ const InstructionBody = styled.div`
     display: flex;
     align-items: center;
     gap: 8px;
+    background-color: #f4f7fa;
 `;
+
+const Tasks = (activity: Activity) => {
+    const task = activity.task;
+    return (
+        <>
+            <SideBarHeader>
+                <Notebook />
+                <typography.LargeText>Task</typography.LargeText>
+            </SideBarHeader>
+            {activity.task.map((paragraph, index) => {
+                // Different types of paragraph containers, currently only paragraph and focused_paragraph (see below for adding new types)
+                const { container, body } = paragraph;
+                if (container === "paragraph")
+                    return (
+                        <ParagraphContainer key={index}>
+                            <typography.MediumText
+                                dangerouslySetInnerHTML={{
+                                    __html: body,
+                                }}
+                            ></typography.MediumText>
+                        </ParagraphContainer>
+                    );
+                else if (container === "focused_paragraph")
+                    return (
+                        <FocusedParagraphContainer key={index}>
+                            <typography.BoldMediumText>
+                                {body}
+                            </typography.BoldMediumText>
+                        </FocusedParagraphContainer>
+                    );
+                // else if (container === "foobar") return (
+                //     <div>foobar</div>
+                // )
+            })}
+        </>
+    );
+};
 
 const Instructions = (activity: Activity) => {
     const instructions = activity.instructions;
     return (
         <>
+            <SideBarHeader>
+                <Notebook />
+                <typography.LargeText>Instructions</typography.LargeText>
+            </SideBarHeader>
             {instructions.map((instruction, index) => (
                 <InstructionContainer key={index}>
                     <InstructionTitle>
@@ -101,41 +144,8 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
     return (
         <ActivityPanelContainer className={isOpen ? "" : "slide-left"}>
             <ActivityContentContainer>
-                <SideBarHeader>
-                    <Notebook />
-                    <typography.LargeText>Task</typography.LargeText>
-                </SideBarHeader>
-                {activity.task.map((paragraph, index) => {
-                    const { container, body } = paragraph;
-                    if (container === "paragraph")
-                        return (
-                            <ParagraphContainer key={index}>
-                                <typography.MediumText
-                                    dangerouslySetInnerHTML={{
-                                        __html: body,
-                                    }}
-                                ></typography.MediumText>
-                            </ParagraphContainer>
-                        );
-                    else if (container === "focused-paragraph")
-                        return (
-                            <FocusedParagraphContainer key={index}>
-                                <typography.BoldMediumText>
-                                    {body}
-                                </typography.BoldMediumText>
-                            </FocusedParagraphContainer>
-                        );
-                    // else if (container === "foobar") return (
-                    //     <div>foobar</div>
-                    // )
-                })}
+                <Tasks {...activity} />
                 <Top30>
-                    <SideBarHeader>
-                        <Notebook />
-                        <typography.LargeText>
-                            Instructions
-                        </typography.LargeText>
-                    </SideBarHeader>
                     <Instructions {...activity} />
                 </Top30>
             </ActivityContentContainer>
