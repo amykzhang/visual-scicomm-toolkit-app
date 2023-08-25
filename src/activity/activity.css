@@ -1,0 +1,84 @@
+/* Containers */
+
+div.pad-large {
+    padding: 24px 24px;
+}
+
+div.pad-medium {
+    padding: 16px 16px;
+}
+
+div.pad-small {
+    padding: 8px 8px;
+}
+
+div.gap-large {
+    gap: 24px;
+}
+
+div.gap-medium {
+    gap: 16px;
+}
+
+div.gap-small {
+    gap: 8px;
+}
+
+div.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+div.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Typography */
+
+.large-text {
+    color: #000;
+    font-size: 20px;
+    font-family: Quicksand;
+    font-weight: 700;
+    margin: 0px;
+    padding: 0px;
+}
+
+.medium-text {
+    color: #000;
+    font-size: 17px;
+    font-family: Roboto;
+    margin: 0px;
+    padding: 0px;
+}
+
+.small-text {
+    color: #000;
+    font-size: 14px;
+    font-family: Roboto;
+    margin: 0px;
+    padding: 0px;
+}
+
+.rounded {
+    border-radius: 8px;
+}
+
+/* Weight */
+.bold {
+    font-family: Roboto-Medium;
+}
+
+.extra-bold {
+    font-family: Roboto-Bold;
+}
+
+/* Background Color */
+.yellow-background {
+    background-color: #fff6e3;
+}
+
+.lightblue-background {
+    background-color: #e3f1ff;
+}
