@@ -6,6 +6,7 @@ import { Activity } from "../activity/activity";
 import typography from "../styles/typography";
 import { ExportManager } from "../functions";
 import Konva from "konva";
+import { useState } from "react";
 
 const ExportPanelContainer = styled.div`
     position: absolute;
@@ -29,7 +30,7 @@ const ExportPanelContainer = styled.div`
 
 const ExportButton = styled.div`
     display: flex;
-
+    width: 230px;
     padding: 10px 24px;
     flex-direction: row;
     align-items: center;
@@ -52,20 +53,97 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
     activity,
     stageRef,
 }) => {
+    const [isExportOptionsOpen, setIsExportOptionsOpen] = useState(false);
+
     // Export
     const { exportPNG, exportJPEG, exportPDF } = ExportManager(
         stageRef,
         activity
     );
 
+    function toggleExportOptions() {
+        setIsExportOptionsOpen(!isExportOptionsOpen);
+    }
+
     return (
         <ExportPanelContainer>
             <InformationTool content={activity.info} />
             <GearIcon />
-            <ExportButton onClick={exportPDF}>
+            <ExportButton onClick={toggleExportOptions}>
                 <UploadIcon />
                 <ExportText>Share Canvas</ExportText>
             </ExportButton>
+            {isExportOptionsOpen && (
+                <>
+                    <TransparentBackground onClick={toggleExportOptions} />
+                    <ExportOptions>
+                        <ExportOption
+                            onClick={() => {
+                                exportPNG();
+                                toggleExportOptions();
+                            }}
+                        >
+                            <typography.MediumText>
+                                Export as PNG
+                            </typography.MediumText>
+                        </ExportOption>
+                        <ExportOption
+                            onClick={() => {
+                                exportJPEG();
+                                toggleExportOptions();
+                            }}
+                        >
+                            <typography.MediumText>
+                                Export as JPEG
+                            </typography.MediumText>
+                        </ExportOption>
+                        <ExportOption
+                            onClick={() => {
+                                exportPDF();
+                                toggleExportOptions();
+                            }}
+                        >
+                            <typography.MediumText>
+                                Export as PDF
+                            </typography.MediumText>
+                        </ExportOption>
+                    </ExportOptions>
+                </>
+            )}
         </ExportPanelContainer>
     );
 };
+
+const TransparentBackground = styled.div`
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    inset: 0px;
+    background-color: transparent;
+    z-index: 400;
+`;
+
+const ExportOptions = styled.div`
+    position: fixed;
+    width: 230px;
+    right: 20px;
+    top: 80px;
+
+    background: #ffffff;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 401;
+`;
+
+const ExportOption = styled.div`
+    padding: 8px 24px;
+    cursor: pointer;
+
+    &:hover {
+        background: #d7e9ff;
+    }
+`;
