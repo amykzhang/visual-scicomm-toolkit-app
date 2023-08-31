@@ -15,14 +15,14 @@ UofT BMC web app project 2023
 - resize elements 🐛
 
 ### August 31
-- sharing:
-  - exporting as Image (jpeg, png, pdf), with comments or no comments
+- sharing: 
+  - exporting as Image (jpeg, png, pdf), with comments or no comments ✅
   - Sharable link with interface allowing edits
 - comment view
   - toggle comment view
   - add comment elements
   - hide comment elements when comment view is off
-- missing subtask paragraph✅
+- missing subtask paragraph ✅
 - make background colour grey #d6d6d6 ✅
 - rename lines to labels & arrows ✅
 - fix shortcuts for command

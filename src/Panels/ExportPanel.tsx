@@ -5,6 +5,7 @@ import { ReactComponent as UploadIcon } from "../assets/upload.svg";
 import { Activity } from "../activity/activity";
 import typography from "../styles/typography";
 import { ExportManager } from "../functions";
+import Konva from "konva";
 
 const ExportPanelContainer = styled.div`
     position: absolute;
@@ -44,18 +45,24 @@ const ExportText = styled(typography.LargeText)`
 
 interface ExportPanelProps {
     activity: Activity;
-    exportCanvas: () => void;
+    stageRef: React.RefObject<Konva.Stage | null>;
 }
 
 export const ExportPanel: React.FC<ExportPanelProps> = ({
     activity,
-    exportCanvas,
+    stageRef,
 }) => {
+    // Export
+    const { exportPNG, exportJPEG, exportPDF } = ExportManager(
+        stageRef,
+        activity
+    );
+
     return (
         <ExportPanelContainer>
             <InformationTool content={activity.info} />
             <GearIcon />
-            <ExportButton onClick={exportCanvas}>
+            <ExportButton onClick={exportPDF}>
                 <UploadIcon />
                 <ExportText>Share Canvas</ExportText>
             </ExportButton>

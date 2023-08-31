@@ -158,9 +158,6 @@ export default function App() {
         toggleFullscreen,
     } = StageViewManager(activity.canvas_size);
 
-    // Export
-    const { exportCanvas } = ExportManager(stageRef, activity);
-
     // Comment View
     const commentView = CommentViewManager(setView);
 
@@ -204,10 +201,7 @@ export default function App() {
                         commentView={commentView}
                     />
                     <ExitCommentView commentView={commentView} />
-                    <ExportPanel
-                        exportCanvas={exportCanvas}
-                        activity={activity}
-                    />
+                    <ExportPanel stageRef={stageRef} activity={activity} />
                 </TopZone>
                 <ActivityPanel
                     activity={activity}
