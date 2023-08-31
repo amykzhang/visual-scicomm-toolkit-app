@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Stage, Layer, Image, StageProps } from "react-konva";
-import Konva from "konva";
 import styled from "styled-components";
 import { KeyPressManager, StageViewManager } from "./functions";
 import { CommentViewManager } from "./functions";
@@ -19,7 +18,6 @@ import { CommentViewProp, ImageProp, UiStateProp } from "./utils/interfaces";
 import { persistance } from "./functions";
 import { ImageElement } from "./Elements";
 import { KonvaEventObject } from "konva/lib/Node";
-import { clear } from "console";
 
 // TODO: make this easier to customize, more modular for creators?
 const activity = activity_visual_strategies;

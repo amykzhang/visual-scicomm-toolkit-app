@@ -23,6 +23,14 @@ export type Activity = {
                 height: number;
             }[];
         };
+        draw: {
+            heading: string;
+            contents: {
+                name: string;
+                type: string;
+                tool: string;
+            }[];
+        };
         lines: {
             heading: string;
             icons: string[];
@@ -96,7 +104,7 @@ const activity_visual_strategies: Activity = {
             sizes: [{ width: 78, height: 27 }],
         },
         lines: {
-            heading: "Lines",
+            heading: "Labels & Arrows",
             icons: [
                 "label_left_dot",
                 "label_right_dot",
@@ -138,6 +146,16 @@ const activity_visual_strategies: Activity = {
                 { width: 65, height: 30 },
                 { width: 50, height: 50 },
                 { width: 50, height: 50 },
+            ],
+        },
+        draw: {
+            heading: "Draw",
+            contents: [
+                {
+                    name: "draw-tool",
+                    type: "tool",
+                    tool: "freehand-draw",
+                },
             ],
         },
         shapes: {

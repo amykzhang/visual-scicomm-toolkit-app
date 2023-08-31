@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import Konva from "konva";
 import { ImageProp } from "../utils/interfaces";
 import { Activity } from "../activity/activity";
@@ -101,6 +101,25 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
         );
     };
 
+    const DrawSection = () => {
+        const { heading, contents } = elements.draw;
+        return (
+            <>
+                <ImageSubheadingText>{heading}</ImageSubheadingText>
+                <ElementsRow>
+                    {contents.map((item, i) => {
+                        if (
+                            item.type === "tool" &&
+                            item.tool === "freehand-draw"
+                        ) {
+                            return <Doodle />;
+                        }
+                    })}
+                </ElementsRow>
+            </>
+        );
+    };
+
     const LinesSection = () => {
         const { srcs, icons, sizes } = lines;
         return (
@@ -118,7 +137,6 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
                             stageRef={stageRef}
                         />
                     ))}
-                    <Doodle />
                 </ElementsRow>
             </>
         );
@@ -186,6 +204,7 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
                 </SideBarHeader>
 
                 <TextSection />
+                <DrawSection />
                 <LinesSection />
                 <ShapeSection />
                 <ImageSection />
