@@ -26,7 +26,6 @@ const ActivityPanelContainer = styled(SideBar)`
 `;
 
 const ActivityContentContainer = styled(SideBarContent)`
-    pointer-events: all;
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;

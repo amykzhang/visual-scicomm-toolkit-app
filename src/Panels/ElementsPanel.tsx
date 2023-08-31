@@ -112,7 +112,7 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
                             item.type === "tool" &&
                             item.tool === "freehand-draw"
                         ) {
-                            return <Doodle />;
+                            return <Doodle key={i} />;
                         }
                     })}
                 </ElementsRow>

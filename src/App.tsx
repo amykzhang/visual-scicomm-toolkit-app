@@ -18,6 +18,7 @@ import { CommentViewProp, ImageProp, UiStateProp } from "./utils/interfaces";
 import { persistance } from "./functions";
 import { ImageElement } from "./Elements";
 import { KonvaEventObject } from "konva/lib/Node";
+import { ExportPanel } from "./Panels";
 
 // TODO: make this easier to customize, more modular for creators?
 const activity = activity_visual_strategies;
@@ -200,6 +201,7 @@ export default function App() {
                         commentView={commentView}
                     />
                     <ExitCommentView commentView={commentView} />
+                    <ExportPanel activity={activity} />
                 </TopZone>
                 <ActivityPanel
                     activity={activity}

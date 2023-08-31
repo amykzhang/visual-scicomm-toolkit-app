@@ -63,6 +63,7 @@ export type Activity = {
             }[];
         };
     };
+    info: string;
 };
 
 const activity_visual_strategies: Activity = {
@@ -412,6 +413,10 @@ const activity_visual_strategies: Activity = {
             ],
         },
     },
+    info: `
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque malesuada quis nulla a porta. Quisque aliquet eros at efficitur dictum. Morbi semper interdum hendrerit. Donec at leo ut augue fermentum pellentesque. Proin nec diam eu velit feugiat tempor. Proin placerat, odio fermentum fermentum ullamcorper, urna ante mattis erat, vel commodo quam dolor sit amet nulla. Donec neque quam, condimentum in tortor a, fermentum pellentesque lectus. Sed vitae lorem volutpat magna sagittis euismod.
+    
+    `,
 };
 
 export default activity_visual_strategies;
