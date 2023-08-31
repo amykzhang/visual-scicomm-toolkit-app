@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Stage, Layer, Image, StageProps } from "react-konva";
 import styled from "styled-components";
-import { KeyPressManager, StageViewManager } from "./functions";
+import { ExportManager, KeyPressManager, StageViewManager } from "./functions";
 import { CommentViewManager } from "./functions";
 import { APP_VIEW } from "./utils/enums";
 import { ElementsPanel } from "./Panels/ElementsPanel";
@@ -158,6 +158,9 @@ export default function App() {
         toggleFullscreen,
     } = StageViewManager(activity.canvas_size);
 
+    // Export
+    const { exportCanvas } = ExportManager(stageRef, activity);
+
     // Comment View
     const commentView = CommentViewManager(setView);
 
@@ -201,7 +204,10 @@ export default function App() {
                         commentView={commentView}
                     />
                     <ExitCommentView commentView={commentView} />
-                    <ExportPanel activity={activity} />
+                    <ExportPanel
+                        exportCanvas={exportCanvas}
+                        activity={activity}
+                    />
                 </TopZone>
                 <ActivityPanel
                     activity={activity}
