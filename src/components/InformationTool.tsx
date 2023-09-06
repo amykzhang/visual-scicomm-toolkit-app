@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { ReactComponent as QuestionIcon } from "../assets/questionmarkcircle.svg";
 import { ReactComponent as CrossIcon } from "../assets/cross.svg";

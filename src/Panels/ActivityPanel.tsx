@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Activity } from "../activity/activity";
 import {
     SideBar,
@@ -6,8 +5,6 @@ import {
     SideBarContent,
     SideBarToggle,
     Top30,
-    Top20,
-    Top10,
 } from "../styles/containers";
 import typography from "../styles/typography";
 import styled from "styled-components";
@@ -70,7 +67,6 @@ const InstructionBody = styled.div`
 `;
 
 const Tasks = (activity: Activity) => {
-    const task = activity.task;
     return (
         <>
             <SideBarHeader>
@@ -101,6 +97,7 @@ const Tasks = (activity: Activity) => {
                 // else if (container === "foobar") return (
                 //     <div>foobar</div>
                 // )
+                else return <></>;
             })}
         </>
     );

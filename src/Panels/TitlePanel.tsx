@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { Activity } from "../activity/activity";
 import typography from "../styles/typography";
 
 const TitlePanelContainer = styled.div`

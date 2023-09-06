@@ -1,11 +1,14 @@
 import Konva from "konva";
 import { Activity } from "../activity/activity";
 import { jsPDF } from "jspdf";
+import { ExportOptions } from "../utils/interfaces";
 
-export const ExportManager = (
+export function ExportManager(
+    activity: Activity,
     stageRef: React.MutableRefObject<Konva.Stage | null>,
-    activity: Activity
-) => {
+    selectedIds: number[],
+    setSelectedIds: React.Dispatch<React.SetStateAction<number[]>>
+): ExportOptions {
     const exportSize = activity.canvas_size;
 
     function downloadURI(uri: string, name: string) {
@@ -20,13 +23,16 @@ export const ExportManager = (
 
     type ImageFormat = "png" | "jpeg";
 
+    // Get DataURL of image of stage
     const exportImage = (format: ImageFormat = "png") => {
         if (stageRef.current !== null) {
             const stage = stageRef.current;
 
+            // save position, scale, and selected IDs
             const oldPos = stage.position();
             const oldScale = stage.scale();
 
+            // reset stage
             stage.position({ x: 0, y: 0 });
             stage.scale({ x: 1, y: 1 });
 
@@ -40,6 +46,7 @@ export const ExportManager = (
                 mimeType: "image/" + format,
             });
 
+            // restore stage and selected IDs
             stage.position(oldPos);
             stage.scale(oldScale);
 
@@ -103,4 +110,4 @@ export const ExportManager = (
         exportJPEG,
         exportPDF,
     };
-};
+}

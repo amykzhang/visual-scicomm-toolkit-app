@@ -28,7 +28,7 @@ export const KeyPressManager = () => {
             window.removeEventListener("keydown", onKeyDown);
             window.removeEventListener("keyup", onKeyUp);
         };
-    }, []);
+    }, [onKeyDown, onKeyUp]);
 
     return { shiftKey, ctrlKey, altKey, metaKey };
 };

@@ -40,21 +40,6 @@ const ElementsRow = styled.div`
     width: 288px;
 `;
 
-const ElementTool = styled.div`
-    pointer-events: all;
-    background: white;
-    border: none;
-    border-radius: 0px;
-
-    &:hover {
-        background-color: #d7e9ff;
-    }
-
-    &[data-isactive="true"] {
-        background-color: #d7e9ff;
-    }
-`;
-
 const ElementsToggle = styled(SideBarToggle)`
     border-radius: 5px 0 0 5px;
 `;
@@ -113,7 +98,7 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
                             item.tool === "freehand-draw"
                         ) {
                             return <Doodle key={i} />;
-                        }
+                        } else return <></>;
                     })}
                 </ElementsRow>
             </>
@@ -126,17 +111,19 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
             <>
                 <ImageSubheadingText>{lines.heading}</ImageSubheadingText>
                 <ElementsRow>
-                    {srcs.map((src, i) => (
-                        <ImageTool
-                            key={i}
-                            src={src}
-                            name={icons[i]}
-                            dimensions={sizes[i]}
-                            images={images}
-                            setImages={setImages}
-                            stageRef={stageRef}
-                        />
-                    ))}
+                    {srcs.map((src, i) => {
+                        return (
+                            <ImageTool
+                                key={i}
+                                src={src}
+                                name={icons[i]}
+                                dimensions={sizes[i]}
+                                images={images}
+                                setImages={setImages}
+                                stageRef={stageRef}
+                            />
+                        );
+                    })}
                 </ElementsRow>
             </>
         );

@@ -1,12 +1,11 @@
+import { useState } from "react";
 import styled from "styled-components";
 import { ReactComponent as GearIcon } from "../assets/gear.svg";
 import { InformationTool } from "../components/InformationTool";
 import { ReactComponent as UploadIcon } from "../assets/upload.svg";
 import { Activity } from "../activity/activity";
 import typography from "../styles/typography";
-import { ExportManager } from "../functions";
-import Konva from "konva";
-import { useState } from "react";
+import { ExportOptions } from "../utils/interfaces";
 
 const ExportPanelContainer = styled.div`
     position: absolute;
@@ -46,20 +45,14 @@ const ExportText = styled(typography.LargeText)`
 
 interface ExportPanelProps {
     activity: Activity;
-    stageRef: React.RefObject<Konva.Stage | null>;
+    exportManager: ExportOptions;
 }
 
 export const ExportPanel: React.FC<ExportPanelProps> = ({
     activity,
-    stageRef,
+    exportManager,
 }) => {
     const [isExportOptionsOpen, setIsExportOptionsOpen] = useState(false);
-
-    // Export
-    const { exportPNG, exportJPEG, exportPDF } = ExportManager(
-        stageRef,
-        activity
-    );
 
     function toggleExportOptions() {
         setIsExportOptionsOpen(!isExportOptionsOpen);
@@ -76,10 +69,10 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
             {isExportOptionsOpen && (
                 <>
                     <TransparentBackground onClick={toggleExportOptions} />
-                    <ExportOptions>
+                    <ExportOptionsContainer>
                         <ExportOption
                             onClick={() => {
-                                exportPNG();
+                                exportManager.exportPNG();
                                 toggleExportOptions();
                             }}
                         >
@@ -89,7 +82,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
                         </ExportOption>
                         <ExportOption
                             onClick={() => {
-                                exportJPEG();
+                                exportManager.exportJPEG();
                                 toggleExportOptions();
                             }}
                         >
@@ -99,7 +92,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
                         </ExportOption>
                         <ExportOption
                             onClick={() => {
-                                exportPDF();
+                                exportManager.exportPDF();
                                 toggleExportOptions();
                             }}
                         >
@@ -107,7 +100,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
                                 Export as PDF
                             </typography.MediumText>
                         </ExportOption>
-                    </ExportOptions>
+                    </ExportOptionsContainer>
                 </>
             )}
         </ExportPanelContainer>
@@ -123,7 +116,7 @@ const TransparentBackground = styled.div`
     z-index: 400;
 `;
 
-const ExportOptions = styled.div`
+const ExportOptionsContainer = styled.div`
     position: fixed;
     width: 230px;
     right: 20px;

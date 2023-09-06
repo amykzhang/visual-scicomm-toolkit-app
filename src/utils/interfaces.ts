@@ -12,6 +12,12 @@ export interface CommentViewProp {
     exit: () => void;
 }
 
+export interface ExportOptions {
+    exportPNG: () => void;
+    exportJPEG: () => void;
+    exportPDF: () => void;
+}
+
 export interface ImageProp {
     id: string;
     x: number;

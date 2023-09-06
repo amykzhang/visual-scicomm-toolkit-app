@@ -1,6 +1,6 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useRef } from "react";
 import Konva from "konva";
-import { Stage, Layer, Image, Transformer } from "react-konva";
+import { Image, Transformer } from "react-konva";
 import { ImageProp } from "../utils/interfaces";
 import { handleDragEnd, handleDragStart } from "../functions";
 
@@ -23,15 +23,17 @@ const ImageElement = ({
     setImages,
     draggable,
 }: ImageElementProps) => {
-    const imageRef = React.useRef<Konva.Image | null>(null);
-    const trRef = React.useRef<Konva.Transformer | null>(null);
+    const imageRef = useRef<Konva.Image | null>(null);
+    const transformerRef = useRef<Konva.Transformer | null>(null);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (isSelected) {
             // we need to attach transformer manually
-            if (trRef.current !== null && imageRef.current !== null) {
-                trRef.current.nodes([imageRef.current]);
-                trRef.current.getLayer()?.batchDraw();
+            // TODO: make a transformer state for removing transformer nodes while exporting
+            if (transformerRef.current !== null && imageRef.current !== null) {
+                const transformer = transformerRef.current;
+                transformer.nodes([imageRef.current]);
+                transformer.getLayer()?.batchDraw();
             }
         }
     }, [isSelected]);
@@ -46,7 +48,7 @@ const ImageElement = ({
                 draggable={draggable}
                 onDragStart={handleDragStart(images, setImages)}
                 onDragEnd={handleDragEnd(images, setImages)}
-                onTransformEnd={(e) => {
+                onTransformEnd={() => {
                     // transformer is changing scale of the node
                     // and NOT its width or height
                     // but in the store we have only width and height
@@ -65,14 +67,14 @@ const ImageElement = ({
                             y: node.y(),
                             // set minimal value
                             width: Math.max(5, node.width() * scaleX),
-                            height: Math.max(node.height() * scaleY),
+                            height: Math.max(5, node.height() * scaleY),
                         });
                     }
                 }}
             />
             {isSelected && (
                 <Transformer
-                    ref={trRef}
+                    ref={transformerRef}
                     boundBoxFunc={(oldBox, newBox) => {
                         // limit resize
                         if (newBox.width < 5 || newBox.height < 5) {

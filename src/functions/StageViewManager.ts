@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Konva from "konva";
 import { persistance } from "./persistance";
 
@@ -23,61 +23,6 @@ export const StageViewManager = (canvas_size: {
     });
 
     const stageRef = useRef<Konva.Stage | null>(null);
-
-    // Load persisted stage state on initial load
-    useEffect(() => {
-        const saved = persistance.retrieveStageState();
-
-        if (saved !== undefined) {
-            const { stagePosition, scaleX } = saved;
-            if (stageRef.current !== null) {
-                const stage = stageRef.current;
-                stage.position(stagePosition);
-                stage.scale({ x: scaleX, y: scaleX });
-                stage.batchDraw();
-            }
-        } else {
-            zoomFit();
-            if (stageRef.current !== null) {
-                const stage = stageRef.current;
-                persistance.persistStageState({
-                    stagePosition: stage.getAbsolutePosition(),
-                    scaleX: stage.scaleX(),
-                });
-            }
-        }
-    }, []);
-
-    // // Keyboard shortcuts
-    // let canZoom = true;
-    // let metaPressed = false;
-
-    // function handleKeyDown(e: KeyboardEvent) {
-    //     if (e.key === "Meta") metaPressed = true;
-
-    //     // Zoom shortcuts (shift/meta +, shift/meta -, shift/meta 0)
-    //     // if (canZoom) {
-    //     //     if (e.key === "+" || (metaPressed && e.key === "=")) {
-    //     //         e.preventDefault();
-    //     //         zoomIn();
-    //     //     }
-    //     //     if (e.key === "_" || (metaPressed && e.key === "-")) {
-    //     //         e.preventDefault();
-    //     //         zoomOut();
-    //     //     }
-    //     //     if (e.key === ")" || (metaPressed && e.key === "0")) {
-    //     //         e.preventDefault();
-    //     //         zoomFit();
-    //     //     }
-    //     // }
-    // }
-
-    // function handleKeyUp(e: KeyboardEvent) {
-    //     metaPressed = false;
-    // }
-
-    // document.addEventListener("keydown", handleKeyDown);
-    // document.addEventListener("keyup", handleKeyUp);
 
     function handleZoom(
         oldScale: number,
@@ -143,7 +88,7 @@ export const StageViewManager = (canvas_size: {
         }
     }
 
-    function zoomFit() {
+    const zoomFit = useCallback(() => {
         if (stageRef.current !== null) {
             const stage = stageRef.current;
 
@@ -168,7 +113,7 @@ export const StageViewManager = (canvas_size: {
             });
         }
         return;
-    }
+    }, [canvas_size]);
 
     function zoomIn() {
         if (stageRef.current !== null) {
@@ -226,6 +171,23 @@ export const StageViewManager = (canvas_size: {
         }
     }
 
+    // Load persisted stage state on initial load
+    useEffect(() => {
+        const saved = persistance.retrieveStageState();
+
+        if (saved !== undefined) {
+            const { stagePosition, scaleX } = saved;
+            if (stageRef.current !== null) {
+                const stage = stageRef.current;
+                stage.position(stagePosition);
+                stage.scale({ x: scaleX, y: scaleX });
+                stage.batchDraw();
+            }
+        } else {
+            zoomFit();
+        }
+    }, [zoomFit]);
+
     return {
         stageRef,
         handleWheel,
@@ -236,22 +198,3 @@ export const StageViewManager = (canvas_size: {
         toggleFullscreen,
     };
 };
-
-// Zooming
-function getDistance(
-    p1: { x: number; y: number },
-    p2: { x: number; y: number }
-) {
-    return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
-}
-
-function getCenter(p1: { x: number; y: number }, p2: { x: number; y: number }) {
-    return {
-        x: (p1.x + p2.x) / 2,
-        y: (p1.y + p2.y) / 2,
-    };
-}
-
-function isTouchEnabled() {
-    return "ontouchstart" in window || navigator.maxTouchPoints > 0;
-}

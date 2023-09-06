@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Stage, Layer, Image, StageProps } from "react-konva";
+import { useCallback, useEffect, useState } from "react";
+import { Stage, Layer } from "react-konva";
 import styled from "styled-components";
 import { ExportManager, KeyPressManager, StageViewManager } from "./functions";
 import { CommentViewManager } from "./functions";
@@ -52,12 +52,12 @@ export default function App() {
     });
 
     const view = uiState.view;
-    const setView = (view: APP_VIEW) => {
+    function setView(view: APP_VIEW) {
         setUiState({ ...uiState, view: view });
         if (view !== APP_VIEW.select) {
             setSelectedIds([]);
         }
-    };
+    }
 
     // Canvas State (images)
     const [images, setImages] = useState<ImageProp[]>(() => {
@@ -119,33 +119,30 @@ export default function App() {
         }
     };
 
-    const deleteSelected = () => {
+    const deleteSelected = useCallback(() => {
         const newImages = images.filter((_, i) => !selectedIds.includes(i));
         setImages(newImages);
         setSelectedIds([]);
-    };
+    }, [images, selectedIds]);
 
     // Key Presses
-    const handleKeyPress = (e: KeyboardEvent) => {
-        if (e.key === "d") {
-            //debug
-            console.log(selectedIds);
-            console.log(uiState);
-            console.log(images);
-        }
-        if (e.key === "Escape") {
-            setSelectedIds([]);
-        } else if (e.key === "Backspace") {
-            deleteSelected();
-        } else if (e.key === "Delete") {
-            if (selectedIds.length > 0) {
+    const handleKeyPress = useCallback(
+        (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                setSelectedIds([]);
+            } else if (e.key === "Backspace") {
                 deleteSelected();
+            } else if (e.key === "Delete") {
+                if (selectedIds.length > 0) {
+                    deleteSelected();
+                }
+            } else if (e.key === "a" && ctrlKey) {
+                e.preventDefault();
+                setSelectedIds(images.map((_, i) => i));
             }
-        } else if (e.key === "a" && ctrlKey) {
-            e.preventDefault();
-            setSelectedIds(images.map((_, i) => i));
-        }
-    };
+        },
+        [ctrlKey, images, selectedIds, deleteSelected]
+    );
 
     // Stage View
     const {
@@ -160,6 +157,14 @@ export default function App() {
 
     // Comment View
     const commentView = CommentViewManager(setView);
+
+    // Export
+    const exportManager = ExportManager(
+        activity,
+        stageRef,
+        selectedIds,
+        setSelectedIds
+    );
 
     // Dragging Behaviour depending on View
     const stageConstants = {
@@ -188,7 +193,7 @@ export default function App() {
         return () => {
             window.removeEventListener("keyup", handleKeyPress);
         };
-    }, [selectedIds, shiftKey, ctrlKey, altKey, metaKey]);
+    }, [selectedIds, shiftKey, ctrlKey, altKey, metaKey, handleKeyPress]);
 
     return (
         <div>
@@ -201,7 +206,10 @@ export default function App() {
                         commentView={commentView}
                     />
                     <ExitCommentView commentView={commentView} />
-                    <ExportPanel stageRef={stageRef} activity={activity} />
+                    <ExportPanel
+                        activity={activity}
+                        exportManager={exportManager}
+                    />
                 </TopZone>
                 <ActivityPanel
                     activity={activity}

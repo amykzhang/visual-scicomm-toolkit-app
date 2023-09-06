@@ -1,7 +1,5 @@
-import { useEffect } from "react";
 import { APP_VIEW } from "../utils/enums";
 import { CommentViewProp } from "../utils/interfaces";
-import { CommentViewManager } from "../functions";
 import { SquareButton } from "../components/Components";
 import { CommentTool } from "../components/CommentTool";
 import { ReactComponent as SelectIcon } from "../assets/select.svg";

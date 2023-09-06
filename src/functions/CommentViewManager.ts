@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { CommentStateProp } from "../utils/interfaces";
 import { APP_VIEW } from "../utils/enums";
 
