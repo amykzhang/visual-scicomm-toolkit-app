@@ -195,6 +195,16 @@ export default function App() {
         };
     }, [selectedIds, shiftKey, ctrlKey, altKey, metaKey, handleKeyPress]);
 
+    // For Comment View
+    useEffect(() => {
+        if (stageRef.current !== null) {
+            const stage = stageRef.current;
+
+            const container = stage.getContent();
+            container.style.backgroundColor = commentView.state.backgroundColor;
+        }
+    }, [commentView.state.backgroundColor, stageRef]);
+
     return (
         <div>
             <PanelsContainer>
@@ -250,7 +260,7 @@ export default function App() {
                 onWheel={handleWheel}
                 onClick={handleUnfocus}
                 ref={stageRef}
-                fill={commentView.state.backgroundColor}
+                // fill={commentView.state.backgroundColor}
                 {...stageConstants}
             >
                 <Layer id="export-layer">

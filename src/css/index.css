@@ -9,7 +9,6 @@ body {
     /* mobile viewport bug fix */
     min-height: -webkit-fill-available;
     height: 100%;
-    background-color: #e2e2e2;
 }
 
 html,
