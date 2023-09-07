@@ -28,10 +28,6 @@ export interface ImageProp {
     isDragging: boolean;
     image: HTMLImageElement | undefined;
     src: string;
-    offset?: {
-        x: number;
-        y: number;
-    };
 }
 
 export interface CanvasStateProp {

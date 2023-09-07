@@ -275,7 +275,7 @@ export default function App() {
                             <ImageElement
                                 {...canvasElementConstants}
                                 key={i}
-                                imageProps={image}
+                                image={image}
                                 isSelected={selectedIds.includes(i)}
                                 onSelect={() => handleSelect(i)}
                                 onChange={(newAttrs: any) => {
