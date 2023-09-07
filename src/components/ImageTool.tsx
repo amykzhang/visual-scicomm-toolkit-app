@@ -48,15 +48,14 @@ export const ImageTool: FC<ImageToolProps> = ({
             ...images,
             {
                 id: uuid(),
-                x: x,
-                y: y,
+                x: x - offset.x,
+                y: y - offset.y,
                 width: dimensions.width,
                 height: dimensions.height,
                 rotation: 0,
                 isDragging: false,
                 image: imageElement,
                 src: src,
-                offset: offset,
             },
         ]);
     }
