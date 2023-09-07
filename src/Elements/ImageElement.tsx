@@ -2,12 +2,7 @@ import React, { Fragment, useEffect, useRef } from "react";
 import Konva from "konva";
 import { Image, Transformer } from "react-konva";
 import { ImageProp } from "../utils/interfaces";
-import {
-    handleDragEnd,
-    handleDragStart,
-    handleRotationEnd,
-    handleRotationStart,
-} from "../functions";
+import { handleDragEnd, handleDragStart } from "../functions";
 
 interface ImageElementProps {
     // key: number;
@@ -55,7 +50,6 @@ const ImageElement = ({
                 draggable={draggable}
                 onDragStart={handleDragStart(images, setImages)}
                 onDragEnd={handleDragEnd(images, setImages)}
-                onTransformStart={() => console.log("transform start")}
                 onTransformEnd={() => {
                     // transformer is changing scale of the node
                     // and NOT its width or height
