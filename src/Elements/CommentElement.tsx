@@ -19,9 +19,7 @@ const CommentElement = ({
     return (
         <Fragment>
             <Text
-                x={comment.x}
-                y={comment.y}
-                text={comment.text}
+                {...comment}
                 onDragStart={handleDragStart(comments, setComments)}
                 onDragEnd={handleDragEnd(comments, setComments)}
                 draggable={true}

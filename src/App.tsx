@@ -25,6 +25,7 @@ import { ImageElement } from "./Elements";
 import { KonvaEventObject } from "konva/lib/Node";
 import { ExportPanel } from "./Panels";
 import CommentElement from "./Elements/CommentElement";
+import { handleAddComment } from "./functions/comment";
 
 // TODO: make this easier to customize, more modular for creators?
 const activity = activity_visual_strategies;
@@ -136,7 +137,7 @@ export default function App() {
         }
     };
 
-    const handleUnfocus = (e: KonvaEventObject<MouseEvent>) => {
+    const handleStageUnfocus = (e: KonvaEventObject<MouseEvent>) => {
         if (view === APP_VIEW.select) {
             const clickedOnEmpty = e.target === stageRef.current;
             if (clickedOnEmpty) {
@@ -284,9 +285,12 @@ export default function App() {
                 width={window.innerWidth}
                 height={window.innerHeight}
                 onWheel={handleWheel}
-                onClick={handleUnfocus}
+                onClick={
+                    commentView.state.active
+                        ? handleAddComment(comments, setComments, stageRef)
+                        : handleStageUnfocus
+                }
                 ref={stageRef}
-                // fill={commentView.state.backgroundColor}
                 {...stageConstants}
             >
                 <Layer id="export-layer">
@@ -294,6 +298,20 @@ export default function App() {
                         {...activity.canvas_size}
                         onClick={() => setSelectedIds([])}
                     />
+                </Layer>
+                <Layer id="comment-layer">
+                    {commentView.state.active &&
+                        comments.map((comment, i) => {
+                            return (
+                                <CommentElement
+                                    {...canvasElementConstants}
+                                    key={i}
+                                    comment={comment}
+                                    comments={comments}
+                                    setComments={setComments}
+                                />
+                            );
+                        })}
                 </Layer>
                 <Layer id="image-layer">
                     {images.map((image, i) => {
@@ -315,20 +333,6 @@ export default function App() {
                             />
                         );
                     })}
-                </Layer>
-                <Layer id="comment-layer">
-                    {commentView.state.active &&
-                        comments.map((comment, i) => {
-                            return (
-                                <CommentElement
-                                    {...canvasElementConstants}
-                                    key={i}
-                                    comment={comment}
-                                    comments={comments}
-                                    setComments={setComments}
-                                />
-                            );
-                        })}
                 </Layer>
             </Stage>
         </div>

@@ -25,6 +25,7 @@ UofT BMC web app project 2023
 - make background colour grey #d6d6d6 ✅
 - rename lines to labels & arrows ✅
 - fix shortcuts for commands
+- rework drag with selection to use selection IDs instead of isDragging
 - Export button indicate hover and selection, pointer
 - Info modal window 70vw 50vh
 - Info and Settings same box as squaretool

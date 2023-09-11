@@ -27,7 +27,6 @@ function reconstructImagesFromJSON(imagesJSON: string): ImageProp[] {
 
 // Saves each canvas layer/group as string, then stringify canvasState and save to local storage
 function persistCanvasState(images: ImageProp[], comments: CommentProp[]) {
-    console.log(comments);
     window.localStorage.setItem(
         LOCALSTORAGE_CANVAS_STATE_KEY,
         JSON.stringify({

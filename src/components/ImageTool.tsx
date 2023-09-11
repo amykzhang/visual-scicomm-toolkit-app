@@ -34,11 +34,7 @@ export const ImageTool: FC<ImageToolProps> = ({
     setImages,
     stageRef,
 }) => {
-    function putImageOnCanvas(
-        x: number,
-        y: number,
-        offset: { x: number; y: number }
-    ) {
+    function addImage(x: number, y: number, offset: { x: number; y: number }) {
         const imageElement = new Image();
         imageElement.width = dimensions.width;
         imageElement.height = dimensions.height;
@@ -66,7 +62,7 @@ export const ImageTool: FC<ImageToolProps> = ({
             const stage = stageRef.current;
             const x = (e.clientX - stage.x()) / stage.scaleX();
             const y = (e.clientY - stage.y()) / stage.scaleX();
-            putImageOnCanvas(x, y, {
+            addImage(x, y, {
                 x: dimensions.width / 2,
                 y: dimensions.height / 2,
             });
