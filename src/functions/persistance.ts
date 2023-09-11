@@ -1,9 +1,9 @@
 import {
     ImageProp,
-    CanvasStateStringsProp,
     UiStateProp,
     StageStateProp,
     CanvasStateProp,
+    CommentProp,
 } from "../utils/interfaces";
 
 const LOCALSTORAGE_CANVAS_STATE_KEY = "visual-toolkit-canvas";
@@ -26,27 +26,30 @@ function reconstructImagesFromJSON(imagesJSON: string): ImageProp[] {
 }
 
 // Saves each canvas layer/group as string, then stringify canvasState and save to local storage
-function persistCanvasState(images: ImageProp[]) {
+function persistCanvasState(images: ImageProp[], comments: CommentProp[]) {
+    console.log(comments);
     window.localStorage.setItem(
         LOCALSTORAGE_CANVAS_STATE_KEY,
         JSON.stringify({
             images: JSON.stringify(images),
+            comments: comments,
         })
     );
 }
 
 // Returns reconstructed canvas state from local storage
-function retrieveCanvasState(): CanvasStateProp | undefined {
-    const canvasStateJSON = window.localStorage.getItem(
-        LOCALSTORAGE_CANVAS_STATE_KEY
-    );
+function retrieveCanvasState() {
+    const saved = window.localStorage.getItem(LOCALSTORAGE_CANVAS_STATE_KEY);
 
-    if (canvasStateJSON !== null) {
-        const canvasStateStringFields: CanvasStateStringsProp =
-            JSON.parse(canvasStateJSON);
+    if (saved !== null) {
+        const canvasState = JSON.parse(saved);
 
-        const persistedCanvasState = {
-            images: reconstructImagesFromJSON(canvasStateStringFields.images),
+        const persistedCanvasState: CanvasStateProp = {
+            // images have a field called image which is an HTMLImageElement, which needed to be stringified
+            images: reconstructImagesFromJSON(
+                canvasState.images
+            ) as ImageProp[],
+            comments: canvasState.comments as CommentProp[],
         };
 
         return persistedCanvasState;

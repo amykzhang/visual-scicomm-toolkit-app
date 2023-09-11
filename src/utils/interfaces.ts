@@ -18,6 +18,28 @@ export interface ExportOptions {
     exportPDF: () => void;
 }
 
+export interface CanvasStateProp {
+    images: ImageProp[];
+    comments: CommentProp[];
+}
+
+// export interface CanvasStateStringsProp {
+//     images: string;
+// }
+
+export interface UiStateProp {
+    view: APP_VIEW;
+    isLeftPanelOpen: boolean;
+    isRightPanelOpen: boolean;
+}
+
+export interface StageStateProp {
+    stagePosition: { x: number; y: number };
+    scaleX: number;
+}
+
+// Elements
+
 export interface ImageProp {
     id: string;
     x: number;
@@ -30,21 +52,11 @@ export interface ImageProp {
     src: string;
 }
 
-export interface CanvasStateProp {
-    images: ImageProp[];
-}
-
-export interface CanvasStateStringsProp {
-    images: string;
-}
-
-export interface UiStateProp {
-    view: APP_VIEW;
-    isLeftPanelOpen: boolean;
-    isRightPanelOpen: boolean;
-}
-
-export interface StageStateProp {
-    stagePosition: { x: number; y: number };
-    scaleX: number;
+export interface CommentProp {
+    id: string;
+    x: number;
+    y: number;
+    isDragging: boolean;
+    isEditing: boolean;
+    text: string;
 }

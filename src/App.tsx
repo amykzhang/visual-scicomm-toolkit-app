@@ -14,11 +14,17 @@ import typography from "./styles/typography";
 import { ExportArea } from "./components/ExportArea";
 import { ExitCommentViewButton } from "./components/Components";
 import activity_visual_strategies from "./activity/activity";
-import { CommentViewProp, ImageProp, UiStateProp } from "./utils/interfaces";
+import {
+    CommentProp,
+    CommentViewProp,
+    ImageProp,
+    UiStateProp,
+} from "./utils/interfaces";
 import { persistance } from "./functions";
 import { ImageElement } from "./Elements";
 import { KonvaEventObject } from "konva/lib/Node";
 import { ExportPanel } from "./Panels";
+import CommentElement from "./Elements/CommentElement";
 
 // TODO: make this easier to customize, more modular for creators?
 const activity = activity_visual_strategies;
@@ -59,13 +65,33 @@ export default function App() {
         }
     }
 
-    // Canvas State (images)
+    // images
     const [images, setImages] = useState<ImageProp[]>(() => {
         const saved = persistance.retrieveCanvasState();
 
-        if (saved !== undefined) {
+        if (saved !== undefined && saved.images !== undefined) {
             return saved.images;
         } else return [];
+    });
+
+    // comments
+    const [comments, setComments] = useState<CommentProp[]>(() => {
+        const saved = persistance.retrieveCanvasState();
+
+        if (saved !== undefined && saved.comments !== undefined) {
+            return saved.comments;
+        } else {
+            return [
+                // {
+                //     id: "0",
+                //     x: 100,
+                //     y: 100,
+                //     isDragging: false,
+                //     isEditing: false,
+                //     text: "Hello World!",
+                // },
+            ];
+        }
     });
 
     // Splices the indexed imaged with the new image
@@ -178,8 +204,8 @@ export default function App() {
 
     // Side effect for canvas state
     useEffect(() => {
-        persistance.persistCanvasState(images);
-    }, [images]);
+        persistance.persistCanvasState(images, comments);
+    }, [images, comments]);
 
     // Side effect for UI state
     useEffect(() => {
@@ -278,10 +304,10 @@ export default function App() {
                                 image={image}
                                 isSelected={selectedIds.includes(i)}
                                 onSelect={() => handleSelect(i)}
-                                onChange={(newAttrs: any) => {
+                                onChange={(attributes: any) => {
                                     modifyImage(i, {
                                         ...image,
-                                        ...newAttrs,
+                                        ...attributes,
                                     });
                                 }}
                                 images={images}
@@ -290,7 +316,20 @@ export default function App() {
                         );
                     })}
                 </Layer>
-                <Layer id="comment-layer"></Layer>
+                <Layer id="comment-layer">
+                    {commentView.state.active &&
+                        comments.map((comment, i) => {
+                            return (
+                                <CommentElement
+                                    {...canvasElementConstants}
+                                    key={i}
+                                    comment={comment}
+                                    comments={comments}
+                                    setComments={setComments}
+                                />
+                            );
+                        })}
+                </Layer>
             </Stage>
         </div>
     );

@@ -8,13 +8,18 @@ export const handleDragStart = (
 ) => {
     return (e: Konva.KonvaEventObject<DragEvent>) => {
         console.log("drag start");
+
         const id = e.target.id();
         initialXY.x = e.target.x();
         initialXY.y = e.target.y();
 
+        console.log("id", id);
         const newElements = elements.map((element) => {
+            console.log("element.id", element.id);
             return { ...element, isDragging: element.id === id };
         });
+
+        console.log("before", newElements);
 
         setElements(newElements);
     };
@@ -44,6 +49,8 @@ export const handleDragEnd = (
                 return element;
             }
         });
+
+        console.log("after", newElements);
 
         setElements(newElements);
     };

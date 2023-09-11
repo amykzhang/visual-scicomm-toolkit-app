@@ -4,27 +4,27 @@ import { Image, Transformer } from "react-konva";
 import { ImageProp } from "../utils/interfaces";
 import { handleDragEnd, handleDragStart } from "../functions";
 
-interface ImageElementProps {
-    // key: number;
+interface ImageElementProp {
     image: ImageProp;
     isSelected: boolean;
     onSelect: any;
     onChange: any;
     images: ImageProp[];
     setImages: React.Dispatch<React.SetStateAction<ImageProp[]>>;
+    perfectDrawEnabled?: boolean;
     draggable: boolean;
 }
 
 const ImageElement = ({
-    // key,
     image,
     isSelected,
     onSelect,
     onChange,
     images,
     setImages,
+    perfectDrawEnabled,
     draggable,
-}: ImageElementProps) => {
+}: ImageElementProp) => {
     const imageRef = useRef<Konva.Image | null>(null);
     const transformerRef = useRef<Konva.Transformer | null>(null);
 
@@ -47,6 +47,7 @@ const ImageElement = ({
                 onClick={onSelect}
                 onTap={onSelect}
                 ref={imageRef}
+                perfectDrawEnabled={perfectDrawEnabled}
                 draggable={draggable}
                 onDragStart={handleDragStart(images, setImages)}
                 onDragEnd={handleDragEnd(images, setImages)}
