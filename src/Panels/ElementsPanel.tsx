@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import Konva from "konva";
 import { ImageProp } from "../utils/interfaces";
 import { Activity } from "../activity/activity";
@@ -38,21 +38,6 @@ const ElementsRow = styled.div`
     justify-content: space-between;
     gap: 12px 3px;
     width: 288px;
-`;
-
-const ElementTool = styled.div`
-    pointer-events: all;
-    background: white;
-    border: none;
-    border-radius: 0px;
-
-    &:hover {
-        background-color: #d7e9ff;
-    }
-
-    &[data-isactive="true"] {
-        background-color: #d7e9ff;
-    }
 `;
 
 const ElementsToggle = styled(SideBarToggle)`
@@ -101,24 +86,44 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
         );
     };
 
+    const DrawSection = () => {
+        const { heading, contents } = elements.draw;
+        return (
+            <>
+                <ImageSubheadingText>{heading}</ImageSubheadingText>
+                <ElementsRow>
+                    {contents.map((item, i) => {
+                        if (
+                            item.type === "tool" &&
+                            item.tool === "freehand-draw"
+                        ) {
+                            return <Doodle key={i} />;
+                        } else return <></>;
+                    })}
+                </ElementsRow>
+            </>
+        );
+    };
+
     const LinesSection = () => {
         const { srcs, icons, sizes } = lines;
         return (
             <>
                 <ImageSubheadingText>{lines.heading}</ImageSubheadingText>
                 <ElementsRow>
-                    {srcs.map((src, i) => (
-                        <ImageTool
-                            key={i}
-                            src={src}
-                            name={icons[i]}
-                            dimensions={sizes[i]}
-                            images={images}
-                            setImages={setImages}
-                            stageRef={stageRef}
-                        />
-                    ))}
-                    <Doodle />
+                    {srcs.map((src, i) => {
+                        return (
+                            <ImageTool
+                                key={i}
+                                src={src}
+                                name={icons[i]}
+                                dimensions={sizes[i]}
+                                images={images}
+                                setImages={setImages}
+                                stageRef={stageRef}
+                            />
+                        );
+                    })}
                 </ElementsRow>
             </>
         );
@@ -186,6 +191,7 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
                 </SideBarHeader>
 
                 <TextSection />
+                <DrawSection />
                 <LinesSection />
                 <ShapeSection />
                 <ImageSection />

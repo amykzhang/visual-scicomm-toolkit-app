@@ -50,6 +50,7 @@ export const SideBar = styled.div`
 `;
 
 export const SideBarHeader = styled.div`
+    user-select: none;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -69,6 +70,7 @@ export const SideBarToggle = styled.div`
 `;
 
 export const SideBarContent = styled.div`
+    user-select: none;
     width: 325px;
     height: 100%;
     background: white;

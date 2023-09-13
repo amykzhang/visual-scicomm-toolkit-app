@@ -1,10 +1,9 @@
 import styled from "styled-components";
-import { Activity } from "../activity/activity";
 import typography from "../styles/typography";
 
 const TitlePanelContainer = styled.div`
     position: absolute;
-    width: 24vw;
+    width: 380px;
     height: 69px;
     left: 0px;
     top: 0px;
@@ -15,7 +14,9 @@ const TitlePanelContainer = styled.div`
 
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    padding: 0px 20px;
+    gap: 24px;
 `;
 
 const Logo = styled.div`
@@ -23,11 +24,8 @@ const Logo = styled.div`
     text-align: center;
     gap: 10px;
 
-    position: absolute;
     width: 62px;
     height: 38px;
-    left: 12px;
-    top: 13px;
 
     background: #000000;
     color: #ffffff;
@@ -35,8 +33,6 @@ const Logo = styled.div`
 `;
 
 const StyledName = styled.div`
-    position: absolute;
-    left: 100px;
     line-height: 25px;
 `;
 

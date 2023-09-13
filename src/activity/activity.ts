@@ -16,6 +16,14 @@ export type Activity = {
                 height: number;
             }[];
         };
+        draw: {
+            heading: string;
+            contents: {
+                name: string;
+                type: string;
+                tool: string;
+            }[];
+        };
         lines: {
             heading: string;
             icons: string[];
@@ -48,6 +56,7 @@ export type Activity = {
             }[];
         };
     };
+    info: string;
 };
 
 const activity_visual_strategies: Activity = {
@@ -120,7 +129,7 @@ const activity_visual_strategies: Activity = {
             sizes: [{ width: 78, height: 27 }],
         },
         lines: {
-            heading: "Lines",
+            heading: "Labels & Arrows",
             icons: [
                 "label_left_dot",
                 "label_right_dot",
@@ -162,6 +171,16 @@ const activity_visual_strategies: Activity = {
                 { width: 65, height: 30 },
                 { width: 50, height: 50 },
                 { width: 50, height: 50 },
+            ],
+        },
+        draw: {
+            heading: "Draw",
+            contents: [
+                {
+                    name: "draw-tool",
+                    type: "tool",
+                    tool: "freehand-draw",
+                },
             ],
         },
         shapes: {
@@ -418,6 +437,10 @@ const activity_visual_strategies: Activity = {
             ],
         },
     },
+    info: `
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque malesuada quis nulla a porta. Quisque aliquet eros at efficitur dictum. Morbi semper interdum hendrerit. Donec at leo ut augue fermentum pellentesque. Proin nec diam eu velit feugiat tempor. Proin placerat, odio fermentum fermentum ullamcorper, urna ante mattis erat, vel commodo quam dolor sit amet nulla. Donec neque quam, condimentum in tortor a, fermentum pellentesque lectus. Sed vitae lorem volutpat magna sagittis euismod.
+    
+    `,
 };
 
 export default activity_visual_strategies;

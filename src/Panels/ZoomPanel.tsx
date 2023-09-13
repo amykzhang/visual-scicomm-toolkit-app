@@ -1,4 +1,3 @@
-import { useState } from "react";
 import styled from "styled-components";
 import { SquareButton } from "../components/Components";
 import { CenterBar } from "../styles/containers";

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Activity } from "../activity/activity";
 import {
     SideBar,
@@ -6,8 +5,6 @@ import {
     SideBarContent,
     SideBarToggle,
     Top30,
-    Top20,
-    Top10,
 } from "../styles/containers";
 import typography from "../styles/typography";
 import styled from "styled-components";
@@ -26,7 +23,6 @@ const ActivityPanelContainer = styled(SideBar)`
 `;
 
 const ActivityContentContainer = styled(SideBarContent)`
-    pointer-events: all;
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;

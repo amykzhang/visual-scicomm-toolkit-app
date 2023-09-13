@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
-import { Stage, Layer, Image, StageProps } from "react-konva";
-import Konva from "konva";
+import { useCallback, useEffect, useState } from "react";
+import { Stage, Layer } from "react-konva";
 import styled from "styled-components";
-import { KeyPressManager, StageViewManager } from "./functions";
+import { ExportManager, KeyPressManager, StageViewManager } from "./functions";
 import { CommentViewManager } from "./functions";
 import { APP_VIEW } from "./utils/enums";
 import { ElementsPanel } from "./Panels/ElementsPanel";
@@ -15,11 +14,18 @@ import typography from "./styles/typography";
 import { ExportArea } from "./components/ExportArea";
 import { ExitCommentViewButton } from "./components/Components";
 import activity_visual_strategies from "./activity/activity";
-import { CommentViewProp, ImageProp, UiStateProp } from "./utils/interfaces";
+import {
+    CommentProp,
+    CommentViewProp,
+    ImageProp,
+    UiStateProp,
+} from "./utils/interfaces";
 import { persistance } from "./functions";
 import { ImageElement } from "./Elements";
 import { KonvaEventObject } from "konva/lib/Node";
-import { clear } from "console";
+import { ExportPanel } from "./Panels";
+import CommentElement from "./Elements/CommentElement";
+import { handleAddComment } from "./functions/comment";
 
 // TODO: make this easier to customize, more modular for creators?
 const activity = activity_visual_strategies;
@@ -53,20 +59,40 @@ export default function App() {
     });
 
     const view = uiState.view;
-    const setView = (view: APP_VIEW) => {
+    function setView(view: APP_VIEW) {
         setUiState({ ...uiState, view: view });
         if (view !== APP_VIEW.select) {
             setSelectedIds([]);
         }
-    };
+    }
 
-    // Canvas State (images)
+    // images
     const [images, setImages] = useState<ImageProp[]>(() => {
         const saved = persistance.retrieveCanvasState();
 
-        if (saved !== undefined) {
+        if (saved !== undefined && saved.images !== undefined) {
             return saved.images;
         } else return [];
+    });
+
+    // comments
+    const [comments, setComments] = useState<CommentProp[]>(() => {
+        const saved = persistance.retrieveCanvasState();
+
+        if (saved !== undefined && saved.comments !== undefined) {
+            return saved.comments;
+        } else {
+            return [
+                // {
+                //     id: "0",
+                //     x: 100,
+                //     y: 100,
+                //     isDragging: false,
+                //     isEditing: false,
+                //     text: "Hello World!",
+                // },
+            ];
+        }
     });
 
     // Splices the indexed imaged with the new image
@@ -111,7 +137,7 @@ export default function App() {
         }
     };
 
-    const handleUnfocus = (e: KonvaEventObject<MouseEvent>) => {
+    const handleStageUnfocus = (e: KonvaEventObject<MouseEvent>) => {
         if (view === APP_VIEW.select) {
             const clickedOnEmpty = e.target === stageRef.current;
             if (clickedOnEmpty) {
@@ -120,33 +146,30 @@ export default function App() {
         }
     };
 
-    const deleteSelected = () => {
+    const deleteSelected = useCallback(() => {
         const newImages = images.filter((_, i) => !selectedIds.includes(i));
         setImages(newImages);
         setSelectedIds([]);
-    };
+    }, [images, selectedIds]);
 
     // Key Presses
-    const handleKeyPress = (e: KeyboardEvent) => {
-        if (e.key === "d") {
-            //debug
-            console.log(selectedIds);
-            console.log(uiState);
-            console.log(images);
-        }
-        if (e.key === "Escape") {
-            setSelectedIds([]);
-        } else if (e.key === "Backspace") {
-            deleteSelected();
-        } else if (e.key === "Delete") {
-            if (selectedIds.length > 0) {
+    const handleKeyPress = useCallback(
+        (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                setSelectedIds([]);
+            } else if (e.key === "Backspace") {
                 deleteSelected();
+            } else if (e.key === "Delete") {
+                if (selectedIds.length > 0) {
+                    deleteSelected();
+                }
+            } else if (e.key === "a" && ctrlKey) {
+                e.preventDefault();
+                setSelectedIds(images.map((_, i) => i));
             }
-        } else if (e.key === "a" && ctrlKey) {
-            e.preventDefault();
-            setSelectedIds(images.map((_, i) => i));
-        }
-    };
+        },
+        [ctrlKey, images, selectedIds, deleteSelected]
+    );
 
     // Stage View
     const {
@@ -162,6 +185,14 @@ export default function App() {
     // Comment View
     const commentView = CommentViewManager(setView);
 
+    // Export
+    const exportManager = ExportManager(
+        activity,
+        stageRef,
+        selectedIds,
+        setSelectedIds
+    );
+
     // Dragging Behaviour depending on View
     const stageConstants = {
         draggable: view === APP_VIEW.pan,
@@ -174,8 +205,8 @@ export default function App() {
 
     // Side effect for canvas state
     useEffect(() => {
-        persistance.persistCanvasState(images);
-    }, [images]);
+        persistance.persistCanvasState(images, comments);
+    }, [images, comments]);
 
     // Side effect for UI state
     useEffect(() => {
@@ -189,7 +220,17 @@ export default function App() {
         return () => {
             window.removeEventListener("keyup", handleKeyPress);
         };
-    }, [selectedIds, shiftKey, ctrlKey, altKey, metaKey]);
+    }, [selectedIds, shiftKey, ctrlKey, altKey, metaKey, handleKeyPress]);
+
+    // For Comment View
+    useEffect(() => {
+        if (stageRef.current !== null) {
+            const stage = stageRef.current;
+
+            const container = stage.getContent();
+            container.style.backgroundColor = commentView.state.backgroundColor;
+        }
+    }, [commentView.state.backgroundColor, stageRef]);
 
     return (
         <div>
@@ -202,6 +243,10 @@ export default function App() {
                         commentView={commentView}
                     />
                     <ExitCommentView commentView={commentView} />
+                    <ExportPanel
+                        activity={activity}
+                        exportManager={exportManager}
+                    />
                 </TopZone>
                 <ActivityPanel
                     activity={activity}
@@ -240,9 +285,12 @@ export default function App() {
                 width={window.innerWidth}
                 height={window.innerHeight}
                 onWheel={handleWheel}
-                onClick={handleUnfocus}
+                onClick={
+                    commentView.state.active
+                        ? handleAddComment(comments, setComments, stageRef)
+                        : handleStageUnfocus
+                }
                 ref={stageRef}
-                fill={commentView.state.backgroundColor}
                 {...stageConstants}
             >
                 <Layer id="export-layer">
@@ -251,19 +299,33 @@ export default function App() {
                         onClick={() => setSelectedIds([])}
                     />
                 </Layer>
+                <Layer id="comment-layer">
+                    {commentView.state.active &&
+                        comments.map((comment, i) => {
+                            return (
+                                <CommentElement
+                                    {...canvasElementConstants}
+                                    key={i}
+                                    comment={comment}
+                                    comments={comments}
+                                    setComments={setComments}
+                                />
+                            );
+                        })}
+                </Layer>
                 <Layer id="image-layer">
                     {images.map((image, i) => {
                         return (
                             <ImageElement
                                 {...canvasElementConstants}
                                 key={i}
-                                imageProps={image}
+                                image={image}
                                 isSelected={selectedIds.includes(i)}
                                 onSelect={() => handleSelect(i)}
-                                onChange={(newAttrs: any) => {
+                                onChange={(attributes: any) => {
                                     modifyImage(i, {
                                         ...image,
-                                        ...newAttrs,
+                                        ...attributes,
                                     });
                                 }}
                                 images={images}
@@ -272,7 +334,6 @@ export default function App() {
                         );
                     })}
                 </Layer>
-                <Layer id="comment-layer"></Layer>
             </Stage>
         </div>
     );

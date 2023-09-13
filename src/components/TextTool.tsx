@@ -16,12 +16,7 @@ export const TextTool = () => {
 
     return (
         <StyledTextContainer>
-            <StyledTextButton
-            // data-isactive={app.currentToolId === "text"}
-            // onClick={() => app.setSelectedTool("text")}
-            >
-                Text Box
-            </StyledTextButton>
+            <StyledTextButton>Text Box</StyledTextButton>
         </StyledTextContainer>
     );
 };

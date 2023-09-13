@@ -13,7 +13,7 @@ export const ExportArea: React.FC<{
             height={height}
             id={"export-area"}
             draggable={false}
-            fill={"transparent"}
+            fill={"white"}
             stroke={"#c1c1c1"}
             strokeWidth={2}
             onClick={onClick}

@@ -1,31 +1,32 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { CommentStateProp } from "../utils/interfaces";
 import { APP_VIEW } from "../utils/enums";
 
-const initial_comment_view: CommentStateProp = {
-    active: false,
-    backgroundColor: "white",
-};
+const defaultBackgroundColor = "#F5F5F5";
+const commentBackgroundColor = "#CECECE";
 
 export const CommentViewManager = (setView: (view: APP_VIEW) => void) => {
-    const [state, setState] = useState<CommentStateProp>(initial_comment_view);
+    const [state, setState] = useState<CommentStateProp>({
+        active: false,
+        backgroundColor: defaultBackgroundColor,
+    });
 
     function enter() {
         setView(APP_VIEW.comment);
-        setState((prev) => {
+        setState(() => {
             return {
-                ...prev,
                 active: true,
+                backgroundColor: commentBackgroundColor,
             };
         });
     }
 
     function exit() {
         setView(APP_VIEW.select);
-        setState((prev) => {
+        setState(() => {
             return {
-                ...prev,
                 active: false,
+                backgroundColor: defaultBackgroundColor,
             };
         });
     }
