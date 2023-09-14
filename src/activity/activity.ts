@@ -77,15 +77,15 @@ const activity_visual_strategies: Activity = {
             Instructions
         </div>
         <div class="gap-large flex-column">
-            <div class="flex-column lightblue-background rounded gap-medium pad-medium">
+            <div class="flex-column lightblue-background rounded gap-medium pad-small">
                 <div class="small-text bold">1. Understand the science</div>
                 <div class="small-text">We start by researching the topic if we're unfamiliar with the science. This includes searching and referencing visuals, such as diagrams, created by others.</div>
             </div>
-            <div class="flex-column lightblue-background rounded gap-medium pad-medium">
+            <div class="flex-column lightblue-background rounded gap-medium pad-small">
                 <div class="small-text bold">2. Design a communication piece</div>
                 <div class="small-text">Once we have a good grasp of the science, we can communicate it to our target audience. We start considering the text that appears in the piece, the placement of visuals, and the balance between text and visuals.</div>
             </div>
-            <div class="flex-column lightblue-background rounded gap-medium pad-medium">
+            <div class="flex-column lightblue-background rounded gap-medium pad-small">
                 <div class="small-text bold">3. Support your design choices</div>
                 <div class="small-text">Place a comment next to different parts of your diagram and explain how you've made your design as effective as possible.</div>
             </div>

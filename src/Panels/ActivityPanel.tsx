@@ -40,7 +40,8 @@ const ActivityHeader = styled(SideBarHeader)`
 
 const ActivityToggle = styled(SideBarToggle)`
     position: fixed;
-    right: 6px;
+    right: 0;
+    margin: 6px;
 `;
 
 export const ActivityPanel: React.FC<ActivityPanelProps> = ({
