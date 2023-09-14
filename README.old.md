@@ -66,7 +66,7 @@ Sharable Link (optional):
 
 SEPTEMBER 13: (5 hours)
 - Rework color.ts ✅
-- Export button: hover, selected, pointer
+- Export button: hover, selected, pointer ✅
 - Modify info window: 70vw 50vh
 - Modify Info and Settings same box as SquareTool component
 - Add blue background on hover for sidebar minimize and expand

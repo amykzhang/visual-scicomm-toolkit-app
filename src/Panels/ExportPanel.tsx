@@ -9,6 +9,8 @@ import { ExportOptions } from "../utils/interfaces";
 import color from "../styles/color";
 
 const ExportPanelContainer = styled.div`
+    pointer-events: all;
+    user-select: none;
     position: absolute;
     width: 380px;
     height: 69px;
@@ -24,11 +26,10 @@ const ExportPanelContainer = styled.div`
     justify-content: space-between;
     padding: 0px 20px;
     gap: 24px;
-
-    pointer-events: all;
 `;
 
 const ExportButton = styled.div`
+    cursor: pointer;
     display: flex;
     width: 230px;
     padding: 10px 24px;
@@ -38,6 +39,13 @@ const ExportButton = styled.div`
 
     border-radius: 5px;
     background: ${color.blue};
+
+    &:hover {
+        opacity: 0.9;
+    }
+
+    &[data-isactive="true"] {
+        opacity: 0.8;
 `;
 
 const ExportText = styled(typography.LargeText)`
@@ -63,7 +71,10 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
         <ExportPanelContainer>
             <InformationTool content={activity.info} />
             <GearIcon />
-            <ExportButton onClick={toggleExportOptions}>
+            <ExportButton
+                data-isactive={isExportOptionsOpen}
+                onClick={toggleExportOptions}
+            >
                 <UploadIcon />
                 <ExportText>Share Canvas</ExportText>
             </ExportButton>
