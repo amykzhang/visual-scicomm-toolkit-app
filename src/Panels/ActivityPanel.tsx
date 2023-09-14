@@ -1,12 +1,9 @@
 import { Activity } from "../activity/activity";
 import {
     SideBar,
-    SideBarHeader,
     SideBarContent,
     SideBarToggle,
-    Top30,
 } from "../styles/containers";
-import typography from "../styles/typography";
 import styled from "styled-components";
 import { ReactComponent as LeftArrow } from "../assets/arrowhead-left.svg";
 import { ReactComponent as RightArrow } from "../assets/arrowhead-right.svg";
