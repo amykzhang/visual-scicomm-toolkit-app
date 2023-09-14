@@ -7,6 +7,7 @@ import { Activity } from "../activity/activity";
 import typography from "../styles/typography";
 import { ExportOptions } from "../utils/interfaces";
 import color from "../styles/color";
+import { SettingTool } from "../components/SettingTool";
 
 const ExportPanelContainer = styled.div`
     pointer-events: all;
@@ -16,16 +17,14 @@ const ExportPanelContainer = styled.div`
     height: 69px;
     right: 0px;
     top: 0px;
-
     background: ${color.white};
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     border-radius: 0px 0px 0px 5px;
-
     display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    padding: 0px 20px;
-    gap: 24px;
+    justify-content: center;
+    gap: 10px;
 `;
 
 const ExportButton = styled.div`
@@ -70,7 +69,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
     return (
         <ExportPanelContainer>
             <InformationTool content={activity.info} />
-            <GearIcon />
+            <SettingTool />
             <ExportButton
                 data-isactive={isExportOptionsOpen}
                 onClick={toggleExportOptions}
