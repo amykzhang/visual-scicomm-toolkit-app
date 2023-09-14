@@ -12,7 +12,6 @@ export const SquareButton = styled.button`
 
     &:hover {
         padding: 0;
-        border: 2px solid #bbbbbb;
     }
 
     &[data-isactive="true"] {
