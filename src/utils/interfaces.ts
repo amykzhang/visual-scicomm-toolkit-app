@@ -60,3 +60,10 @@ export interface CommentProp {
     isEditing: boolean;
     text: string;
 }
+
+export interface SelectionBoundsProp {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}

@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { ImageProp } from "../utils/interfaces";
+import { ImageProp, SelectionBoundsProp } from "../utils/interfaces";
 import { APP_VIEW } from "../utils/enums";
 import Konva from "konva";
 
@@ -9,10 +9,12 @@ export const SelectionManager = (
     setImages: React.Dispatch<React.SetStateAction<ImageProp[]>>,
     view: APP_VIEW,
     shiftKey: boolean,
+    stageRef: React.MutableRefObject<Konva.Stage | null>,
     groupRef: React.MutableRefObject<Konva.Group | null>
 ) => {
-    // selected Ids
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [isSelectionMode, setIsSelectionMode] = useState(false);
+    const [selectionBounds, setSelectionBounds] = useState<SelectionBoundsProp>({ x: 0, y: 0, width: 0, height: 0 });
 
     const addSelectedId = (id: string) => {
         setSelectedIds([...selectedIds, id]);
@@ -75,14 +77,64 @@ export const SelectionManager = (
         setSelectedIds([]);
     }, [images,setImages, selectedIds]);
 
+
+    // Drag selection
+
+    const handleMouseDown = () => {
+        setIsSelectionMode(true);
+
+        if (stageRef.current !== null) {
+            const stage = stageRef.current;
+            const pointerPosition = stage.getPointerPosition();
+
+            if (pointerPosition !== null) {
+                const x = (pointerPosition.x - stage.x()) / stage.scaleX();
+                const y = (pointerPosition.y - stage.y()) / stage.scaleX();
+                setSelectionBounds({
+                    x,
+                    y,
+                    width: 0,
+                    height: 0,
+                });
+            }
+        }
+    };
+
+    const handleMouseMove = () => {
+        if (stageRef.current !== null) {
+            const stage = stageRef.current;
+            const pointerPosition = stage.getPointerPosition();
+
+            if (pointerPosition !== null) {
+                const x = (pointerPosition.x - stage.x()) / stage.scaleX();
+                const y = (pointerPosition.y - stage.y()) / stage.scaleX();
+                const width = x - selectionBounds.x;
+                const height = y - selectionBounds.y;
+                setSelectionBounds({
+                    ...selectionBounds,
+                    width,
+                    height,
+                });
+            }
+        }
+    };
+
+    const handleMouseUp = () => {
+        setIsSelectionMode(false);
+    };
+
     return {
         selectedIds,
         setSelectedIds,
-        addSelectedId,
-        removeSelectedId,
-        toggleSelectedId,
+        isSelectionMode,
+        setIsSelectionMode,
+        selectionBounds,
+        setSelectionBounds,
         handleSelect,
         deleteSelected,
         updateResetGroup,
+        handleMouseDown,
+        handleMouseMove,
+        handleMouseUp,
     };
 }

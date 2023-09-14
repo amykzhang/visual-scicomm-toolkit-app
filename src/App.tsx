@@ -33,6 +33,7 @@ import { ExportPanel } from "./Panels";
 import CommentElement from "./Elements/CommentElement";
 import { handleAddComment } from "./functions/comment";
 import Konva from "konva";
+import { SelectionRect } from "./components/SelectionRect";
 
 // TODO: make this easier to customize, more modular for creators?
 const activity = activity_visual_strategies;
@@ -101,31 +102,32 @@ export default function App() {
         setImages(newImages);
     };
 
+    // Stage View
+    const {
+        stageRef,
+        handleWheel,
+        zoomLevel,
+        zoomIn,
+        zoomOut,
+        zoomFit,
+        toggleFullscreen,
+    } = StageViewManager(activity.canvas_size);
+
     // Selection
     const {
         selectedIds,
         setSelectedIds,
+        isSelectionMode,
+        setIsSelectionMode,
+        selectionBounds,
+        setSelectionBounds,
         handleSelect,
         deleteSelected,
         updateResetGroup,
-    } = SelectionManager(images, setImages, view, shiftKey, groupRef);
-
-    const handleStageUnfocus = (e: Konva.KonvaEventObject<MouseEvent>) => {
-        if (view === APP_VIEW.select) {
-            const clickedOnStage = e.target === stageRef.current;
-            if (clickedOnStage) {
-                updateResetGroup();
-                setSelectedIds([]);
-            }
-        }
-    };
-
-    const handleExportAreaUnfocus = () => {
-        if (view === APP_VIEW.select) {
-            updateResetGroup();
-            setSelectedIds([]);
-        }
-    };
+        handleMouseDown,
+        handleMouseMove,
+        handleMouseUp,
+    } = SelectionManager(images, setImages, view, shiftKey, stageRef, groupRef);
 
     // Key Presses
     const handleKeyPress = useCallback(
@@ -146,17 +148,6 @@ export default function App() {
         },
         [ctrlKey, images, selectedIds, deleteSelected, setSelectedIds]
     );
-
-    // Stage View
-    const {
-        stageRef,
-        handleWheel,
-        zoomLevel,
-        zoomIn,
-        zoomOut,
-        zoomFit,
-        toggleFullscreen,
-    } = StageViewManager(activity.canvas_size);
 
     // Comment View
     const commentView = CommentViewManager(setView);
@@ -257,19 +248,49 @@ export default function App() {
                 height={window.innerHeight}
                 onWheel={handleWheel}
                 onClick={
+                    // handle unfocus
                     commentView.state.active
                         ? handleAddComment(comments, setComments, stageRef)
-                        : handleStageUnfocus
+                        : (e) => {
+                              if (view === APP_VIEW.select) {
+                                  const clickedOnStage =
+                                      e.target === stageRef.current;
+                                  if (clickedOnStage) {
+                                      updateResetGroup();
+                                      setSelectedIds([]);
+                                  }
+                              }
+                          }
                 }
+                onMouseDown={
+                    view === APP_VIEW.select ? handleMouseDown : undefined
+                }
+                onMouseMove={
+                    view === APP_VIEW.select ? handleMouseMove : undefined
+                }
+                onMouseUp={view === APP_VIEW.select ? handleMouseUp : undefined}
                 ref={stageRef}
                 {...stageConstants}
             >
-                <Layer id="export-layer">
+                <Layer>
                     <ExportArea
                         exportAreaRef={exportAreaRef}
                         {...activity.canvas_size}
-                        onClick={handleExportAreaUnfocus}
+                        onClick={() => {
+                            if (view === APP_VIEW.select) {
+                                updateResetGroup();
+                                setSelectedIds([]);
+                            }
+                        }}
                     />
+                    {isSelectionMode && view === APP_VIEW.select && (
+                        <SelectionRect
+                            x={selectionBounds.x}
+                            y={selectionBounds.y}
+                            width={selectionBounds.width}
+                            height={selectionBounds.height}
+                        />
+                    )}
                 </Layer>
                 <Layer id="comment-layer">
                     {commentView.state.active &&
