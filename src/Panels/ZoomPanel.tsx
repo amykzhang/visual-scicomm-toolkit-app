@@ -24,7 +24,6 @@ const StyledPercentage = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-
 `;
 
 const StyledMinusIcon = styled(MinusIcon)`
@@ -51,7 +50,6 @@ export const ZoomPanel: React.FC<ZoomPanelProps> = ({
             <SquareButton onClick={toggleFullscreen}>
                 <FullscreenIcon />
             </SquareButton>
-            <Divider />
             <SquareButton onClick={zoomFit}>
                 <FitToScreenIcon />
             </SquareButton>
@@ -59,9 +57,7 @@ export const ZoomPanel: React.FC<ZoomPanelProps> = ({
             <SquareButton onClick={zoomOut}>
                 <StyledMinusIcon />
             </SquareButton>
-            <Divider />
             <StyledPercentage>{zoomLevel}%</StyledPercentage>
-            <Divider />
             <SquareButton onClick={zoomIn}>
                 <PlusIcon />
             </SquareButton>

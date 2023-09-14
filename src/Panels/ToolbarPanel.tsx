@@ -33,14 +33,12 @@ export const ToolbarPanel: React.FC<ToolbarPanelProps> = ({
             >
                 <SelectIcon />
             </SquareButton>
-            <Divider />
             <SquareButton
                 data-isactive={view === APP_VIEW.pan}
                 onClick={() => setView(APP_VIEW.pan)}
             >
                 <PanIcon />
             </SquareButton>
-            <Divider />
             <CommentTool
                 view={view}
                 setView={setView}
@@ -52,7 +50,6 @@ export const ToolbarPanel: React.FC<ToolbarPanelProps> = ({
             >
                 <UndoIcon />
             </SquareButton>
-            <Divider />
             <SquareButton
             // onClick={() => app.redo()}
             >
