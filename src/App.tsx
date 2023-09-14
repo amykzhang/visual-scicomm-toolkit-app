@@ -148,8 +148,6 @@ export default function App() {
 
     // Updates the images with offset position and makes a new selection
     const updateResetGroup = () => {
-        console.log("update reset group");
-
         if (groupRef.current !== null) {
             const group = groupRef.current;
 
@@ -165,8 +163,6 @@ export default function App() {
                 }
             });
             setImages(newImages);
-
-            console.log(group.x(), group.y());
             group.x(0);
             group.y(0);
         }
@@ -366,7 +362,9 @@ export default function App() {
                                     key={i}
                                     image={image}
                                     isSelected={selectedIds.includes(image.id)}
-                                    onSelect={() => handleSelect(image.id)}
+                                    onSelect={() => {
+                                        handleSelect(image.id);
+                                    }}
                                     onChange={(attributes: any) => {
                                         modifyImage(i, {
                                             ...image,
@@ -377,11 +375,15 @@ export default function App() {
                                         images,
                                         setImages,
                                         selectedIds,
-                                        setSelectedIds
+                                        setSelectedIds,
+                                        updateResetGroup
                                     )}
                                     handleDragEnd={handleDragEnd(
                                         images,
-                                        setImages
+                                        setImages,
+                                        selectedIds,
+                                        setSelectedIds,
+                                        updateResetGroup
                                     )}
                                 />
                             );

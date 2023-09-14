@@ -7,6 +7,7 @@ export const handleDragStart = (
     setElements: React.Dispatch<React.SetStateAction<any>>,
     selectedIds: string[],
     setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>,
+    updateResetGroup: () => void
 ) => {
     return (e: Konva.KonvaEventObject<DragEvent>) => {
         const id = e.target.id();
@@ -22,7 +23,10 @@ export const handleDragStart = (
 
 export const handleDragEnd = (
     elements: any[],
-    setElements: React.Dispatch<React.SetStateAction<any>>
+    setElements: React.Dispatch<React.SetStateAction<any>>,
+    selectedIds: string[],
+    setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>,
+    updateResetGroup: () => void
 ) => {
     return (e: Konva.KonvaEventObject<DragEvent>) => {
         const offset = {
@@ -42,7 +46,6 @@ export const handleDragEnd = (
                 return element;
             }
         });
-
         setElements(newElements);
     };
 };

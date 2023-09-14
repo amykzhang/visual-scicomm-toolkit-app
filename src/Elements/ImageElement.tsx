@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import Konva from "konva";
 import { Image, Transformer } from "react-konva";
 import { ImageProp } from "../utils/interfaces";
@@ -24,11 +24,12 @@ const ImageElement = ({
     handleDragStart,
     handleDragEnd,
 }: ImageElementProp) => {
+    const [dragSelected, setDragSelected] = useState(false);
     const imageRef = useRef<Konva.Image | null>(null);
     const transformerRef = useRef<Konva.Transformer | null>(null);
 
     useEffect(() => {
-        if (isSelected) {
+        if (isSelected || dragSelected) {
             // we need to attach transformer manually
             // TODO: make a transformer state for removing transformer nodes while exporting
             if (transformerRef.current !== null && imageRef.current !== null) {
@@ -37,7 +38,7 @@ const ImageElement = ({
                 transformer.getLayer()?.batchDraw();
             }
         }
-    }, [isSelected]);
+    }, [isSelected, dragSelected]);
 
     return (
         <Fragment>
@@ -47,8 +48,14 @@ const ImageElement = ({
                 ref={imageRef}
                 perfectDrawEnabled={perfectDrawEnabled}
                 draggable={draggable}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
+                onDragStart={(e) => {
+                    // setDragSelected(true);
+                    handleDragStart(e);
+                }}
+                onDragEnd={(e) => {
+                    // setDragSelected(false);
+                    handleDragEnd(e);
+                }}
                 onTransformEnd={() => {
                     // transformer is changing scale of the node
                     // and NOT its width or height
@@ -76,7 +83,7 @@ const ImageElement = ({
                     }
                 }}
             />
-            {isSelected && (
+            {(isSelected || dragSelected) && (
                 <Transformer
                     ref={transformerRef}
                     boundBoxFunc={(oldBox, newBox) => {
