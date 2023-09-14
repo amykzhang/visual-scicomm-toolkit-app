@@ -41,6 +41,7 @@ const activity = activity_visual_strategies;
 export default function App() {
     const groupRef = useRef<Konva.Group>(null);
     const exportAreaRef = useRef<Konva.Rect>(null);
+    const selectionRectRef = useRef<Konva.Rect>(null);
 
     const { shiftKey, ctrlKey, altKey, metaKey } = KeyPressManager();
 
@@ -118,16 +119,22 @@ export default function App() {
         selectedIds,
         setSelectedIds,
         isSelectionMode,
-        setIsSelectionMode,
         selectionBounds,
-        setSelectionBounds,
         handleSelect,
         deleteSelected,
         updateResetGroup,
         handleMouseDown,
         handleMouseMove,
         handleMouseUp,
-    } = SelectionManager(images, setImages, view, shiftKey, stageRef, groupRef);
+    } = SelectionManager(
+        images,
+        setImages,
+        view,
+        shiftKey,
+        stageRef,
+        groupRef,
+        selectionRectRef
+    );
 
     // Key Presses
     const handleKeyPress = useCallback(
@@ -285,6 +292,7 @@ export default function App() {
                     />
                     {isSelectionMode && view === APP_VIEW.select && (
                         <SelectionRect
+                            selectionRectRef={selectionRectRef}
                             x={selectionBounds.x}
                             y={selectionBounds.y}
                             width={selectionBounds.width}

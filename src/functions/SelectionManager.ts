@@ -3,18 +3,20 @@ import { ImageProp, SelectionBoundsProp } from "../utils/interfaces";
 import { APP_VIEW } from "../utils/enums";
 import Konva from "konva";
 
-
 export const SelectionManager = (
     images: ImageProp[],
     setImages: React.Dispatch<React.SetStateAction<ImageProp[]>>,
     view: APP_VIEW,
     shiftKey: boolean,
     stageRef: React.MutableRefObject<Konva.Stage | null>,
-    groupRef: React.MutableRefObject<Konva.Group | null>
+    groupRef: React.MutableRefObject<Konva.Group | null>,
+    selectionRectRef: React.MutableRefObject<Konva.Rect | null>
 ) => {
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [isSelectionMode, setIsSelectionMode] = useState(false);
-    const [selectionBounds, setSelectionBounds] = useState<SelectionBoundsProp>({ x: 0, y: 0, width: 0, height: 0 });
+    const [selectionBounds, setSelectionBounds] = useState<SelectionBoundsProp>(
+        { x: 0, y: 0, width: 0, height: 0 }
+    );
 
     const addSelectedId = (id: string) => {
         setSelectedIds([...selectedIds, id]);
@@ -75,8 +77,7 @@ export const SelectionManager = (
         );
         setImages(newImages);
         setSelectedIds([]);
-    }, [images,setImages, selectedIds]);
-
+    }, [images, setImages, selectedIds]);
 
     // Drag selection
 
@@ -121,6 +122,40 @@ export const SelectionManager = (
 
     const handleMouseUp = () => {
         setIsSelectionMode(false);
+        const targetedIds = getElementIdsWithinBounds();
+
+        console.log(targetedIds);
+
+        setSelectedIds(targetedIds); // why is this not working?
+    };
+
+    const getElementIdsWithinBounds = () => {
+        const newSelectedIds: string[] = [];
+
+        const actualBounds = {
+            x:
+                selectionBounds.width > 0
+                    ? selectionBounds.x
+                    : selectionBounds.x + selectionBounds.width,
+            y:
+                selectionBounds.height > 0
+                    ? selectionBounds.y
+                    : selectionBounds.y + selectionBounds.height,
+            width: Math.abs(selectionBounds.width),
+            height: Math.abs(selectionBounds.height),
+        };
+
+        images.forEach((image) => {
+            if (
+                image.x > actualBounds.x &&
+                image.y > actualBounds.y &&
+                image.x + image.width < actualBounds.x + actualBounds.width &&
+                image.y + image.height < actualBounds.y + actualBounds.height
+            ) {
+                newSelectedIds.push(image.id);
+            }
+        });
+        return newSelectedIds;
     };
 
     return {
@@ -137,4 +172,4 @@ export const SelectionManager = (
         handleMouseMove,
         handleMouseUp,
     };
-}
+};
