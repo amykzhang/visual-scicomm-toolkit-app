@@ -48,12 +48,15 @@ const ElementsToggle = styled(SideBarToggle)`
 `;
 
 const ElementsRow = styled.div`
+    width: 290px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 12px 3px;
-    width: 288px;
+    padding: 4px 4px;
+    border-radius: 5px;
+    background: ${color.lighterBlue};
 `;
 
 const ImageSubheadingText = styled(typography.BoldSmallText)`
