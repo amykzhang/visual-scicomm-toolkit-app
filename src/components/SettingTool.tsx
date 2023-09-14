@@ -1,14 +1,14 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { ReactComponent as QuestionIcon } from "../assets/questionmarkcircle.svg";
+import { ReactComponent as GearIcon } from "../assets/gear.svg";
 import { ReactComponent as CrossIcon } from "../assets/cross.svg";
 import color from "../styles/color";
 import { SquareButton } from "./Components";
 
-export const InformationTool = ({ content }: { content: string }) => {
+export const SettingTool = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-    const toggleInformationPopup = () => {
+    const toggleSettingPopup = () => {
         setIsPopupOpen(!isPopupOpen);
     };
 
@@ -16,19 +16,19 @@ export const InformationTool = ({ content }: { content: string }) => {
         <>
             <SquareButton
                 data-isactive={isPopupOpen}
-                onClick={toggleInformationPopup}
+                onClick={toggleSettingPopup}
             >
-                <QuestionIcon />
+                <GearIcon />
             </SquareButton>
             {isPopupOpen && (
                 <>
-                    <DarkenBackground onClick={toggleInformationPopup} />
-                    <InformationPopup>
-                        <InformationHeader>
-                            <StyledCrossIcon onClick={toggleInformationPopup} />
-                        </InformationHeader>
-                        <InformationContent>{content}</InformationContent>
-                    </InformationPopup>
+                    <DarkenBackground onClick={toggleSettingPopup} />
+                    <SettingPopup>
+                        <SettingHeader>
+                            <StyledCrossIcon onClick={toggleSettingPopup} />
+                        </SettingHeader>
+                        <SettingContent>Settings</SettingContent>
+                    </SettingPopup>
                 </>
             )}
         </>
@@ -44,7 +44,7 @@ const DarkenBackground = styled.div`
     z-index: 400;
 `;
 
-const InformationPopup = styled.div`
+const SettingPopup = styled.div`
     position: fixed;
     width: 70vw;
     height: 50vh;
@@ -63,7 +63,7 @@ const InformationPopup = styled.div`
     z-index: 401;
 `;
 
-const InformationHeader = styled.div`
+const SettingHeader = styled.div`
     position: relative;
     width: 100%;
     height: 10%;
@@ -72,7 +72,7 @@ const InformationHeader = styled.div`
     justify-content: flex-end;
 `;
 
-const InformationContent = styled.div`
+const SettingContent = styled.div`
     user-select: none;
     position: relative;
     width: 100%;

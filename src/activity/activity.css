@@ -1,23 +1,22 @@
 /* Containers */
-
 div.pad-large {
-    padding: 24px 24px;
+    padding: 24px;
 }
 
 div.pad-medium {
-    padding: 16px 16px;
+    padding: 18px;
 }
 
 div.pad-small {
-    padding: 8px 8px;
+    padding: 15px;
 }
 
 div.gap-large {
-    gap: 24px;
+    gap: 18px;
 }
 
 div.gap-medium {
-    gap: 16px;
+    gap: 13px;
 }
 
 div.gap-small {
@@ -41,28 +40,22 @@ div.flex-column {
     font-size: 20px;
     font-family: Quicksand;
     font-weight: 700;
-    margin: 0px;
-    padding: 0px;
 }
 
 .medium-text {
     color: #000;
     font-size: 17px;
     font-family: Roboto;
-    margin: 0px;
-    padding: 0px;
 }
 
 .small-text {
     color: #000;
     font-size: 14px;
     font-family: Roboto;
-    margin: 0px;
-    padding: 0px;
 }
 
 .rounded {
-    border-radius: 8px;
+    border-radius: 5px;
 }
 
 /* Weight */
@@ -76,9 +69,9 @@ div.flex-column {
 
 /* Background Color */
 .yellow-background {
-    background-color: #fff6e3;
+    background-color: #FFF1D7;
 }
 
 .lightblue-background {
-    background-color: #e3f1ff;
+    background-color: #EEF3F8;
 }

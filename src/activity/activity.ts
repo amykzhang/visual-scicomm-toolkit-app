@@ -66,22 +66,18 @@ const activity_visual_strategies: Activity = {
         height: 810,
     },
     activity_panel: `
-        <div class="large-text flex gap-small">
-            <img src="/activity/assets/notebook.svg">
-            Task
-        </div>
-        <br/>
         <div class="medium-text">You're a researcher who wants to describe the following process in a <span class="bold">visual diagram</span>. Can you design a communication piece using the elements provided in this activity?</div>
-        <div class="medium-text pad-large yellow-background rounded bold">The receptor Y is found in the cell membrane. The molecule X binds to the receptor. This triggers the release of proteins by an organelle in the cell.</div>
+        <br/>
+        <div class="medium-text pad-medium yellow-background rounded bold">The receptor Y is found in the cell membrane. The molecule X binds to the receptor. This triggers the release of proteins by an organelle in the cell.</div>
         <br/>
         <br/>
         <br/>
 
-        <div class="large-text flex gap-small">
+        <div class="large-text flex-row gap-small">
             <img src="/activity/assets/notebook.svg">
             Instructions
         </div>
-        <div class="pad-small gap-large flex-column">
+        <div class="gap-large flex-column">
             <div class="flex-column lightblue-background rounded gap-medium pad-small">
                 <div class="small-text bold">1. Understand the science</div>
                 <div class="small-text">We start by researching the topic if we're unfamiliar with the science. This includes searching and referencing visuals, such as diagrams, created by others.</div>

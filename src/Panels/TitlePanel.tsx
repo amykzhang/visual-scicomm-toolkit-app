@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import typography from "../styles/typography";
+import color from "../styles/color";
 
 const TitlePanelContainer = styled.div`
     position: absolute;
@@ -8,7 +9,7 @@ const TitlePanelContainer = styled.div`
     left: 0px;
     top: 0px;
 
-    background: #ffffff;
+    background: ${color.white};
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     border-radius: 0px 0px 5px 0px;
 
@@ -27,8 +28,8 @@ const Logo = styled.div`
     width: 62px;
     height: 38px;
 
-    background: #000000;
-    color: #ffffff;
+    background:${color.black};
+    color: ${color.white};
     border-radius: 5px;
 `;
 

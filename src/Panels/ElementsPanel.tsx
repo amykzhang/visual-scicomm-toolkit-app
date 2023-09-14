@@ -11,41 +11,56 @@ import { TextTool } from "../components/TextTool";
 import typography from "../styles/typography";
 import {
     SideBar,
+    SideBarBackground,
     SideBarContent,
     SideBarHeader,
     SideBarToggle,
 } from "../styles/containers";
 import styled from "styled-components";
+import color from "../styles/color";
 
 const ElementsPanelContainer = styled(SideBar)`
     right: 0;
 `;
 
 const ElementsMenuContainer = styled(SideBarContent)`
+    position: fixed;
+    top: 80px;
+    right: 0;
+
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    gap: 11px;
-    flex-direction: column;
 
+    gap: 11px;
     border-radius: 0px 0px 0px 5px;
 `;
 
+const ElementsMenuBackground = styled(SideBarBackground)`
+    position: fixed;
+    right: 0;
+    border-radius: 0px 5px 0px 0px;
+`;
+
+const ElementsToggle = styled(SideBarToggle)`
+    margin: 6px;
+`;
+
 const ElementsRow = styled.div`
+    width: 290px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 12px 3px;
-    width: 288px;
-`;
-
-const ElementsToggle = styled(SideBarToggle)`
-    border-radius: 5px 0 0 5px;
+    padding: 4px 4px;
+    border-radius: 5px;
+    background: ${color.lighterBlue};
 `;
 
 const ImageSubheadingText = styled(typography.BoldSmallText)`
-    color: #606060;
+    color: ${color.black};
 `;
 
 interface ElementsMenuProps {
@@ -181,14 +196,15 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
 
     return (
         <ElementsPanelContainer className={isOpen ? "" : "slide-right"}>
-            <ElementsToggle onClick={handleToggle}>
-                <Arrow />
-            </ElementsToggle>
+            <SideBarHeader>
+                <ElementsToggle onClick={handleToggle}>
+                    <Arrow />
+                </ElementsToggle>
+                <PenAndRuler />
+                <typography.LargeText>Elements</typography.LargeText>
+            </SideBarHeader>
+            <ElementsMenuBackground />
             <ElementsMenuContainer>
-                <SideBarHeader>
-                    <PenAndRuler />
-                    <typography.LargeText>Elements</typography.LargeText>
-                </SideBarHeader>
 
                 <TextSection />
                 <DrawSection />

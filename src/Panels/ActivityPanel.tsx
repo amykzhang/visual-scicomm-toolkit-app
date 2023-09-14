@@ -1,16 +1,16 @@
 import { Activity } from "../activity/activity";
 import {
     SideBar,
-    SideBarHeader,
+    SideBarBackground,
     SideBarContent,
+    SideBarHeader,
     SideBarToggle,
-    Top30,
 } from "../styles/containers";
-import typography from "../styles/typography";
 import styled from "styled-components";
 import { ReactComponent as LeftArrow } from "../assets/arrowhead-left.svg";
 import { ReactComponent as RightArrow } from "../assets/arrowhead-right.svg";
 import { ReactComponent as Notebook } from "../assets/notebook.svg";
+import typography from "../styles/typography";
 
 interface ActivityPanelProps {
     activity: Activity;
@@ -23,20 +23,31 @@ const ActivityPanelContainer = styled(SideBar)`
 `;
 
 const ActivityContentContainer = styled(SideBarContent)`
+    position: fixed;
+    top: 80px;
+    padding-right: 30px;
+
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
     gap: 8px;
     flex-direction: column;
+`;
+
+const ActivityBackground = styled(SideBarBackground)`
+    position: fixed;
+    left: 0;
     border-radius: 0px 0px 5px 0px;
 `;
 
-const ActivityToggle = styled(SideBarToggle)`
-    border-radius: 0 5px 5px 0;
+const ActivityHeader = styled(SideBarHeader)`
+    padding: 22px;
 `;
 
-const Invisible = styled.div`
-    display: none;
+const ActivityToggle = styled(SideBarToggle)`
+    position: fixed;
+    right: 0;
+    margin: 6px;
 `;
 
 export const ActivityPanel: React.FC<ActivityPanelProps> = ({
@@ -49,17 +60,19 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
 
     return (
         <ActivityPanelContainer className={isOpen ? "" : "slide-left"}>
-            <Invisible>
+            <ActivityHeader>
                 <Notebook />
-            </Invisible>
+                <typography.LargeText>Task</typography.LargeText>
+                <ActivityToggle onClick={handleToggle}>
+                    <Arrow />
+                </ActivityToggle>
+            </ActivityHeader>
+            <ActivityBackground />
             <ActivityContentContainer
                 dangerouslySetInnerHTML={{
                     __html: activity.activity_panel,
                 }}
             ></ActivityContentContainer>
-            <ActivityToggle onClick={handleToggle}>
-                <Arrow />
-            </ActivityToggle>
         </ActivityPanelContainer>
     );
 };

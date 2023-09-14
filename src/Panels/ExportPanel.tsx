@@ -1,33 +1,33 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { ReactComponent as GearIcon } from "../assets/gear.svg";
 import { InformationTool } from "../components/InformationTool";
 import { ReactComponent as UploadIcon } from "../assets/upload.svg";
 import { Activity } from "../activity/activity";
 import typography from "../styles/typography";
 import { ExportOptions } from "../utils/interfaces";
+import color from "../styles/color";
+import { SettingTool } from "../components/SettingTool";
 
 const ExportPanelContainer = styled.div`
+    pointer-events: all;
+    user-select: none;
     position: absolute;
     width: 380px;
     height: 69px;
     right: 0px;
     top: 0px;
-
-    background: #ffffff;
+    background: ${color.white};
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     border-radius: 0px 0px 0px 5px;
-
     display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    padding: 0px 20px;
-    gap: 24px;
-
-    pointer-events: all;
+    justify-content: center;
+    gap: 10px;
 `;
 
 const ExportButton = styled.div`
+    cursor: pointer;
     display: flex;
     width: 230px;
     padding: 10px 24px;
@@ -36,11 +36,18 @@ const ExportButton = styled.div`
     gap: 16px;
 
     border-radius: 5px;
-    background: #629ffc;
+    background: ${color.blue};
+
+    &:hover {
+        opacity: 0.9;
+    }
+
+    &[data-isactive="true"] {
+        opacity: 0.8;
 `;
 
 const ExportText = styled(typography.LargeText)`
-    color: white;
+    color: ${color.white};
 `;
 
 interface ExportPanelProps {
@@ -61,8 +68,11 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
     return (
         <ExportPanelContainer>
             <InformationTool content={activity.info} />
-            <GearIcon />
-            <ExportButton onClick={toggleExportOptions}>
+            <SettingTool />
+            <ExportButton
+                data-isactive={isExportOptionsOpen}
+                onClick={toggleExportOptions}
+            >
                 <UploadIcon />
                 <ExportText>Share Canvas</ExportText>
             </ExportButton>
@@ -122,7 +132,7 @@ const ExportOptionsContainer = styled.div`
     right: 20px;
     top: 80px;
 
-    background: #ffffff;
+    background: ${color.white};
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
 
@@ -137,6 +147,6 @@ const ExportOption = styled.div`
     cursor: pointer;
 
     &:hover {
-        background: #d7e9ff;
+        background: ${color.lightBlue};
     }
 `;
