@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { CommentStateProp } from "../utils/interfaces";
 import { APP_VIEW } from "../utils/enums";
+import color from "../styles/color";
 
-const defaultBackgroundColor = "#F5F5F5";
-const commentBackgroundColor = "#CECECE";
+const defaultBackgroundColor = color.canvasBackground;
+const commentBackgroundColor = color.commentBackground;
 
 export const CommentViewManager = (setView: (view: APP_VIEW) => void) => {
     const [state, setState] = useState<CommentStateProp>({

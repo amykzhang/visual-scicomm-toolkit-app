@@ -55,9 +55,39 @@ Nice-to-haves:
 - Change colour of images
 - Adustable Lines and arrows, variable stroke length and bend
   
-- Landing Page
 
 
 Sharable Link (optional):
 - room with uuid that saves to server
 - node.js server with pouchdb
+
+
+
+
+SEPTEMBER 13: (5 hours)
+- Rework color.ts ✅
+- Export button: hover, selected, pointer
+- Modify info window: 70vw 50vh
+- Modify Info and Settings same box as SquareTool component
+- Add blue background on hover for sidebar minimize and expand
+- Remove grey outline for hover
+- Remove hover blue background for zoom percentage
+- Modify background margin/padding for ActivityPanel to figma specs
+- Add padding around the sidebar for scrolling (20px)
+- Add Background around element rows
+- Add grey line between tools in ToolBar and ZoomBar
+
+
+- Multiple select: rework drag with selection to use selection IDs instead of isDragging
+- drag select bounding box
+- Comment elements (text, change text onClick)
+- Shapes Elements
+- text box (https://konvajs.org/docs/sandbox/Editable_Text.html)
+- freehand draw (https://konvajs.org/docs/sandbox/Free_Drawing.html)
+
+
+SEPTEMBER 14: (5 hours)
+- Undo/redo stack (https://konvajs.org/docs/react/Undo-Redo.html)
+- fix shortcuts for commands
+- contextmenu for copy paste change color etc.
+- Landing Page 

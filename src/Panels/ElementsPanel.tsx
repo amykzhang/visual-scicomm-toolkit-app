@@ -16,6 +16,7 @@ import {
     SideBarToggle,
 } from "../styles/containers";
 import styled from "styled-components";
+import color from "../styles/color";
 
 const ElementsPanelContainer = styled(SideBar)`
     right: 0;
@@ -45,7 +46,7 @@ const ElementsToggle = styled(SideBarToggle)`
 `;
 
 const ImageSubheadingText = styled(typography.BoldSmallText)`
-    color: #606060;
+    color: ${color.black};
 `;
 
 interface ElementsMenuProps {

@@ -2,6 +2,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import { ReactComponent as QuestionIcon } from "../assets/questionmarkcircle.svg";
 import { ReactComponent as CrossIcon } from "../assets/cross.svg";
+import color from "../styles/color";
 
 export const InformationTool = ({ content }: { content: string }) => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -49,7 +50,7 @@ const InformationPopup = styled.div`
     left: calc(50vw - 250px);
     top: calc(50vh - 150px);
 
-    background-color: #ffffff;
+    background-color: ${color.white};
     border-radius: 5px;
 
     display: flex;

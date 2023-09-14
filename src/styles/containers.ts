@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import color from "./color";
 
 export const Top10 = styled.div`
     padding-top: 10px;
@@ -21,7 +22,6 @@ export const TopZone = styled.div`
     top: 0px;
     left: 0px;
     width: 100%;
-    /* background-color: red; */
 `;
 
 export const BottomZone = styled.div`
@@ -63,7 +63,7 @@ export const SideBarToggle = styled.div`
     pointer-events: all;
     width: 33px;
     height: 92px;
-    background: white;
+    background: ${color.white};
     display: flex;
     align-items: center;
     justify-content: center;
@@ -73,7 +73,7 @@ export const SideBarContent = styled.div`
     user-select: none;
     width: 325px;
     height: 100%;
-    background: white;
+    background: ${color.white};
     padding: 18px;
     pointer-events: all;
 
@@ -98,6 +98,6 @@ export const CenterBar = styled.div`
     width: 330px;
     height: 70px;
 
-    background: #ffffff;
+    background: ${color.white};
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 `;

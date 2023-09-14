@@ -6,6 +6,7 @@ import { ReactComponent as UploadIcon } from "../assets/upload.svg";
 import { Activity } from "../activity/activity";
 import typography from "../styles/typography";
 import { ExportOptions } from "../utils/interfaces";
+import color from "../styles/color";
 
 const ExportPanelContainer = styled.div`
     position: absolute;
@@ -14,7 +15,7 @@ const ExportPanelContainer = styled.div`
     right: 0px;
     top: 0px;
 
-    background: #ffffff;
+    background: ${color.white};
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     border-radius: 0px 0px 0px 5px;
 
@@ -36,11 +37,11 @@ const ExportButton = styled.div`
     gap: 16px;
 
     border-radius: 5px;
-    background: #629ffc;
+    background: ${color.blue};
 `;
 
 const ExportText = styled(typography.LargeText)`
-    color: white;
+    color: ${color.white};
 `;
 
 interface ExportPanelProps {
@@ -122,7 +123,7 @@ const ExportOptionsContainer = styled.div`
     right: 20px;
     top: 80px;
 
-    background: #ffffff;
+    background: ${color.white};
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
 
@@ -137,6 +138,6 @@ const ExportOption = styled.div`
     cursor: pointer;
 
     &:hover {
-        background: #d7e9ff;
+        background: ${color.lightBlue};
     }
 `;
