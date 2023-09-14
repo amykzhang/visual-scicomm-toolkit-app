@@ -3,6 +3,9 @@ import color from "../styles/color";
 
 export const SquareButton = styled.button`
     pointer-events: all;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+
     background: ${color.white};
     border: none;
     border-radius: 5px;
@@ -18,6 +21,8 @@ export const SquareButton = styled.button`
 export const ExitCommentViewButton = styled.div`
     position: absolute;
     pointer-events: all;
+    user-select: none;
+    cursor: pointer;
 
     display: flex;
     justify-content: center;

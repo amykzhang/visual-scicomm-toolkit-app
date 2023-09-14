@@ -7,7 +7,6 @@ import {
 import styled from "styled-components";
 import { ReactComponent as LeftArrow } from "../assets/arrowhead-left.svg";
 import { ReactComponent as RightArrow } from "../assets/arrowhead-right.svg";
-import { ReactComponent as Notebook } from "../assets/notebook.svg";
 
 interface ActivityPanelProps {
     activity: Activity;
@@ -32,10 +31,6 @@ const ActivityToggle = styled(SideBarToggle)`
     border-radius: 0 5px 5px 0;
 `;
 
-const Invisible = styled.div`
-    display: none;
-`;
-
 export const ActivityPanel: React.FC<ActivityPanelProps> = ({
     activity,
     isOpen,
@@ -46,9 +41,6 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
 
     return (
         <ActivityPanelContainer className={isOpen ? "" : "slide-left"}>
-            <Invisible>
-                <Notebook />
-            </Invisible>
             <ActivityContentContainer
                 dangerouslySetInnerHTML={{
                     __html: activity.activity_panel,

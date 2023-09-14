@@ -61,12 +61,19 @@ export const SideBarHeader = styled.div`
 
 export const SideBarToggle = styled.div`
     pointer-events: all;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+
     width: 33px;
     height: 92px;
-    background: ${color.white};
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: ${color.white};
+
+    &:hover {
+        background: ${color.lightBlue};
+    }
 `;
 
 export const SideBarContent = styled.div`

@@ -35,11 +35,6 @@ export const SettingTool = () => {
     );
 };
 
-const StyledQuestionIcon = styled(GearIcon)`
-    cursor: pointer;
-    z-index: 401;
-`;
-
 const DarkenBackground = styled.div`
     position: fixed;
     width: 100vw;
