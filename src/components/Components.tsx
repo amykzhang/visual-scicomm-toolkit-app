@@ -42,3 +42,10 @@ export const ExitCommentViewButton = styled.div`
         background-color: ${color.lightBlue};
     }
 `;
+
+export const Divider = styled.div`
+    width: 2px;
+    height: 42px;
+    background-color: ${color.darkGrey};
+    border-radius: 2px;
+`;

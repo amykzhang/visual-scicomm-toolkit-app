@@ -1,6 +1,6 @@
 import { APP_VIEW } from "../utils/enums";
 import { CommentViewProp } from "../utils/interfaces";
-import { SquareButton } from "../components/Components";
+import { Divider, SquareButton } from "../components/Components";
 import { CommentTool } from "../components/CommentTool";
 import { ReactComponent as SelectIcon } from "../assets/select.svg";
 import { ReactComponent as PanIcon } from "../assets/pan.svg";
@@ -33,26 +33,26 @@ export const ToolbarPanel: React.FC<ToolbarPanelProps> = ({
             >
                 <SelectIcon />
             </SquareButton>
-
+            <Divider />
             <SquareButton
                 data-isactive={view === APP_VIEW.pan}
                 onClick={() => setView(APP_VIEW.pan)}
             >
                 <PanIcon />
             </SquareButton>
-
+            <Divider />
             <CommentTool
                 view={view}
                 setView={setView}
                 commentView={commentView}
             ></CommentTool>
-
+            <Divider />
             <SquareButton
             // onClick={() => app.undo()}
             >
                 <UndoIcon />
             </SquareButton>
-
+            <Divider />
             <SquareButton
             // onClick={() => app.redo()}
             >

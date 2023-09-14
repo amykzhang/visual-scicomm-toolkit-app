@@ -75,7 +75,7 @@ SEPTEMBER 13: (5 hours)
 - Modify background margin/padding for ActivityPanel to figma specs ✅
 - Add padding around the sidebar for scrolling (20px) ✅
 - Add Background around element rows ✅
-- Add grey line between tools in ToolBar and ZoomBar
+- Add grey line between tools in ToolBar and ZoomBar ✅
 
 
 - Multiple select: rework drag with selection to use selection IDs instead of isDragging

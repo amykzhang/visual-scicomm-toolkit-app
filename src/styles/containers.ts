@@ -102,10 +102,9 @@ export const CenterBar = styled.div`
     margin-right: auto;
 
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     padding: 7px 6px;
-    gap: 9px;
 
     width: 330px;
     height: 70px;
