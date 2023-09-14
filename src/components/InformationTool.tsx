@@ -45,10 +45,10 @@ const DarkenBackground = styled.div`
 
 const InformationPopup = styled.div`
     position: fixed;
-    width: 500px;
-    height: 300px;
-    left: calc(50vw - 250px);
-    top: calc(50vh - 150px);
+    width: 70vw;
+    height: 50vh;
+    left: calc(15vw);
+    top: calc(25vh);
 
     background-color: ${color.white};
     border-radius: 5px;
