@@ -1,6 +1,7 @@
 import { Activity } from "../activity/activity";
 import {
     SideBar,
+    SideBarBackground,
     SideBarContent,
     SideBarHeader,
     SideBarToggle,
@@ -31,6 +32,11 @@ const ActivityContentContainer = styled(SideBarContent)`
     justify-content: flex-start;
     gap: 8px;
     flex-direction: column;
+`;
+
+const ActivityBackground = styled(SideBarBackground)`
+    position: fixed;
+    left: 0;
     border-radius: 0px 0px 5px 0px;
 `;
 
@@ -61,6 +67,7 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
                     <Arrow />
                 </ActivityToggle>
             </ActivityHeader>
+            <ActivityBackground />
             <ActivityContentContainer
                 dangerouslySetInnerHTML={{
                     __html: activity.activity_panel,

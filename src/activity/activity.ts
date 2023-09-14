@@ -67,6 +67,7 @@ const activity_visual_strategies: Activity = {
     },
     activity_panel: `
         <div class="medium-text">You're a researcher who wants to describe the following process in a <span class="bold">visual diagram</span>. Can you design a communication piece using the elements provided in this activity?</div>
+        <br/>
         <div class="medium-text pad-medium yellow-background rounded bold">The receptor Y is found in the cell membrane. The molecule X binds to the receptor. This triggers the release of proteins by an organelle in the cell.</div>
         <br/>
         <br/>

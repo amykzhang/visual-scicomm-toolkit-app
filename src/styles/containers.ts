@@ -34,8 +34,6 @@ export const BottomZone = styled.div`
 export const SideBar = styled.div`
     position: absolute;
     top: 14vh;
-    height: 76vh;
-    display: flex;
     transition-duration: 0.5s;
     transition-property: transform;
     filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.15));
@@ -86,11 +84,17 @@ export const SideBarContent = styled.div`
     pointer-events: all;
     
     width: 340px;
-    height: 70vh;
+    height: calc(68vh - 15px);
     background: ${color.white};
-    padding: 22px;
+    padding: 0px 22px;
 
     overflow-y: scroll;
+`;
+
+export const SideBarBackground = styled.div`
+    width: 340px;
+    height: 68vh;
+    background: ${color.white};
 `;
 
 export const CenterBar = styled.div`

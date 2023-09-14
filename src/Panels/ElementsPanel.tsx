@@ -11,6 +11,7 @@ import { TextTool } from "../components/TextTool";
 import typography from "../styles/typography";
 import {
     SideBar,
+    SideBarBackground,
     SideBarContent,
     SideBarHeader,
     SideBarToggle,
@@ -36,7 +37,10 @@ const ElementsMenuContainer = styled(SideBarContent)`
     border-radius: 0px 0px 0px 5px;
 `;
 
-const ElementsMenuHeader = styled(SideBarHeader)`
+const ElementsMenuBackground = styled(SideBarBackground)`
+    position: fixed;
+    right: 0;
+    border-radius: 0px 5px 0px 0px;
 `;
 
 const ElementsToggle = styled(SideBarToggle)`
@@ -196,6 +200,7 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
                 <PenAndRuler />
                 <typography.LargeText>Elements</typography.LargeText>
             </SideBarHeader>
+            <ElementsMenuBackground />
             <ElementsMenuContainer>
 
                 <TextSection />

@@ -73,7 +73,7 @@ SEPTEMBER 13: (5 hours)
 - Remove grey outline for hover ✅
 - Remove hover blue background for zoom percentage ✅
 - Modify background margin/padding for ActivityPanel to figma specs ✅
-- Add padding around the sidebar for scrolling (20px)
+- Add padding around the sidebar for scrolling (20px) ✅
 - Add Background around element rows
 - Add grey line between tools in ToolBar and ZoomBar
 
