@@ -5,7 +5,7 @@ const lightBlue = "#C0DDFF";
 const lighterBlue = "#EEF3F8";
 const yellow = "#FFF6E3";
 const grey = "#D6D6D6";
-const lightGrey = "#D7E9FF";
+const lightGrey = "#ECECEC";
 const darkGrey = "#D9D9D9";
 
 const color = {
