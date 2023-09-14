@@ -6,8 +6,8 @@ import { ExportOptions } from "../utils/interfaces";
 export function ExportManager(
     activity: Activity,
     stageRef: React.MutableRefObject<Konva.Stage | null>,
-    selectedIds: number[],
-    setSelectedIds: React.Dispatch<React.SetStateAction<number[]>>
+    selectedIds: string[],
+    setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>
 ): ExportOptions {
     const exportSize = activity.canvas_size;
 

@@ -103,19 +103,17 @@ export default function App() {
     };
 
     // selected Ids
-    const [selectedIds, setSelectedIds] = useState<number[]>([]);
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-    const addSelectedId = (id: number) => {
-        console.log(id);
+    const addSelectedId = (id: string) => {
         setSelectedIds([...selectedIds, id]);
     };
 
-    const removeSelectedId = (id: number) => {
-        console.log(id);
+    const removeSelectedId = (id: string) => {
         setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
     };
 
-    const toggleSelectedId = (id: number) => {
+    const toggleSelectedId = (id: string) => {
         if (selectedIds.includes(id)) {
             removeSelectedId(id);
         } else {
@@ -123,7 +121,7 @@ export default function App() {
         }
     };
 
-    const handleSelect = (id: number) => {
+    const handleSelect = (id: string) => {
         if (view === APP_VIEW.select) {
             if (shiftKey) {
                 toggleSelectedId(id);
@@ -147,7 +145,7 @@ export default function App() {
     };
 
     const deleteSelected = useCallback(() => {
-        const newImages = images.filter((_, i) => !selectedIds.includes(i));
+        const newImages = images.filter((image) => !selectedIds.includes(image.id));
         setImages(newImages);
         setSelectedIds([]);
     }, [images, selectedIds]);
@@ -165,7 +163,7 @@ export default function App() {
                 }
             } else if (e.key === "a" && ctrlKey) {
                 e.preventDefault();
-                setSelectedIds(images.map((_, i) => i));
+                setSelectedIds(images.map((image) => image.id));
             }
         },
         [ctrlKey, images, selectedIds, deleteSelected]
@@ -320,8 +318,8 @@ export default function App() {
                                 {...canvasElementConstants}
                                 key={i}
                                 image={image}
-                                isSelected={selectedIds.includes(i)}
-                                onSelect={() => handleSelect(i)}
+                                isSelected={selectedIds.includes(image.id)}
+                                onSelect={() => handleSelect(image.id)}
                                 onChange={(attributes: any) => {
                                     modifyImage(i, {
                                         ...image,
