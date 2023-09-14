@@ -24,6 +24,7 @@ const ActivityPanelContainer = styled(SideBar)`
 const ActivityContentContainer = styled(SideBarContent)`
     position: fixed;
     top: 80px;
+    padding-right: 30px;
 
     display: flex;
     align-items: flex-start;

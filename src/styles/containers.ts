@@ -83,19 +83,14 @@ export const SideBarToggle = styled.div`
 
 export const SideBarContent = styled.div`
     user-select: none;
+    pointer-events: all;
     
     width: 340px;
     height: 70vh;
     background: ${color.white};
-    padding: 18px;
-    pointer-events: all;
+    padding: 22px;
 
     overflow-y: scroll;
-    -ms-overflow-style: none; /* Internet Explorer 10+ */
-    scrollbar-width: none; /* Firefox */
-    &::-webkit-scrollbar {
-        display: none; /* Safari and Chrome */
-    }
 `;
 
 export const CenterBar = styled.div`
