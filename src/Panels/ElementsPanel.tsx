@@ -23,13 +23,24 @@ const ElementsPanelContainer = styled(SideBar)`
 `;
 
 const ElementsMenuContainer = styled(SideBarContent)`
+    position: fixed;
+    top: 80px;
+    right: 0;
+
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    gap: 11px;
-    flex-direction: column;
 
+    gap: 11px;
     border-radius: 0px 0px 0px 5px;
+`;
+
+const ElementsMenuHeader = styled(SideBarHeader)`
+`;
+
+const ElementsToggle = styled(SideBarToggle)`
+    margin: 6px;
 `;
 
 const ElementsRow = styled.div`
@@ -39,10 +50,6 @@ const ElementsRow = styled.div`
     justify-content: space-between;
     gap: 12px 3px;
     width: 288px;
-`;
-
-const ElementsToggle = styled(SideBarToggle)`
-    border-radius: 5px 0 0 5px;
 `;
 
 const ImageSubheadingText = styled(typography.BoldSmallText)`
@@ -182,14 +189,14 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
 
     return (
         <ElementsPanelContainer className={isOpen ? "" : "slide-right"}>
-            <ElementsToggle onClick={handleToggle}>
-                <Arrow />
-            </ElementsToggle>
+            <SideBarHeader>
+                <ElementsToggle onClick={handleToggle}>
+                    <Arrow />
+                </ElementsToggle>
+                <PenAndRuler />
+                <typography.LargeText>Elements</typography.LargeText>
+            </SideBarHeader>
             <ElementsMenuContainer>
-                <SideBarHeader>
-                    <PenAndRuler />
-                    <typography.LargeText>Elements</typography.LargeText>
-                </SideBarHeader>
 
                 <TextSection />
                 <DrawSection />

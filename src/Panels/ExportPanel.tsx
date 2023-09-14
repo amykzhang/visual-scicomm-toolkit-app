@@ -1,6 +1,5 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { ReactComponent as GearIcon } from "../assets/gear.svg";
 import { InformationTool } from "../components/InformationTool";
 import { ReactComponent as UploadIcon } from "../assets/upload.svg";
 import { Activity } from "../activity/activity";

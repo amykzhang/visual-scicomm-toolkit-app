@@ -41,22 +41,27 @@ export const SideBar = styled.div`
     filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.15));
 
     &.slide-left {
-        transform: translateX(-325px);
+        transform: translateX(-340px);
     }
 
     &.slide-right {
-        transform: translateX(325px);
+        transform: translateX(340px);
     }
 `;
 
 export const SideBarHeader = styled.div`
     user-select: none;
+
+    width: 373px;
+    height: 92px;
+    background: ${color.white};
+    border-radius: 5px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
+    gap: 10px;
+
     display: flex;
     flex-direction: row;
     align-items: center;
-    line-height: 0px;
-    gap: 10px;
-    padding-bottom: 20px;
 `;
 
 export const SideBarToggle = styled.div`
@@ -64,11 +69,11 @@ export const SideBarToggle = styled.div`
     cursor: pointer;
     transition: all 0.3s ease-in-out;
 
-    width: 33px;
-    height: 92px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: inline-flex;
+    padding: 31px 7px;
+    align-items: flex-start;
+    gap: 10px;
+    border-radius: 5px;
     background-color: ${color.white};
 
     &:hover {
@@ -78,8 +83,9 @@ export const SideBarToggle = styled.div`
 
 export const SideBarContent = styled.div`
     user-select: none;
-    width: 325px;
-    height: 100%;
+    
+    width: 340px;
+    height: 70vh;
     background: ${color.white};
     padding: 18px;
     pointer-events: all;

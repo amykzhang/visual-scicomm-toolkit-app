@@ -2,11 +2,14 @@ import { Activity } from "../activity/activity";
 import {
     SideBar,
     SideBarContent,
+    SideBarHeader,
     SideBarToggle,
 } from "../styles/containers";
 import styled from "styled-components";
 import { ReactComponent as LeftArrow } from "../assets/arrowhead-left.svg";
 import { ReactComponent as RightArrow } from "../assets/arrowhead-right.svg";
+import { ReactComponent as Notebook } from "../assets/notebook.svg";
+import typography from "../styles/typography";
 
 interface ActivityPanelProps {
     activity: Activity;
@@ -19,6 +22,9 @@ const ActivityPanelContainer = styled(SideBar)`
 `;
 
 const ActivityContentContainer = styled(SideBarContent)`
+    position: fixed;
+    top: 80px;
+
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
@@ -27,8 +33,13 @@ const ActivityContentContainer = styled(SideBarContent)`
     border-radius: 0px 0px 5px 0px;
 `;
 
+const ActivityHeader = styled(SideBarHeader)`
+    padding: 22px;
+`;
+
 const ActivityToggle = styled(SideBarToggle)`
-    border-radius: 0 5px 5px 0;
+    position: fixed;
+    right: 6px;
 `;
 
 export const ActivityPanel: React.FC<ActivityPanelProps> = ({
@@ -41,14 +52,18 @@ export const ActivityPanel: React.FC<ActivityPanelProps> = ({
 
     return (
         <ActivityPanelContainer className={isOpen ? "" : "slide-left"}>
+            <ActivityHeader>
+                <Notebook />
+                <typography.LargeText>Task</typography.LargeText>
+                <ActivityToggle onClick={handleToggle}>
+                    <Arrow />
+                </ActivityToggle>
+            </ActivityHeader>
             <ActivityContentContainer
                 dangerouslySetInnerHTML={{
                     __html: activity.activity_panel,
                 }}
             ></ActivityContentContainer>
-            <ActivityToggle onClick={handleToggle}>
-                <Arrow />
-            </ActivityToggle>
         </ActivityPanelContainer>
     );
 };
