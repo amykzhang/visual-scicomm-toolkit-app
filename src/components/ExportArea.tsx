@@ -1,13 +1,16 @@
 import { Rect } from "react-konva";
 import color from "../styles/color";
+import Konva from "konva";
 
 export const ExportArea: React.FC<{
+    exportAreaRef: React.RefObject<Konva.Rect>;
     width: number;
     height: number;
-    onClick: () => void;
-}> = ({ width, height, onClick }) => {
+    onClick: (e: Konva.KonvaEventObject<MouseEvent>) => void;
+}> = ({ exportAreaRef, width, height, onClick }) => {
     return (
         <Rect
+            ref={exportAreaRef}
             x={0}
             y={0}
             width={width}

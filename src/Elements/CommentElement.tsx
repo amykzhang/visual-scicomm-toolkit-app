@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 import { Text } from "react-konva";
 import { CommentProp } from "../utils/interfaces";
-import { handleDragEnd, handleDragStart } from "../functions";
+import Konva from "konva";
 
 interface CommentElementProp {
     comment: CommentProp;
@@ -16,12 +16,33 @@ const CommentElement = ({
     setComments,
     draggable,
 }: CommentElementProp) => {
+    const handleCommentDragStart = (e: Konva.KonvaEventObject<DragEvent>) => {
+        setComments(comments.map((comment) => {
+            return { ...comment, isDragging: comment.id === e.target.id() };
+        }));
+    };
+
+    const handleCommentDragEnd = (e: Konva.KonvaEventObject<DragEvent>) => {
+        setComments(comments.map((comment) => {
+            if (comment.isDragging) {
+                return {
+                    ...comment,
+                    x: e.target.x(),
+                    y: e.target.y(),
+                    isDragging: false,
+                };
+            } else {
+                return comment;
+            }
+        }));
+    };
+
     return (
         <Fragment>
             <Text
                 {...comment}
-                onDragStart={handleDragStart(comments, setComments)}
-                onDragEnd={handleDragEnd(comments, setComments)}
+                onDragStart={handleCommentDragStart}
+                onDragEnd={handleCommentDragEnd}
                 draggable={true}
                 onClick={() => console.log("clicked")}
             />

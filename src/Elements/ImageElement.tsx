@@ -1,18 +1,17 @@
-import React, { Fragment, useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import Konva from "konva";
 import { Image, Transformer } from "react-konva";
 import { ImageProp } from "../utils/interfaces";
-import { handleDragEnd, handleDragStart } from "../functions";
 
 interface ImageElementProp {
     image: ImageProp;
     isSelected: boolean;
     onSelect: any;
     onChange: any;
-    images: ImageProp[];
-    setImages: React.Dispatch<React.SetStateAction<ImageProp[]>>;
     perfectDrawEnabled?: boolean;
     draggable: boolean;
+    handleDragStart: (e: Konva.KonvaEventObject<DragEvent>) => void;
+    handleDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => void;
 }
 
 const ImageElement = ({
@@ -20,10 +19,10 @@ const ImageElement = ({
     isSelected,
     onSelect,
     onChange,
-    images,
-    setImages,
     perfectDrawEnabled,
     draggable,
+    handleDragStart,
+    handleDragEnd,
 }: ImageElementProp) => {
     const imageRef = useRef<Konva.Image | null>(null);
     const transformerRef = useRef<Konva.Transformer | null>(null);
@@ -45,19 +44,16 @@ const ImageElement = ({
             <Image
                 {...image}
                 onClick={onSelect}
-                onTap={onSelect}
                 ref={imageRef}
                 perfectDrawEnabled={perfectDrawEnabled}
                 draggable={draggable}
-                onDragStart={handleDragStart(images, setImages)}
-                onDragEnd={handleDragEnd(images, setImages)}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
                 onTransformEnd={() => {
                     // transformer is changing scale of the node
                     // and NOT its width or height
                     // but in the store we have only width and height
                     // to match the data better we will reset scale on transform end
-                    console.log("transform end");
-
                     if (imageRef.current !== null) {
                         const node = imageRef.current;
                         const scaleX = node.scaleX();

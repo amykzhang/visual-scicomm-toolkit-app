@@ -1,7 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
-import { Stage, Layer } from "react-konva";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Stage, Layer, Group } from "react-konva";
 import styled from "styled-components";
-import { ExportManager, KeyPressManager, StageViewManager } from "./functions";
+import {
+    ExportManager,
+    KeyPressManager,
+    StageViewManager,
+    handleDragEnd,
+    handleDragStart,
+} from "./functions";
 import { CommentViewManager } from "./functions";
 import { APP_VIEW } from "./utils/enums";
 import { ElementsPanel } from "./Panels/ElementsPanel";
@@ -26,6 +32,7 @@ import { KonvaEventObject } from "konva/lib/Node";
 import { ExportPanel } from "./Panels";
 import CommentElement from "./Elements/CommentElement";
 import { handleAddComment } from "./functions/comment";
+import Konva from "konva";
 
 // TODO: make this easier to customize, more modular for creators?
 const activity = activity_visual_strategies;
@@ -42,6 +49,9 @@ const PanelsContainer = styled.div`
 `;
 
 export default function App() {
+    const groupRef = useRef<Konva.Group>(null);
+    const exportAreaRef = useRef<Konva.Rect>(null);
+
     const { shiftKey, ctrlKey, altKey, metaKey } = KeyPressManager();
 
     // App State (stage position, zoom, view, panels)
@@ -132,20 +142,57 @@ export default function App() {
                     setSelectedIds([id]);
                 }
             }
+            updateResetGroup();
+        }
+    };
+
+    // Updates the images with offset position and makes a new selection
+    const updateResetGroup = () => {
+        console.log("update reset group");
+
+        if (groupRef.current !== null) {
+            const group = groupRef.current;
+
+            const newImages = images.map((image) => {
+                if (selectedIds.includes(image.id)) {
+                    return {
+                        ...image,
+                        x: image.x + group.x(),
+                        y: image.y + group.y(),
+                    };
+                } else {
+                    return image;
+                }
+            });
+            setImages(newImages);
+
+            console.log(group.x(), group.y());
+            group.x(0);
+            group.y(0);
         }
     };
 
     const handleStageUnfocus = (e: KonvaEventObject<MouseEvent>) => {
         if (view === APP_VIEW.select) {
-            const clickedOnEmpty = e.target === stageRef.current;
-            if (clickedOnEmpty) {
+            const clickedOnStage = e.target === stageRef.current;
+            if (clickedOnStage) {
+                updateResetGroup();
                 setSelectedIds([]);
             }
         }
     };
 
+    const handleExportAreaUnfocus = (e: KonvaEventObject<MouseEvent>) => {
+        if (view === APP_VIEW.select) {
+            updateResetGroup();
+            setSelectedIds([]);
+        }
+    };
+
     const deleteSelected = useCallback(() => {
-        const newImages = images.filter((image) => !selectedIds.includes(image.id));
+        const newImages = images.filter(
+            (image) => !selectedIds.includes(image.id)
+        );
         setImages(newImages);
         setSelectedIds([]);
     }, [images, selectedIds]);
@@ -164,6 +211,8 @@ export default function App() {
             } else if (e.key === "a" && ctrlKey) {
                 e.preventDefault();
                 setSelectedIds(images.map((image) => image.id));
+            } else if (e.key === "=") {
+                console.log(images);
             }
         },
         [ctrlKey, images, selectedIds, deleteSelected]
@@ -194,11 +243,6 @@ export default function App() {
     // Dragging Behaviour depending on View
     const stageConstants = {
         draggable: view === APP_VIEW.pan,
-    };
-
-    const canvasElementConstants = {
-        perfectDrawEnabled: false,
-        draggable: view === APP_VIEW.select,
     };
 
     // Side effect for canvas state
@@ -293,8 +337,9 @@ export default function App() {
             >
                 <Layer id="export-layer">
                     <ExportArea
+                        exportAreaRef={exportAreaRef}
                         {...activity.canvas_size}
-                        onClick={() => setSelectedIds([])}
+                        onClick={handleExportAreaUnfocus}
                     />
                 </Layer>
                 <Layer id="comment-layer">
@@ -302,7 +347,7 @@ export default function App() {
                         comments.map((comment, i) => {
                             return (
                                 <CommentElement
-                                    {...canvasElementConstants}
+                                    draggable={view === APP_VIEW.select}
                                     key={i}
                                     comment={comment}
                                     comments={comments}
@@ -312,25 +357,61 @@ export default function App() {
                         })}
                 </Layer>
                 <Layer id="image-layer">
-                    {images.map((image, i) => {
-                        return (
-                            <ImageElement
-                                {...canvasElementConstants}
-                                key={i}
-                                image={image}
-                                isSelected={selectedIds.includes(image.id)}
-                                onSelect={() => handleSelect(image.id)}
-                                onChange={(attributes: any) => {
-                                    modifyImage(i, {
-                                        ...image,
-                                        ...attributes,
-                                    });
-                                }}
-                                images={images}
-                                setImages={setImages}
-                            />
-                        );
-                    })}
+                    {images
+                        .filter((image) => !selectedIds.includes(image.id))
+                        .map((image: ImageProp, i: number) => {
+                            return (
+                                <ImageElement
+                                    draggable={view === APP_VIEW.select}
+                                    key={i}
+                                    image={image}
+                                    isSelected={selectedIds.includes(image.id)}
+                                    onSelect={() => handleSelect(image.id)}
+                                    onChange={(attributes: any) => {
+                                        modifyImage(i, {
+                                            ...image,
+                                            ...attributes,
+                                        });
+                                    }}
+                                    handleDragStart={handleDragStart(
+                                        images,
+                                        setImages,
+                                        selectedIds,
+                                        setSelectedIds
+                                    )}
+                                    handleDragEnd={handleDragEnd(
+                                        images,
+                                        setImages
+                                    )}
+                                />
+                            );
+                        })}
+
+                    <Group draggable ref={groupRef}>
+                        {selectedIds.map((id) => {
+                            const idx = images.findIndex(
+                                (image) => image.id === id
+                            );
+                            const image = images[idx];
+                            return (
+                                <ImageElement
+                                    draggable={false}
+                                    key={idx}
+                                    image={image}
+                                    isSelected={selectedIds.includes(image.id)}
+                                    onSelect={() => handleSelect(image.id)}
+                                    onChange={(attributes: any) => {
+                                        modifyImage(idx, {
+                                            ...image,
+                                            ...attributes,
+                                        });
+                                    }}
+                                    handleDragStart={() => {}}
+                                    handleDragEnd={() => {}}
+                                />
+                            );
+                        })}
+                    </Group>
                 </Layer>
             </Stage>
         </div>
