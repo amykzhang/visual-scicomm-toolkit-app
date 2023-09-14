@@ -112,3 +112,14 @@ export const CenterBar = styled.div`
     background: ${color.white};
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 `;
+
+export const PanelsContainer = styled.div`
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 100vh;
+    inset: 0px;
+    z-index: 300;
+    pointer-events: none;
+`;

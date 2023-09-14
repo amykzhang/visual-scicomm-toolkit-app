@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Stage, Layer, Group } from "react-konva";
-import styled from "styled-components";
+import { PanelsContainer } from "./styles/containers";
 import {
     ExportManager,
     KeyPressManager,
+    SelectionManager,
     StageViewManager,
     handleDragEnd,
     handleDragStart,
@@ -28,7 +29,6 @@ import {
 } from "./utils/interfaces";
 import { persistance } from "./functions";
 import { ImageElement } from "./Elements";
-import { KonvaEventObject } from "konva/lib/Node";
 import { ExportPanel } from "./Panels";
 import CommentElement from "./Elements/CommentElement";
 import { handleAddComment } from "./functions/comment";
@@ -36,17 +36,6 @@ import Konva from "konva";
 
 // TODO: make this easier to customize, more modular for creators?
 const activity = activity_visual_strategies;
-
-const PanelsContainer = styled.div`
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    width: 100vw;
-    height: 100vh;
-    inset: 0px;
-    z-index: 300;
-    pointer-events: none;
-`;
 
 export default function App() {
     const groupRef = useRef<Konva.Group>(null);
@@ -112,63 +101,16 @@ export default function App() {
         setImages(newImages);
     };
 
-    // selected Ids
-    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    // Selection
+    const {
+        selectedIds,
+        setSelectedIds,
+        handleSelect,
+        deleteSelected,
+        updateResetGroup,
+    } = SelectionManager(images, setImages, view, shiftKey, groupRef);
 
-    const addSelectedId = (id: string) => {
-        setSelectedIds([...selectedIds, id]);
-    };
-
-    const removeSelectedId = (id: string) => {
-        setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
-    };
-
-    const toggleSelectedId = (id: string) => {
-        if (selectedIds.includes(id)) {
-            removeSelectedId(id);
-        } else {
-            addSelectedId(id);
-        }
-    };
-
-    const handleSelect = (id: string) => {
-        if (view === APP_VIEW.select) {
-            if (shiftKey) {
-                toggleSelectedId(id);
-            } else {
-                if (selectedIds.length === 1 && selectedIds.includes(id)) {
-                    setSelectedIds([]);
-                } else {
-                    setSelectedIds([id]);
-                }
-            }
-            updateResetGroup();
-        }
-    };
-
-    // Updates the images with offset position and makes a new selection
-    const updateResetGroup = () => {
-        if (groupRef.current !== null) {
-            const group = groupRef.current;
-
-            const newImages = images.map((image) => {
-                if (selectedIds.includes(image.id)) {
-                    return {
-                        ...image,
-                        x: image.x + group.x(),
-                        y: image.y + group.y(),
-                    };
-                } else {
-                    return image;
-                }
-            });
-            setImages(newImages);
-            group.x(0);
-            group.y(0);
-        }
-    };
-
-    const handleStageUnfocus = (e: KonvaEventObject<MouseEvent>) => {
+    const handleStageUnfocus = (e: Konva.KonvaEventObject<MouseEvent>) => {
         if (view === APP_VIEW.select) {
             const clickedOnStage = e.target === stageRef.current;
             if (clickedOnStage) {
@@ -178,20 +120,12 @@ export default function App() {
         }
     };
 
-    const handleExportAreaUnfocus = (e: KonvaEventObject<MouseEvent>) => {
+    const handleExportAreaUnfocus = () => {
         if (view === APP_VIEW.select) {
             updateResetGroup();
             setSelectedIds([]);
         }
     };
-
-    const deleteSelected = useCallback(() => {
-        const newImages = images.filter(
-            (image) => !selectedIds.includes(image.id)
-        );
-        setImages(newImages);
-        setSelectedIds([]);
-    }, [images, selectedIds]);
 
     // Key Presses
     const handleKeyPress = useCallback(
@@ -208,10 +142,9 @@ export default function App() {
                 e.preventDefault();
                 setSelectedIds(images.map((image) => image.id));
             } else if (e.key === "=") {
-                console.log(images);
             }
         },
-        [ctrlKey, images, selectedIds, deleteSelected]
+        [ctrlKey, images, selectedIds, deleteSelected, setSelectedIds]
     );
 
     // Stage View
