@@ -11,11 +11,20 @@ const ZoomPanelContainer = styled(CenterBar)`
     border-radius: 8px 8px 0px 0px;
 `;
 
-const StyledPercentage = styled.p`
+const StyledPercentage = styled.div`
     font-style: normal;
     font-weight: 700;
     font-size: 16px;
     line-height: 20px;
+
+    width: 55px;
+    height: 55px;
+    padding: 2px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
 `;
 
 const StyledMinusIcon = styled(MinusIcon)`
@@ -48,9 +57,7 @@ export const ZoomPanel: React.FC<ZoomPanelProps> = ({
             <SquareButton onClick={zoomOut}>
                 <StyledMinusIcon />
             </SquareButton>
-            <SquareButton>
-                <StyledPercentage>{zoomLevel}%</StyledPercentage>
-            </SquareButton>
+            <StyledPercentage>{zoomLevel}%</StyledPercentage>
             <SquareButton onClick={zoomIn}>
                 <PlusIcon />
             </SquareButton>

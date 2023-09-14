@@ -69,9 +69,9 @@ SEPTEMBER 13: (5 hours)
 - Export button: hover, selected, pointer ✅
 - Modify info window: 70vw 50vh ✅
 - Modify Info and Settings same box as SquareTool component ✅
-- Add blue background on hover for sidebar minimize and expand
-- Remove grey outline for hover
-- Remove hover blue background for zoom percentage
+- Add blue background on hover for sidebar minimize and expand ✅
+- Remove grey outline for hover ✅
+- Remove hover blue background for zoom percentage ✅
 - Modify background margin/padding for ActivityPanel to figma specs
 - Add padding around the sidebar for scrolling (20px)
 - Add Background around element rows
