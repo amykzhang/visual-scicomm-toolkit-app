@@ -16,6 +16,10 @@ export const SquareButton = styled.button`
     &[data-isactive="true"] {
         background-color: ${color.lightBlue};
     }
+
+    &:hover {
+        background-color: ${color.lightBlue};
+    }
 `;
 
 export const ExitCommentViewButton = styled.div`
