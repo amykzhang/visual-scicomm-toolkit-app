@@ -49,7 +49,6 @@ export const SelectionManager = (
 
     // Updates the images with offset position and makes a new groupSelection
     const updateResetGroup = () => {
-        console.log("updateResetGroup");
         if (groupRef.current !== null) {
             const group = groupRef.current;
 

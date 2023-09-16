@@ -134,7 +134,7 @@ export default function App() {
                 console.log(groupSelection);
             }
         },
-        [ctrlKey, images, groupSelection, deleteSelected, setGroupSelection]
+        [ctrlKey, images, deleteSelected, groupSelection, setGroupSelection]
     );
 
     // Comment View
@@ -244,7 +244,6 @@ export default function App() {
                 onMouseUp={view === APP_VIEW.select ? handleMouseUp : undefined}
                 onContextMenu={(e) => {
                     e.evt.preventDefault();
-                    console.log(groupSelection);
                 }}
                 ref={stageRef}
                 {...stageConstants}
@@ -303,20 +302,8 @@ export default function App() {
                                             ...attributes,
                                         });
                                     }}
-                                    handleDragStart={handleDragStart(
-                                        images,
-                                        setImages,
-                                        groupSelection,
-                                        setGroupSelection,
-                                        updateResetGroup
-                                    )}
-                                    handleDragEnd={handleDragEnd(
-                                        images,
-                                        setImages,
-                                        groupSelection,
-                                        setGroupSelection,
-                                        updateResetGroup
-                                    )}
+                                    handleDragStart={handleDragStart(images, setImages)}
+                                    handleDragEnd={handleDragEnd(images, setImages)}
                                     transformFlag={transformFlag}
                                     setTransformFlag={setTransformFlag}
                                     setGroupSelection={setGroupSelection}

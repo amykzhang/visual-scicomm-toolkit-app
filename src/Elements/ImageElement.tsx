@@ -22,13 +22,13 @@ const ImageElement = ({
     image,
     isSelected,
     selectSelf,
+    transformFlag,
+    setTransformFlag,
     onChange,
     perfectDrawEnabled,
     draggable,
     handleDragStart,
     handleDragEnd,
-    transformFlag,
-    setTransformFlag,
     setGroupSelection,
     updateResetGroup,
 }: ImageElementProp) => {
@@ -60,36 +60,36 @@ const ImageElement = ({
                 perfectDrawEnabled={perfectDrawEnabled}
                 draggable={draggable}
                 onClick={() => {
-                    console.log("onClick\n", image.id);
+                    // console.log("onClick\n", image.id);
                     selectSelf();
                 }}
                 onMouseDown={() => {
-                    console.log("onMouseDown\n", image.id);
+                    // console.log("onMouseDown\n", image.id);
                     setDragSelected(true);
                     updateResetGroup();
                 }}
                 onMouseUp={() => {
-                    console.log("onMouseUp\n", image.id);
+                    // console.log("onMouseUp\n", image.id);
                     setDragSelected(false);
                 }}
                 onDragStart={(e) => {
-                    console.log("onDragStart\n", image.id);
+                    // console.log("onDragStart\n", image.id);
 
                     setTransformFlag(false);
                     if (handleDragStart !== undefined) handleDragStart(e);
                 }}
                 onDragEnd={(e) => {
-                    console.log("onDragEnd\n", image.id);
+                    // console.log("onDragEnd\n", image.id);
 
                     if (handleDragEnd !== undefined) handleDragEnd(e);
                     setGroupSelection([image.id]);
                     setTransformFlag(true);
                 }}
                 onTransformStart={() => {
-                    console.log("onTransformStart\n", image.id);
+                    // console.log("onTransformStart\n", image.id);
                 }}
                 onTransformEnd={() => {
-                    console.log("onTransformEnd\n", image.id);
+                    // console.log("onTransformEnd\n", image.id);
                     // transformer is changing scale of the node
                     // and NOT its width or height
                     // but in the store we have only width and height
