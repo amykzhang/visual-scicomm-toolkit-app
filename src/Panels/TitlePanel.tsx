@@ -3,6 +3,8 @@ import typography from "../styles/typography";
 import color from "../styles/color";
 
 const TitlePanelContainer = styled.div`
+    pointer-events: all;
+    user-select: none;
     position: absolute;
     width: 380px;
     height: 69px;
@@ -28,7 +30,7 @@ const Logo = styled.div`
     width: 62px;
     height: 38px;
 
-    background:${color.black};
+    background: ${color.black};
     color: ${color.white};
     border-radius: 5px;
 `;

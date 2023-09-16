@@ -91,9 +91,7 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     const TextSection = () => {
         return (
             <>
-                <ImageSubheadingText>
-                    {elements.text.heading}
-                </ImageSubheadingText>
+                <ImageSubheadingText>{elements.text.heading}</ImageSubheadingText>
                 <ElementsRow>
                     <TextTool />
                 </ElementsRow>
@@ -108,10 +106,7 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
                 <ImageSubheadingText>{heading}</ImageSubheadingText>
                 <ElementsRow>
                     {contents.map((item, i) => {
-                        if (
-                            item.type === "tool" &&
-                            item.tool === "freehand-draw"
-                        ) {
+                        if (item.type === "tool" && item.tool === "freehand-draw") {
                             return <Doodle key={i} />;
                         } else return <></>;
                     })}
@@ -171,9 +166,7 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
             <>
                 {image_sections.map((section, i) => (
                     <div key={i}>
-                        <ImageSubheadingText>
-                            {section.subheading}
-                        </ImageSubheadingText>
+                        <ImageSubheadingText>{section.subheading}</ImageSubheadingText>
 
                         <ElementsRow>
                             {section.srcs.map((src, j) => (
@@ -205,7 +198,6 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
             </SideBarHeader>
             <ElementsMenuBackground />
             <ElementsMenuContainer>
-
                 <TextSection />
                 <DrawSection />
                 <LinesSection />

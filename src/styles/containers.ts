@@ -32,6 +32,9 @@ export const BottomZone = styled.div`
 `;
 
 export const SideBar = styled.div`
+    pointer-events: all;
+    user-select: none;
+
     position: absolute;
     top: 14vh;
     transition-duration: 0.5s;
@@ -82,7 +85,7 @@ export const SideBarToggle = styled.div`
 export const SideBarContent = styled.div`
     user-select: none;
     pointer-events: all;
-    
+
     width: 340px;
     height: calc(68vh - 15px);
     background: ${color.white};
@@ -98,6 +101,9 @@ export const SideBarBackground = styled.div`
 `;
 
 export const CenterBar = styled.div`
+    pointer-events: all;
+    user-select: none;
+
     margin-left: auto;
     margin-right: auto;
 

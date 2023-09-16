@@ -23,9 +23,10 @@ export const SquareButton = styled.button`
 `;
 
 export const ExitCommentViewButton = styled.div`
-    position: absolute;
     pointer-events: all;
     user-select: none;
+
+    position: absolute;
     cursor: pointer;
 
     display: flex;

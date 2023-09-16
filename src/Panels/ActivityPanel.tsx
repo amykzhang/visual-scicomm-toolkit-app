@@ -50,11 +50,7 @@ const ActivityToggle = styled(SideBarToggle)`
     margin: 6px;
 `;
 
-export const ActivityPanel: React.FC<ActivityPanelProps> = ({
-    activity,
-    isOpen,
-    handleToggle,
-}) => {
+export const ActivityPanel: React.FC<ActivityPanelProps> = ({ activity, isOpen, handleToggle }) => {
     // For expanding and collapsing the sidebar
     const Arrow = isOpen ? LeftArrow : RightArrow;
 
