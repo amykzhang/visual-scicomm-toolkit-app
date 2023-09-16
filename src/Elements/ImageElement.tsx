@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import Konva from "konva";
 import { Image, Transformer } from "react-konva";
 import { ImageProp } from "../utils/interfaces";
@@ -6,30 +6,42 @@ import { ImageProp } from "../utils/interfaces";
 interface ImageElementProp {
     image: ImageProp;
     isSelected: boolean;
-    onSelect: any;
-    onChange: any;
+    selectSelf: () => void;
+    onChange: (attributes: any) => void;
     perfectDrawEnabled?: boolean;
     draggable: boolean;
-    handleDragStart: (e: Konva.KonvaEventObject<DragEvent>) => void;
-    handleDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => void;
+    handleDragStart?: (e: Konva.KonvaEventObject<DragEvent>) => void;
+    handleDragEnd?: (e: Konva.KonvaEventObject<DragEvent>) => void;
+    transformFlag: boolean;
+    setTransformFlag: React.Dispatch<React.SetStateAction<boolean>>;
+    setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>;
+    updateResetGroup: () => void;
 }
 
 const ImageElement = ({
     image,
     isSelected,
-    onSelect,
+    selectSelf,
     onChange,
     perfectDrawEnabled,
     draggable,
     handleDragStart,
     handleDragEnd,
+    transformFlag,
+    setTransformFlag,
+    setGroupSelection,
+    updateResetGroup,
 }: ImageElementProp) => {
-    // const [dragSelected, setDragSelected] = useState(false);
+    // Controls to show transformer when the element is dragged selected but not selected yet
+    const [dragSelected, setDragSelected] = useState(false);
+    const showTransform = (transformFlag || dragSelected) && (isSelected || dragSelected);
+
     const imageRef = useRef<Konva.Image | null>(null);
     const transformerRef = useRef<Konva.Transformer | null>(null);
 
     useEffect(() => {
-        if (isSelected /* || dragSelected */) {
+        // Show transformer when the image is selected or dragged
+        if (showTransform) {
             // we need to attach transformer manually
             // TODO: make a transformer state for removing transformer nodes while exporting
             if (transformerRef.current !== null && imageRef.current !== null) {
@@ -38,25 +50,46 @@ const ImageElement = ({
                 transformer.getLayer()?.batchDraw();
             }
         }
-    }, [isSelected]);
+    }, [showTransform]);
 
     return (
         <Fragment>
             <Image
                 {...image}
-                onClick={onSelect}
                 ref={imageRef}
                 perfectDrawEnabled={perfectDrawEnabled}
                 draggable={draggable}
+                onClick={() => {
+                    console.log("onClick\n", image.id);
+                    selectSelf();
+                }}
+                onMouseDown={() => {
+                    console.log("onMouseDown\n", image.id);
+                    setDragSelected(true);
+                    updateResetGroup();
+                }}
+                onMouseUp={() => {
+                    console.log("onMouseUp\n", image.id);
+                    setDragSelected(false);
+                }}
                 onDragStart={(e) => {
-                    // setDragSelected(true);
-                    handleDragStart(e);
+                    console.log("onDragStart\n", image.id);
+
+                    setTransformFlag(false);
+                    if (handleDragStart !== undefined) handleDragStart(e);
                 }}
                 onDragEnd={(e) => {
-                    // setDragSelected(false);
-                    handleDragEnd(e);
+                    console.log("onDragEnd\n", image.id);
+
+                    if (handleDragEnd !== undefined) handleDragEnd(e);
+                    setGroupSelection([image.id]);
+                    setTransformFlag(true);
+                }}
+                onTransformStart={() => {
+                    console.log("onTransformStart\n", image.id);
                 }}
                 onTransformEnd={() => {
+                    console.log("onTransformEnd\n", image.id);
                     // transformer is changing scale of the node
                     // and NOT its width or height
                     // but in the store we have only width and height
@@ -83,7 +116,7 @@ const ImageElement = ({
                     }
                 }}
             />
-            {isSelected /* || dragSelected */ && (
+            {showTransform && (
                 <Transformer
                     ref={transformerRef}
                     boundBoxFunc={(oldBox, newBox) => {

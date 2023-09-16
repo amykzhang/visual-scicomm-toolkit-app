@@ -3,5 +3,6 @@
     "editor.formatOnPaste": true,
     "javascript.format.semicolons": "insert",
     "typescript.format.semicolons": "insert",
-    "prettier.tabWidth": 4
+    "prettier.tabWidth": 4,
+    "prettier.printWidth": 100
 }

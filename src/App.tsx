@@ -21,12 +21,7 @@ import typography from "./styles/typography";
 import { ExportArea } from "./components/ExportArea";
 import { ExitCommentViewButton } from "./components/Components";
 import activity_visual_strategies from "./activity/activity";
-import {
-    CommentProp,
-    CommentViewProp,
-    ImageProp,
-    UiStateProp,
-} from "./utils/interfaces";
+import { CommentProp, CommentViewProp, ImageProp, UiStateProp } from "./utils/interfaces";
 import { persistance } from "./functions";
 import { ImageElement } from "./Elements";
 import { ExportPanel } from "./Panels";
@@ -63,7 +58,7 @@ export default function App() {
     function setView(view: APP_VIEW) {
         setUiState({ ...uiState, view: view });
         if (view !== APP_VIEW.select) {
-            setSelectedIds([]);
+            setGroupSelection([]);
         }
     }
 
@@ -104,20 +99,13 @@ export default function App() {
     };
 
     // Stage View
-    const {
-        stageRef,
-        handleWheel,
-        zoomLevel,
-        zoomIn,
-        zoomOut,
-        zoomFit,
-        toggleFullscreen,
-    } = StageViewManager(activity.canvas_size);
+    const { stageRef, handleWheel, zoomLevel, zoomIn, zoomOut, zoomFit, toggleFullscreen } =
+        StageViewManager(activity.canvas_size);
 
     // Selection
     const {
-        selectedIds,
-        setSelectedIds,
+        groupSelection,
+        setGroupSelection,
         isSelectionMode,
         selectionBounds,
         handleSelect,
@@ -126,46 +114,34 @@ export default function App() {
         handleMouseDown,
         handleMouseMove,
         handleMouseUp,
-    } = SelectionManager(
-        images,
-        setImages,
-        view,
-        shiftKey,
-        stageRef,
-        groupRef,
-        selectionRectRef
-    );
+    } = SelectionManager(images, setImages, view, shiftKey, stageRef, groupRef, selectionRectRef);
 
     // Key Presses
     const handleKeyPress = useCallback(
         (e: KeyboardEvent) => {
             if (e.key === "Escape") {
-                setSelectedIds([]);
+                setGroupSelection([]);
             } else if (e.key === "Backspace") {
                 deleteSelected();
             } else if (e.key === "Delete") {
-                if (selectedIds.length > 0) {
+                if (groupSelection.length > 0) {
                     deleteSelected();
                 }
             } else if (e.key === "a" && ctrlKey) {
                 e.preventDefault();
-                setSelectedIds(images.map((image) => image.id));
+                setGroupSelection(images.map((image) => image.id));
             } else if (e.key === "=") {
+                console.log(groupSelection);
             }
         },
-        [ctrlKey, images, selectedIds, deleteSelected, setSelectedIds]
+        [ctrlKey, images, groupSelection, deleteSelected, setGroupSelection]
     );
 
     // Comment View
     const commentView = CommentViewManager(setView);
 
     // Export
-    const exportManager = ExportManager(
-        activity,
-        stageRef,
-        selectedIds,
-        setSelectedIds
-    );
+    const exportManager = ExportManager(activity, stageRef, groupSelection, setGroupSelection);
 
     // Dragging Behaviour depending on View
     const stageConstants = {
@@ -189,7 +165,7 @@ export default function App() {
         return () => {
             window.removeEventListener("keyup", handleKeyPress);
         };
-    }, [selectedIds, shiftKey, ctrlKey, altKey, metaKey, handleKeyPress]);
+    }, [groupSelection, shiftKey, ctrlKey, altKey, metaKey, handleKeyPress]);
 
     // For Comment View
     useEffect(() => {
@@ -201,21 +177,16 @@ export default function App() {
         }
     }, [commentView.state.backgroundColor, stageRef]);
 
+    const [transformFlag, setTransformFlag] = useState(true);
+
     return (
         <div>
             <PanelsContainer>
                 <TopZone>
                     <TitlePanel name={activity.name} />
-                    <ToolbarPanel
-                        view={view}
-                        setView={setView}
-                        commentView={commentView}
-                    />
+                    <ToolbarPanel view={view} setView={setView} commentView={commentView} />
                     <ExitCommentView commentView={commentView} />
-                    <ExportPanel
-                        activity={activity}
-                        exportManager={exportManager}
-                    />
+                    <ExportPanel activity={activity} exportManager={exportManager} />
                 </TopZone>
                 <ActivityPanel
                     activity={activity}
@@ -260,22 +231,21 @@ export default function App() {
                         ? handleAddComment(comments, setComments, stageRef)
                         : (e) => {
                               if (view === APP_VIEW.select) {
-                                  const clickedOnStage =
-                                      e.target === stageRef.current;
+                                  const clickedOnStage = e.target === stageRef.current;
                                   if (clickedOnStage) {
                                       updateResetGroup();
-                                      setSelectedIds([]);
+                                      setGroupSelection([]);
                                   }
                               }
                           }
                 }
-                onMouseDown={
-                    view === APP_VIEW.select ? handleMouseDown : undefined
-                }
-                onMouseMove={
-                    view === APP_VIEW.select ? handleMouseMove : undefined
-                }
+                onMouseDown={view === APP_VIEW.select ? handleMouseDown : undefined}
+                onMouseMove={view === APP_VIEW.select ? handleMouseMove : undefined}
                 onMouseUp={view === APP_VIEW.select ? handleMouseUp : undefined}
+                onContextMenu={(e) => {
+                    e.evt.preventDefault();
+                    console.log(groupSelection);
+                }}
                 ref={stageRef}
                 {...stageConstants}
             >
@@ -286,7 +256,7 @@ export default function App() {
                         onClick={() => {
                             if (view === APP_VIEW.select) {
                                 updateResetGroup();
-                                setSelectedIds([]);
+                                setGroupSelection([]);
                             }
                         }}
                     />
@@ -316,15 +286,15 @@ export default function App() {
                 </Layer>
                 <Layer id="image-layer">
                     {images
-                        .filter((image) => !selectedIds.includes(image.id))
+                        .filter((image) => !groupSelection.includes(image.id))
                         .map((image: ImageProp, i: number) => {
                             return (
                                 <ImageElement
                                     draggable={view === APP_VIEW.select}
                                     key={i}
                                     image={image}
-                                    isSelected={selectedIds.includes(image.id)}
-                                    onSelect={() => {
+                                    isSelected={groupSelection.includes(image.id)}
+                                    selectSelf={() => {
                                         handleSelect(image.id);
                                     }}
                                     onChange={(attributes: any) => {
@@ -336,42 +306,46 @@ export default function App() {
                                     handleDragStart={handleDragStart(
                                         images,
                                         setImages,
-                                        selectedIds,
-                                        setSelectedIds,
+                                        groupSelection,
+                                        setGroupSelection,
                                         updateResetGroup
                                     )}
                                     handleDragEnd={handleDragEnd(
                                         images,
                                         setImages,
-                                        selectedIds,
-                                        setSelectedIds,
+                                        groupSelection,
+                                        setGroupSelection,
                                         updateResetGroup
                                     )}
+                                    transformFlag={transformFlag}
+                                    setTransformFlag={setTransformFlag}
+                                    setGroupSelection={setGroupSelection}
+                                    updateResetGroup={updateResetGroup}
                                 />
                             );
                         })}
 
                     <Group draggable ref={groupRef}>
-                        {selectedIds.map((id) => {
-                            const idx = images.findIndex(
-                                (image) => image.id === id
-                            );
+                        {groupSelection.map((id) => {
+                            const idx = images.findIndex((image) => image.id === id);
                             const image = images[idx];
                             return (
                                 <ImageElement
                                     draggable={false}
                                     key={idx}
                                     image={image}
-                                    isSelected={selectedIds.includes(image.id)}
-                                    onSelect={() => handleSelect(image.id)}
+                                    isSelected={groupSelection.includes(image.id)}
+                                    selectSelf={() => handleSelect(image.id)}
                                     onChange={(attributes: any) => {
                                         modifyImage(idx, {
                                             ...image,
                                             ...attributes,
                                         });
                                     }}
-                                    handleDragStart={() => {}}
-                                    handleDragEnd={() => {}}
+                                    transformFlag={transformFlag}
+                                    setTransformFlag={setTransformFlag}
+                                    setGroupSelection={setGroupSelection}
+                                    updateResetGroup={updateResetGroup}
                                 />
                             );
                         })}

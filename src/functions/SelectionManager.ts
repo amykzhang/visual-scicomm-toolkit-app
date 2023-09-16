@@ -12,25 +12,23 @@ export const SelectionManager = (
     groupRef: React.MutableRefObject<Konva.Group | null>,
     selectionRectRef: React.MutableRefObject<Konva.Rect | null>
 ) => {
-    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    // Ids of elements that are group selected
+    const [groupSelection, setGroupSelection] = useState<string[]>([]);
+
+    // Selection mode: true when dragging selection rectangle
     const [isSelectionMode, setIsSelectionMode] = useState(false);
-    const [selectionBounds, setSelectionBounds] = useState<SelectionBoundsProp>(
-        { x: 0, y: 0, width: 0, height: 0 }
-    );
-
-    const addSelectedId = (id: string) => {
-        setSelectedIds([...selectedIds, id]);
-    };
-
-    const removeSelectedId = (id: string) => {
-        setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
-    };
+    const [selectionBounds, setSelectionBounds] = useState<SelectionBoundsProp>({
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+    });
 
     const toggleSelectedId = (id: string) => {
-        if (selectedIds.includes(id)) {
-            removeSelectedId(id);
+        if (groupSelection.includes(id)) {
+            setGroupSelection(groupSelection.filter((selectedId) => selectedId !== id));
         } else {
-            addSelectedId(id);
+            setGroupSelection([...groupSelection, id]);
         }
     };
 
@@ -39,23 +37,24 @@ export const SelectionManager = (
             if (shiftKey) {
                 toggleSelectedId(id);
             } else {
-                if (selectedIds.length === 1 && selectedIds.includes(id)) {
-                    setSelectedIds([]);
+                if (groupSelection.length === 1 && groupSelection.includes(id)) {
+                    setGroupSelection([]);
                 } else {
-                    setSelectedIds([id]);
+                    setGroupSelection([id]);
                 }
             }
             updateResetGroup();
         }
     };
 
-    // Updates the images with offset position and makes a new selection
+    // Updates the images with offset position and makes a new groupSelection
     const updateResetGroup = () => {
+        console.log("updateResetGroup");
         if (groupRef.current !== null) {
             const group = groupRef.current;
 
             const newImages = images.map((image) => {
-                if (selectedIds.includes(image.id)) {
+                if (groupSelection.includes(image.id)) {
                     return {
                         ...image,
                         x: image.x + group.x(),
@@ -72,14 +71,12 @@ export const SelectionManager = (
     };
 
     const deleteSelected = useCallback(() => {
-        const newImages = images.filter(
-            (image) => !selectedIds.includes(image.id)
-        );
+        const newImages = images.filter((image) => !groupSelection.includes(image.id));
         setImages(newImages);
-        setSelectedIds([]);
-    }, [images, setImages, selectedIds]);
+        setGroupSelection([]);
+    }, [images, setImages, groupSelection]);
 
-    // Drag selection
+    // Drag groupSelection
 
     const handleMouseDown = () => {
         setIsSelectionMode(true);
@@ -122,15 +119,13 @@ export const SelectionManager = (
 
     const handleMouseUp = () => {
         setIsSelectionMode(false);
+
         const targetedIds = getElementIdsWithinBounds();
-
-        console.log(targetedIds);
-
-        setSelectedIds(targetedIds); // why is this not working?
+        // setGroupSelection([...targetedIds]); // why is this not working?
     };
 
     const getElementIdsWithinBounds = () => {
-        const newSelectedIds: string[] = [];
+        const newSelection: string[] = [];
 
         const actualBounds = {
             x:
@@ -152,15 +147,15 @@ export const SelectionManager = (
                 image.x + image.width < actualBounds.x + actualBounds.width &&
                 image.y + image.height < actualBounds.y + actualBounds.height
             ) {
-                newSelectedIds.push(image.id);
+                newSelection.push(image.id);
             }
         });
-        return newSelectedIds;
+        return newSelection;
     };
 
     return {
-        selectedIds,
-        setSelectedIds,
+        groupSelection,
+        setGroupSelection,
         isSelectionMode,
         setIsSelectionMode,
         selectionBounds,

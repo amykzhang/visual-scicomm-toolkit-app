@@ -83,13 +83,33 @@ SEPTEMBER 13:
 SEPTEMBER 14:
 
 -   Multiple select: rework drag with selection to use selection IDs instead of isDragging ✅
--   drag select bounding box
--   Comment elements (text, change text onClick)
--   Shapes Elements
+-   drag select bounding box 🐛
+-   Comment elements (text, change text onClick) 🚧
 
+SEPTEMBER 21:
+(Amy::svgs of the things)
+
+-   Shapes Elements
 -   text box (https://konvajs.org/docs/sandbox/Editable_Text.html)
+    -   sides transform changes bounds
+    -   corner transform changes scale
 -   freehand draw (https://konvajs.org/docs/sandbox/Free_Drawing.html)
+-   contextmenu for copy paste change color etc.
+
+SEPTEMBER 28: (Provide link for testing)
+
 -   Undo/redo stack (https://konvajs.org/docs/react/Undo-Redo.html)
 -   fix shortcuts for commands
--   contextmenu for copy paste change color etc.
--   Landing Page
+
+OCTOBER 5:
+
+-   Landing Page (AMY will do)
+-   Add support for chrome, safari, firefox, edge
+-   Production and staging servers
+
+OCTOBER 8 :: APP DEADLINE
+OCTOBER 15 :: PAPER SUBMISSION DEADLINE
+
+buggies:
+
+-   fullscreen doesnt render stage when changing vw/vh
