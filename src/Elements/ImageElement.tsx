@@ -6,8 +6,8 @@ import { ImageProp } from "../utils/interfaces";
 interface ImageElementProp {
     image: ImageProp;
     isSelected: boolean;
-    selectSelf: () => void;
-    onChange: (attributes: any) => void;
+    handleChange: (attributes: any) => void;
+    handleSelect: (id: string) => void;
     perfectDrawEnabled?: boolean;
     draggable: boolean;
     handleDragStart?: (e: Konva.KonvaEventObject<DragEvent>) => void;
@@ -21,10 +21,10 @@ interface ImageElementProp {
 const ImageElement = ({
     image,
     isSelected,
-    selectSelf,
     transformFlag,
     setTransformFlag,
-    onChange,
+    handleChange,
+    handleSelect,
     perfectDrawEnabled,
     draggable,
     handleDragStart,
@@ -34,6 +34,8 @@ const ImageElement = ({
 }: ImageElementProp) => {
     // Controls to show transformer when the element is dragged selected but not selected yet
     const [dragSelected, setDragSelected] = useState(false);
+    // If transformFlag is disabled from App, no transformer will be shown unless the specific element is drag selected
+    // Otherwise, show if it is selected or drag selected
     const showTransform = (transformFlag || dragSelected) && (isSelected || dragSelected);
 
     const imageRef = useRef<Konva.Image | null>(null);
@@ -61,29 +63,27 @@ const ImageElement = ({
                 draggable={draggable}
                 onClick={() => {
                     // console.log("onClick\n", image.id);
-                    selectSelf();
+                    handleSelect(image.id);
                 }}
                 onMouseDown={() => {
-                    // console.log("onMouseDown\n", image.id);
-                    setDragSelected(true);
+                    console.log("onMouseDown\n", image.id);
                     updateResetGroup();
                 }}
                 onMouseUp={() => {
                     // console.log("onMouseUp\n", image.id);
-                    setDragSelected(false);
                 }}
                 onDragStart={(e) => {
                     // console.log("onDragStart\n", image.id);
-
+                    setDragSelected(true);
                     setTransformFlag(false);
                     if (handleDragStart !== undefined) handleDragStart(e);
                 }}
                 onDragEnd={(e) => {
                     // console.log("onDragEnd\n", image.id);
-
                     if (handleDragEnd !== undefined) handleDragEnd(e);
                     setGroupSelection([image.id]);
                     setTransformFlag(true);
+                    setDragSelected(false);
                 }}
                 onTransformStart={() => {
                     // console.log("onTransformStart\n", image.id);
@@ -104,7 +104,7 @@ const ImageElement = ({
                         node.scaleX(1);
                         node.scaleY(1);
 
-                        onChange({
+                        handleChange({
                             ...image,
                             x: node.x(),
                             y: node.y(),
@@ -114,6 +114,13 @@ const ImageElement = ({
                             rotation: rotation,
                         });
                     }
+                }}
+                onContextMenu={(e) => {
+                    console.log("onContextMenu\n", image.id);
+                    console.log("dragSelected\n", dragSelected);
+                    console.log("transformFlag\n", transformFlag);
+                    console.log("isSelected\n", isSelected);
+                    console.log("showTransform\n", showTransform);
                 }}
             />
             {showTransform && (

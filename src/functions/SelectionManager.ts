@@ -10,7 +10,7 @@ export const SelectionManager = (
     shiftKey: boolean,
     stageRef: React.MutableRefObject<Konva.Stage | null>,
     groupRef: React.MutableRefObject<Konva.Group | null>,
-    selectionRectRef: React.MutableRefObject<Konva.Rect | null>
+    exportAreaRef: React.MutableRefObject<Konva.Rect | null>
 ) => {
     // Ids of elements that are group selected
     const [groupSelection, setGroupSelection] = useState<string[]>([]);
@@ -75,30 +75,34 @@ export const SelectionManager = (
         setGroupSelection([]);
     }, [images, setImages, groupSelection]);
 
-    // Drag groupSelection
-
-    const handleMouseDown = () => {
-        setIsSelectionMode(true);
-
-        if (stageRef.current !== null) {
+    // DRAG SELECTION
+    const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
+        if (view === APP_VIEW.select && stageRef.current !== null) {
             const stage = stageRef.current;
-            const pointerPosition = stage.getPointerPosition();
 
-            if (pointerPosition !== null) {
-                const x = (pointerPosition.x - stage.x()) / stage.scaleX();
-                const y = (pointerPosition.y - stage.y()) / stage.scaleX();
-                setSelectionBounds({
-                    x,
-                    y,
-                    width: 0,
-                    height: 0,
-                });
+            // Only start bounding box drag select if user clicks on stage or export area
+            if (e.target === stage || e.target === exportAreaRef.current) {
+                console.log("start selection");
+                setIsSelectionMode(true);
+
+                const pointerPosition = stage.getPointerPosition();
+                if (pointerPosition !== null) {
+                    const x = (pointerPosition.x - stage.x()) / stage.scaleX();
+                    const y = (pointerPosition.y - stage.y()) / stage.scaleX();
+                    setSelectionBounds({
+                        x,
+                        y,
+                        width: 0,
+                        height: 0,
+                    });
+                }
             }
         }
     };
 
-    const handleMouseMove = () => {
-        if (stageRef.current !== null) {
+    const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
+        if (isSelectionMode && stageRef.current !== null) {
+            console.log("mouse move");
             const stage = stageRef.current;
             const pointerPosition = stage.getPointerPosition();
 
@@ -116,16 +120,20 @@ export const SelectionManager = (
         }
     };
 
-    const handleMouseUp = () => {
-        setIsSelectionMode(false);
+    const handleMouseUp = (e: Konva.KonvaEventObject<MouseEvent>) => {
+        if (isSelectionMode && view === APP_VIEW.select) {
+            console.log("mouse up");
+            setIsSelectionMode(false);
 
-        const targetedIds = getElementIdsWithinBounds();
-        // setGroupSelection([...targetedIds]); // why is this not working?
+            // const targetedIds = getElementIdsWithinBounds();
+            // setGroupSelection([...targetedIds]);
+
+            // console.log(targetedIds);
+            // console.log(groupSelection);
+        }
     };
 
     const getElementIdsWithinBounds = () => {
-        const newSelection: string[] = [];
-
         const actualBounds = {
             x:
                 selectionBounds.width > 0
@@ -139,16 +147,15 @@ export const SelectionManager = (
             height: Math.abs(selectionBounds.height),
         };
 
-        images.forEach((image) => {
-            if (
-                image.x > actualBounds.x &&
-                image.y > actualBounds.y &&
-                image.x + image.width < actualBounds.x + actualBounds.width &&
-                image.y + image.height < actualBounds.y + actualBounds.height
-            ) {
-                newSelection.push(image.id);
-            }
-        });
+        const newSelection = images
+            .filter(
+                (image) =>
+                    image.x > actualBounds.x &&
+                    image.y > actualBounds.y &&
+                    image.x + image.width < actualBounds.x + actualBounds.width &&
+                    image.y + image.height < actualBounds.y + actualBounds.height
+            )
+            .map((image) => image.id);
         return newSelection;
     };
 

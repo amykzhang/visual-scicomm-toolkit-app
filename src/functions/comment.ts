@@ -15,7 +15,7 @@ function addComment(
             id: id,
             x: x,
             y: y,
-            text: id,
+            text: "hello world",
             isDragging: false,
             isEditing: false,
         },

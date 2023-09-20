@@ -114,7 +114,7 @@ export default function App() {
         handleMouseDown,
         handleMouseMove,
         handleMouseUp,
-    } = SelectionManager(images, setImages, view, shiftKey, stageRef, groupRef, selectionRectRef);
+    } = SelectionManager(images, setImages, view, shiftKey, stageRef, groupRef, exportAreaRef);
 
     // Key Presses
     const handleKeyPress = useCallback(
@@ -231,17 +231,16 @@ export default function App() {
                         ? handleAddComment(comments, setComments, stageRef)
                         : (e) => {
                               if (view === APP_VIEW.select) {
-                                  const clickedOnStage = e.target === stageRef.current;
-                                  if (clickedOnStage) {
+                                  if (e.target === stageRef.current) {
                                       updateResetGroup();
                                       setGroupSelection([]);
                                   }
                               }
                           }
                 }
-                onMouseDown={view === APP_VIEW.select ? handleMouseDown : undefined}
-                onMouseMove={view === APP_VIEW.select ? handleMouseMove : undefined}
-                onMouseUp={view === APP_VIEW.select ? handleMouseUp : undefined}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
                 onContextMenu={(e) => {
                     e.evt.preventDefault();
                 }}
@@ -293,15 +292,13 @@ export default function App() {
                                     key={i}
                                     image={image}
                                     isSelected={groupSelection.includes(image.id)}
-                                    selectSelf={() => {
-                                        handleSelect(image.id);
-                                    }}
-                                    onChange={(attributes: any) => {
+                                    handleChange={(attributes: any) => {
                                         modifyImage(i, {
                                             ...image,
                                             ...attributes,
                                         });
                                     }}
+                                    handleSelect={handleSelect}
                                     handleDragStart={handleDragStart(images, setImages)}
                                     handleDragEnd={handleDragEnd(images, setImages)}
                                     transformFlag={transformFlag}
@@ -322,13 +319,13 @@ export default function App() {
                                     key={idx}
                                     image={image}
                                     isSelected={groupSelection.includes(image.id)}
-                                    selectSelf={() => handleSelect(image.id)}
-                                    onChange={(attributes: any) => {
+                                    handleChange={(attributes: any) => {
                                         modifyImage(idx, {
                                             ...image,
                                             ...attributes,
                                         });
                                     }}
+                                    handleSelect={handleSelect}
                                     transformFlag={transformFlag}
                                     setTransformFlag={setTransformFlag}
                                     setGroupSelection={setGroupSelection}

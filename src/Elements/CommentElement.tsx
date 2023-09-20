@@ -1,7 +1,8 @@
 import React, { Fragment } from "react";
-import { Text } from "react-konva";
+import { Rect, Text } from "react-konva";
 import { CommentProp } from "../utils/interfaces";
 import Konva from "konva";
+import color from "../styles/color";
 
 interface CommentElementProp {
     comment: CommentProp;
@@ -17,28 +18,39 @@ const CommentElement = ({
     draggable,
 }: CommentElementProp) => {
     const handleCommentDragStart = (e: Konva.KonvaEventObject<DragEvent>) => {
-        setComments(comments.map((comment) => {
-            return { ...comment, isDragging: comment.id === e.target.id() };
-        }));
+        setComments(
+            comments.map((comment) => {
+                return { ...comment, isDragging: comment.id === e.target.id() };
+            })
+        );
     };
 
     const handleCommentDragEnd = (e: Konva.KonvaEventObject<DragEvent>) => {
-        setComments(comments.map((comment) => {
-            if (comment.isDragging) {
-                return {
-                    ...comment,
-                    x: e.target.x(),
-                    y: e.target.y(),
-                    isDragging: false,
-                };
-            } else {
-                return comment;
-            }
-        }));
+        setComments(
+            comments.map((comment) => {
+                if (comment.isDragging) {
+                    return {
+                        ...comment,
+                        x: e.target.x(),
+                        y: e.target.y(),
+                        isDragging: false,
+                    };
+                } else {
+                    return comment;
+                }
+            })
+        );
     };
 
     return (
         <Fragment>
+            <Rect
+                x={comment.x}
+                y={comment.y}
+                width={300}
+                height={100}
+                fill={color.yellow}
+            ></Rect>
             <Text
                 {...comment}
                 onDragStart={handleCommentDragStart}
