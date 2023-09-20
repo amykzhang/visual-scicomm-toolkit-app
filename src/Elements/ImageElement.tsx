@@ -14,7 +14,8 @@ interface ImageElementProp {
     handleDragEnd?: (e: Konva.KonvaEventObject<DragEvent>) => void;
     transformFlag: boolean;
     setTransformFlag: React.Dispatch<React.SetStateAction<boolean>>;
-    setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>;
+    // setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>;
+    groupSelectionRef: React.MutableRefObject<string[]>;
     updateResetGroup: () => void;
 }
 
@@ -29,7 +30,7 @@ const ImageElement = ({
     draggable,
     handleDragStart,
     handleDragEnd,
-    setGroupSelection,
+    groupSelectionRef,
     updateResetGroup,
 }: ImageElementProp) => {
     // Controls to show transformer when the element is dragged selected but not selected yet
@@ -62,34 +63,23 @@ const ImageElement = ({
                 perfectDrawEnabled={perfectDrawEnabled}
                 draggable={draggable}
                 onClick={() => {
-                    // console.log("onClick\n", image.id);
                     handleSelect(image.id);
                 }}
                 onMouseDown={() => {
-                    console.log("onMouseDown\n", image.id);
                     updateResetGroup();
                 }}
-                onMouseUp={() => {
-                    // console.log("onMouseUp\n", image.id);
-                }}
                 onDragStart={(e) => {
-                    // console.log("onDragStart\n", image.id);
                     setDragSelected(true);
                     setTransformFlag(false);
                     if (handleDragStart !== undefined) handleDragStart(e);
                 }}
                 onDragEnd={(e) => {
-                    // console.log("onDragEnd\n", image.id);
                     if (handleDragEnd !== undefined) handleDragEnd(e);
-                    setGroupSelection([image.id]);
+                    groupSelectionRef.current = [image.id];
                     setTransformFlag(true);
                     setDragSelected(false);
                 }}
-                onTransformStart={() => {
-                    // console.log("onTransformStart\n", image.id);
-                }}
                 onTransformEnd={() => {
-                    // console.log("onTransformEnd\n", image.id);
                     // transformer is changing scale of the node
                     // and NOT its width or height
                     // but in the store we have only width and height
@@ -116,11 +106,8 @@ const ImageElement = ({
                     }
                 }}
                 onContextMenu={(e) => {
+                    e.evt.preventDefault();
                     console.log("onContextMenu\n", image.id);
-                    console.log("dragSelected\n", dragSelected);
-                    console.log("transformFlag\n", transformFlag);
-                    console.log("isSelected\n", isSelected);
-                    console.log("showTransform\n", showTransform);
                 }}
             />
             {showTransform && (

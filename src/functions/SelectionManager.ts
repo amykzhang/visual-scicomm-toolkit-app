@@ -1,5 +1,5 @@
-import { useCallback, useState } from "react";
-import { ImageProp, SelectionBoundsProp } from "../utils/interfaces";
+import { useCallback } from "react";
+import { ImageProp } from "../utils/interfaces";
 import { APP_VIEW } from "../utils/enums";
 import Konva from "konva";
 
@@ -8,27 +8,19 @@ export const SelectionManager = (
     setImages: React.Dispatch<React.SetStateAction<ImageProp[]>>,
     view: APP_VIEW,
     shiftKey: boolean,
-    stageRef: React.MutableRefObject<Konva.Stage | null>,
-    groupRef: React.MutableRefObject<Konva.Group | null>,
-    exportAreaRef: React.MutableRefObject<Konva.Rect | null>
+    // stageRef: React.MutableRefObject<Konva.Stage | null>,
+    groupSelectionRef: React.MutableRefObject<string[]>,
+    groupRef: React.MutableRefObject<Konva.Group | null>
+    // exportAreaRef: React.MutableRefObject<Konva.Rect | null>
 ) => {
-    // Ids of elements that are group selected
-    const [groupSelection, setGroupSelection] = useState<string[]>([]);
-
     // Selection mode: true when dragging selection rectangle
-    const [isSelectionMode, setIsSelectionMode] = useState(false);
-    const [selectionBounds, setSelectionBounds] = useState<SelectionBoundsProp>({
-        x: 0,
-        y: 0,
-        width: 0,
-        height: 0,
-    });
-
     const toggleSelectedId = (id: string) => {
-        if (groupSelection.includes(id)) {
-            setGroupSelection(groupSelection.filter((selectedId) => selectedId !== id));
+        if (groupSelectionRef.current.includes(id)) {
+            groupSelectionRef.current = groupSelectionRef.current.filter(
+                (selectedId) => selectedId !== id
+            );
         } else {
-            setGroupSelection([...groupSelection, id]);
+            groupSelectionRef.current = [...groupSelectionRef.current, id];
         }
     };
 
@@ -37,10 +29,13 @@ export const SelectionManager = (
             if (shiftKey) {
                 toggleSelectedId(id);
             } else {
-                if (groupSelection.length === 1 && groupSelection.includes(id)) {
-                    setGroupSelection([]);
+                if (
+                    groupSelectionRef.current.length === 1 &&
+                    groupSelectionRef.current.includes(id)
+                ) {
+                    groupSelectionRef.current = [];
                 } else {
-                    setGroupSelection([id]);
+                    groupSelectionRef.current = [id];
                 }
             }
             updateResetGroup();
@@ -53,7 +48,7 @@ export const SelectionManager = (
             const group = groupRef.current;
 
             const newImages = images.map((image) => {
-                if (groupSelection.includes(image.id)) {
+                if (groupSelectionRef.current.includes(image.id)) {
                     return {
                         ...image,
                         x: image.x + group.x(),
@@ -70,107 +65,111 @@ export const SelectionManager = (
     };
 
     const deleteSelected = useCallback(() => {
-        const newImages = images.filter((image) => !groupSelection.includes(image.id));
+        const newImages = images.filter((image) => !groupSelectionRef.current.includes(image.id));
         setImages(newImages);
-        setGroupSelection([]);
-    }, [images, setImages, groupSelection]);
+        groupSelectionRef.current = [];
+    }, [images, setImages, groupSelectionRef]);
 
     // DRAG SELECTION
-    const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
-        if (view === APP_VIEW.select && stageRef.current !== null) {
-            const stage = stageRef.current;
+    // const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    //     if (view === APP_VIEW.select && stageRef.current !== null) {
+    //         const stage = stageRef.current;
 
-            // Only start bounding box drag select if user clicks on stage or export area
-            if (e.target === stage || e.target === exportAreaRef.current) {
-                console.log("start selection");
-                setIsSelectionMode(true);
+    //         // Only start bounding box drag select if user clicks on stage or export area
+    //         if (e.target === stage || e.target === exportAreaRef.current) {
+    //             console.log("start selection");
+    //             setIsSelectionMode(true);
 
-                const pointerPosition = stage.getPointerPosition();
-                if (pointerPosition !== null) {
-                    const x = (pointerPosition.x - stage.x()) / stage.scaleX();
-                    const y = (pointerPosition.y - stage.y()) / stage.scaleX();
-                    setSelectionBounds({
-                        x,
-                        y,
-                        width: 0,
-                        height: 0,
-                    });
-                }
-            }
-        }
-    };
+    //             const pointerPosition = stage.getPointerPosition();
+    //             if (pointerPosition !== null) {
+    //                 const x = (pointerPosition.x - stage.x()) / stage.scaleX();
+    //                 const y = (pointerPosition.y - stage.y()) / stage.scaleX();
+    //                 setSelectionBounds({
+    //                     x,
+    //                     y,
+    //                     width: 0,
+    //                     height: 0,
+    //                 });
+    //             }
+    //         }
+    //     }
+    // };
 
-    const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
-        if (isSelectionMode && stageRef.current !== null) {
-            console.log("mouse move");
-            const stage = stageRef.current;
-            const pointerPosition = stage.getPointerPosition();
+    // const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    //     if (isSelectionMode && stageRef.current !== null) {
+    //         console.log("mouse move");
+    //         const stage = stageRef.current;
+    //         const pointerPosition = stage.getPointerPosition();
 
-            if (pointerPosition !== null) {
-                const x = (pointerPosition.x - stage.x()) / stage.scaleX();
-                const y = (pointerPosition.y - stage.y()) / stage.scaleX();
-                const width = x - selectionBounds.x;
-                const height = y - selectionBounds.y;
-                setSelectionBounds({
-                    ...selectionBounds,
-                    width,
-                    height,
-                });
-            }
-        }
-    };
+    //         if (pointerPosition !== null) {
+    //             const x = (pointerPosition.x - stage.x()) / stage.scaleX();
+    //             const y = (pointerPosition.y - stage.y()) / stage.scaleX();
+    //             const width = x - selectionBounds.x;
+    //             const height = y - selectionBounds.y;
+    //             setSelectionBounds({
+    //                 ...selectionBounds,
+    //                 width,
+    //                 height,
+    //             });
+    //         }
+    //     }
+    // };
 
-    const handleMouseUp = (e: Konva.KonvaEventObject<MouseEvent>) => {
-        if (isSelectionMode && view === APP_VIEW.select) {
-            console.log("mouse up");
-            setIsSelectionMode(false);
+    // const handleMouseUp = useCallback(
+    //     (e: Konva.KonvaEventObject<MouseEvent>) => {
+    //         console.log("mouse up");
+    //         if (view === APP_VIEW.select) {
+    //             setIsSelectionMode(false);
+    //             const newSelection = getElementIdsWithinBounds(selectionBounds, images);
+    //             setGroupSelection(newSelection);
+    //         }
+    //     },
+    //     [view, selectionBounds, images]
+    // );
 
-            // const targetedIds = getElementIdsWithinBounds();
-            // setGroupSelection([...targetedIds]);
+    // const getElementIdsWithinBounds = (
+    //     selectionBounds: SelectionBoundsProp,
+    //     images: ImageProp[]
+    // ) => {
+    //     const actualBounds = {
+    //         x:
+    //             selectionBounds.width > 0
+    //                 ? selectionBounds.x
+    //                 : selectionBounds.x + selectionBounds.width,
+    //         y:
+    //             selectionBounds.height > 0
+    //                 ? selectionBounds.y
+    //                 : selectionBounds.y + selectionBounds.height,
+    //         width: Math.abs(selectionBounds.width),
+    //         height: Math.abs(selectionBounds.height),
+    //     };
 
-            // console.log(targetedIds);
-            // console.log(groupSelection);
-        }
-    };
+    //     const newSelection = images
+    //         .filter(
+    //             (image) =>
+    //                 image.x > actualBounds.x &&
+    //                 image.y > actualBounds.y &&
+    //                 image.x + image.width < actualBounds.x + actualBounds.width &&
+    //                 image.y + image.height < actualBounds.y + actualBounds.height
+    //         )
+    //         .map((image) => image.id);
 
-    const getElementIdsWithinBounds = () => {
-        const actualBounds = {
-            x:
-                selectionBounds.width > 0
-                    ? selectionBounds.x
-                    : selectionBounds.x + selectionBounds.width,
-            y:
-                selectionBounds.height > 0
-                    ? selectionBounds.y
-                    : selectionBounds.y + selectionBounds.height,
-            width: Math.abs(selectionBounds.width),
-            height: Math.abs(selectionBounds.height),
-        };
-
-        const newSelection = images
-            .filter(
-                (image) =>
-                    image.x > actualBounds.x &&
-                    image.y > actualBounds.y &&
-                    image.x + image.width < actualBounds.x + actualBounds.width &&
-                    image.y + image.height < actualBounds.y + actualBounds.height
-            )
-            .map((image) => image.id);
-        return newSelection;
-    };
+    //     console.log("getElementsWithinBounds", newSelection);
+    //     return newSelection;
+    // };
 
     return {
-        groupSelection,
-        setGroupSelection,
-        isSelectionMode,
-        setIsSelectionMode,
-        selectionBounds,
-        setSelectionBounds,
+        // groupSelection,
+        // setGroupSelection,
+        // isSelectionMode,
+        // setIsSelectionMode,
+        // selectionBounds,
+        // setSelectionBounds,
         handleSelect,
         deleteSelected,
         updateResetGroup,
-        handleMouseDown,
-        handleMouseMove,
-        handleMouseUp,
+        // handleMouseDown,
+        // handleMouseMove,
+        // handleMouseUp,
     };
 };

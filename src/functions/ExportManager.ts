@@ -5,9 +5,9 @@ import { ExportOptions } from "../utils/interfaces";
 
 export function ExportManager(
     activity: Activity,
-    stageRef: React.MutableRefObject<Konva.Stage | null>,
-    selection: string[],
-    setSelection: React.Dispatch<React.SetStateAction<string[]>>
+    stageRef: React.MutableRefObject<Konva.Stage | null>
+    // selection: string[],
+    // setSelection: React.Dispatch<React.SetStateAction<string[]>>
 ): ExportOptions {
     const exportSize = activity.canvas_size;
 
@@ -72,10 +72,7 @@ export function ExportManager(
         if (stageRef.current !== null) {
             const stage = stageRef.current;
 
-            var pdf = new jsPDF("l", "px", [
-                exportSize.width,
-                exportSize.height,
-            ]);
+            var pdf = new jsPDF("l", "px", [exportSize.width, exportSize.height]);
             pdf.setTextColor("#000000");
 
             // first add texts
@@ -91,14 +88,7 @@ export function ExportManager(
             // then put image on top of texts (so texts are not visible)
             const imageDataURL = exportImage("png");
             if (imageDataURL !== undefined) {
-                pdf.addImage(
-                    imageDataURL,
-                    "PNG",
-                    0,
-                    0,
-                    exportSize.width,
-                    exportSize.height
-                );
+                pdf.addImage(imageDataURL, "PNG", 0, 0, exportSize.width, exportSize.height);
 
                 pdf.save(activity.name + ".pdf");
             }

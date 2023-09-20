@@ -21,7 +21,13 @@ import typography from "./styles/typography";
 import { ExportArea } from "./components/ExportArea";
 import { ExitCommentViewButton } from "./components/Components";
 import activity_visual_strategies from "./activity/activity";
-import { CommentProp, CommentViewProp, ImageProp, UiStateProp } from "./utils/interfaces";
+import {
+    CommentProp,
+    CommentViewProp,
+    ImageProp,
+    SelectionBoundsProp,
+    UiStateProp,
+} from "./utils/interfaces";
 import { persistance } from "./functions";
 import { ImageElement } from "./Elements";
 import { ExportPanel } from "./Panels";
@@ -58,7 +64,7 @@ export default function App() {
     function setView(view: APP_VIEW) {
         setUiState({ ...uiState, view: view });
         if (view !== APP_VIEW.select) {
-            setGroupSelection([]);
+            groupSelectionRef.current = [];
         }
     }
 
@@ -69,6 +75,17 @@ export default function App() {
         if (saved !== undefined && saved.images !== undefined) {
             return saved.images;
         } else return [];
+    });
+
+    const groupSelectionRef = useRef<string[]>([]);
+
+    // Drag Select
+    const [isSelectionMode, setIsSelectionMode] = useState(false);
+    const [selectionBounds, setSelectionBounds] = useState<SelectionBoundsProp>({
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
     });
 
     // comments
@@ -104,44 +121,49 @@ export default function App() {
 
     // Selection
     const {
-        groupSelection,
-        setGroupSelection,
-        isSelectionMode,
-        selectionBounds,
         handleSelect,
         deleteSelected,
         updateResetGroup,
-        handleMouseDown,
-        handleMouseMove,
-        handleMouseUp,
-    } = SelectionManager(images, setImages, view, shiftKey, stageRef, groupRef, exportAreaRef);
+        // handleMouseDown,
+        // handleMouseMove,
+        // handleMouseUp,
+    } = SelectionManager(
+        images,
+        setImages,
+        view,
+        shiftKey,
+        // stageRef,
+        groupSelectionRef,
+        groupRef
+        // exportAreaRef
+    );
 
     // Key Presses
     const handleKeyPress = useCallback(
         (e: KeyboardEvent) => {
             if (e.key === "Escape") {
-                setGroupSelection([]);
+                groupSelectionRef.current = [];
             } else if (e.key === "Backspace") {
                 deleteSelected();
             } else if (e.key === "Delete") {
-                if (groupSelection.length > 0) {
+                if (groupSelectionRef.current.length > 0) {
                     deleteSelected();
                 }
             } else if (e.key === "a" && ctrlKey) {
                 e.preventDefault();
-                setGroupSelection(images.map((image) => image.id));
+                groupSelectionRef.current = images.map((image) => image.id);
             } else if (e.key === "=") {
-                console.log(groupSelection);
+                console.log(groupSelectionRef.current);
             }
         },
-        [ctrlKey, images, deleteSelected, groupSelection, setGroupSelection]
+        [ctrlKey, images, deleteSelected, groupSelectionRef]
     );
 
     // Comment View
     const commentView = CommentViewManager(setView);
 
     // Export
-    const exportManager = ExportManager(activity, stageRef, groupSelection, setGroupSelection);
+    const exportManager = ExportManager(activity, stageRef);
 
     // Dragging Behaviour depending on View
     const stageConstants = {
@@ -165,7 +187,7 @@ export default function App() {
         return () => {
             window.removeEventListener("keyup", handleKeyPress);
         };
-    }, [groupSelection, shiftKey, ctrlKey, altKey, metaKey, handleKeyPress]);
+    }, [shiftKey, ctrlKey, altKey, metaKey, handleKeyPress]);
 
     // For Comment View
     useEffect(() => {
@@ -178,6 +200,10 @@ export default function App() {
     }, [commentView.state.backgroundColor, stageRef]);
 
     const [transformFlag, setTransformFlag] = useState(true);
+
+    useEffect(() => {
+        console.log("groupSelectionRef.current", groupSelectionRef.current);
+    }, [groupSelectionRef]);
 
     return (
         <div>
@@ -232,15 +258,62 @@ export default function App() {
                         : (e) => {
                               if (view === APP_VIEW.select) {
                                   if (e.target === stageRef.current) {
-                                      updateResetGroup();
-                                      setGroupSelection([]);
+                                      groupSelectionRef.current = [];
                                   }
                               }
                           }
                 }
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
+                onMouseDown={(e) => {
+                    if (view === APP_VIEW.select && stageRef.current !== null) {
+                        const stage = stageRef.current;
+
+                        // Only start bounding box drag select if user clicks on stage or export area
+                        if (e.target === stage || e.target === exportAreaRef.current) {
+                            setIsSelectionMode(true);
+
+                            const pointerPosition = stage.getPointerPosition();
+                            if (pointerPosition !== null) {
+                                const x = (pointerPosition.x - stage.x()) / stage.scaleX();
+                                const y = (pointerPosition.y - stage.y()) / stage.scaleX();
+                                setSelectionBounds({
+                                    x,
+                                    y,
+                                    width: 0,
+                                    height: 0,
+                                });
+                            }
+                        }
+                    }
+                }}
+                onMouseMove={(e) => {
+                    if (isSelectionMode && stageRef.current !== null) {
+                        const stage = stageRef.current;
+                        const pointerPosition = stage.getPointerPosition();
+
+                        if (pointerPosition !== null) {
+                            const x = (pointerPosition.x - stage.x()) / stage.scaleX();
+                            const y = (pointerPosition.y - stage.y()) / stage.scaleX();
+                            const width = x - selectionBounds.x;
+                            const height = y - selectionBounds.y;
+                            setSelectionBounds({
+                                ...selectionBounds,
+                                width,
+                                height,
+                            });
+                        }
+                    }
+                }}
+                onMouseUp={(e) => {
+                    if (isSelectionMode && view === APP_VIEW.select) {
+                        setIsSelectionMode(false);
+
+                        // Get Elements within bounds
+                        const newSelection = getElementsWithinBounds(selectionBounds, images);
+
+                        console.log("newSelection", newSelection);
+                        groupSelectionRef.current = newSelection;
+                    }
+                }}
                 onContextMenu={(e) => {
                     e.evt.preventDefault();
                 }}
@@ -253,8 +326,7 @@ export default function App() {
                         {...activity.canvas_size}
                         onClick={() => {
                             if (view === APP_VIEW.select) {
-                                updateResetGroup();
-                                setGroupSelection([]);
+                                groupSelectionRef.current = [];
                             }
                         }}
                     />
@@ -284,14 +356,14 @@ export default function App() {
                 </Layer>
                 <Layer id="image-layer">
                     {images
-                        .filter((image) => !groupSelection.includes(image.id))
+                        .filter((image) => !groupSelectionRef.current.includes(image.id))
                         .map((image: ImageProp, i: number) => {
                             return (
                                 <ImageElement
                                     draggable={view === APP_VIEW.select}
                                     key={i}
                                     image={image}
-                                    isSelected={groupSelection.includes(image.id)}
+                                    isSelected={groupSelectionRef.current.includes(image.id)}
                                     handleChange={(attributes: any) => {
                                         modifyImage(i, {
                                             ...image,
@@ -303,22 +375,29 @@ export default function App() {
                                     handleDragEnd={handleDragEnd(images, setImages)}
                                     transformFlag={transformFlag}
                                     setTransformFlag={setTransformFlag}
-                                    setGroupSelection={setGroupSelection}
+                                    groupSelectionRef={groupSelectionRef}
                                     updateResetGroup={updateResetGroup}
                                 />
                             );
                         })}
 
-                    <Group draggable ref={groupRef}>
-                        {groupSelection.map((id) => {
+                    <Group
+                        draggable
+                        ref={groupRef}
+                        onDragEnd={(e) => {
+                            updateResetGroup();
+                        }}
+                    >
+                        {groupSelectionRef.current.map((id) => {
                             const idx = images.findIndex((image) => image.id === id);
+                            if (idx === -1) return null;
                             const image = images[idx];
                             return (
                                 <ImageElement
                                     draggable={false}
                                     key={idx}
                                     image={image}
-                                    isSelected={groupSelection.includes(image.id)}
+                                    isSelected={groupSelectionRef.current.includes(image.id)}
                                     handleChange={(attributes: any) => {
                                         modifyImage(idx, {
                                             ...image,
@@ -328,7 +407,7 @@ export default function App() {
                                     handleSelect={handleSelect}
                                     transformFlag={transformFlag}
                                     setTransformFlag={setTransformFlag}
-                                    setGroupSelection={setGroupSelection}
+                                    groupSelectionRef={groupSelectionRef}
                                     updateResetGroup={updateResetGroup}
                                 />
                             );
@@ -353,3 +432,29 @@ const ExitCommentView: React.FC<ExitCommentStateProps> = ({ commentView }) => {
         </ExitCommentViewButton>
     );
 };
+
+function getElementsWithinBounds(selectionBounds: SelectionBoundsProp, images: ImageProp[]) {
+    const actualBounds = {
+        x:
+            selectionBounds.width > 0
+                ? selectionBounds.x
+                : selectionBounds.x + selectionBounds.width,
+        y:
+            selectionBounds.height > 0
+                ? selectionBounds.y
+                : selectionBounds.y + selectionBounds.height,
+        width: Math.abs(selectionBounds.width),
+        height: Math.abs(selectionBounds.height),
+    };
+
+    const newSelection = images
+        .filter(
+            (image) =>
+                image.x > actualBounds.x &&
+                image.y > actualBounds.y &&
+                image.x + image.width < actualBounds.x + actualBounds.width &&
+                image.y + image.height < actualBounds.y + actualBounds.height
+        )
+        .map((image) => image.id);
+    return newSelection;
+}
