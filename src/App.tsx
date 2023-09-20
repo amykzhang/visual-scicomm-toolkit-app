@@ -64,7 +64,7 @@ export default function App() {
     function setView(view: APP_VIEW) {
         setUiState({ ...uiState, view: view });
         if (view !== APP_VIEW.select) {
-            groupSelectionRef.current = [];
+            selectionRef.current = [];
         }
     }
 
@@ -77,7 +77,8 @@ export default function App() {
         } else return [];
     });
 
-    const groupSelectionRef = useRef<string[]>([]);
+    // Group Selection
+    const selectionRef = useRef<string[]>([]);
 
     // Drag Select
     const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -87,6 +88,9 @@ export default function App() {
         width: 0,
         height: 0,
     });
+
+    // "Global" transform flag (for isolating drag selecting elements)
+    const [transformFlag, setTransformFlag] = useState(true);
 
     // comments
     const [comments, setComments] = useState<CommentProp[]>(() => {
@@ -120,43 +124,34 @@ export default function App() {
         StageViewManager(activity.canvas_size);
 
     // Selection
-    const {
-        handleSelect,
-        deleteSelected,
-        updateResetGroup,
-        // handleMouseDown,
-        // handleMouseMove,
-        // handleMouseUp,
-    } = SelectionManager(
+    const { handleSelect, deleteSelected, updateResetGroup } = SelectionManager(
         images,
         setImages,
         view,
         shiftKey,
-        // stageRef,
-        groupSelectionRef,
+        selectionRef,
         groupRef
-        // exportAreaRef
     );
 
     // Key Presses
     const handleKeyPress = useCallback(
         (e: KeyboardEvent) => {
             if (e.key === "Escape") {
-                groupSelectionRef.current = [];
+                selectionRef.current = [];
             } else if (e.key === "Backspace") {
                 deleteSelected();
             } else if (e.key === "Delete") {
-                if (groupSelectionRef.current.length > 0) {
+                if (selectionRef.current.length > 0) {
                     deleteSelected();
                 }
             } else if (e.key === "a" && ctrlKey) {
                 e.preventDefault();
-                groupSelectionRef.current = images.map((image) => image.id);
+                selectionRef.current = images.map((image) => image.id);
             } else if (e.key === "=") {
-                console.log(groupSelectionRef.current);
+                console.log(selectionRef.current);
             }
         },
-        [ctrlKey, images, deleteSelected, groupSelectionRef]
+        [ctrlKey, images, deleteSelected, selectionRef]
     );
 
     // Comment View
@@ -199,11 +194,9 @@ export default function App() {
         }
     }, [commentView.state.backgroundColor, stageRef]);
 
-    const [transformFlag, setTransformFlag] = useState(true);
-
     useEffect(() => {
-        console.log("groupSelectionRef.current", groupSelectionRef.current);
-    }, [groupSelectionRef]);
+        console.log("selectionRef.current", selectionRef.current);
+    }, [selectionRef]);
 
     return (
         <div>
@@ -258,7 +251,7 @@ export default function App() {
                         : (e) => {
                               if (view === APP_VIEW.select) {
                                   if (e.target === stageRef.current) {
-                                      groupSelectionRef.current = [];
+                                      selectionRef.current = [];
                                   }
                               }
                           }
@@ -311,7 +304,7 @@ export default function App() {
                         const newSelection = getElementsWithinBounds(selectionBounds, images);
 
                         console.log("newSelection", newSelection);
-                        groupSelectionRef.current = newSelection;
+                        selectionRef.current = newSelection;
                     }
                 }}
                 onContextMenu={(e) => {
@@ -326,7 +319,7 @@ export default function App() {
                         {...activity.canvas_size}
                         onClick={() => {
                             if (view === APP_VIEW.select) {
-                                groupSelectionRef.current = [];
+                                selectionRef.current = [];
                             }
                         }}
                     />
@@ -356,14 +349,14 @@ export default function App() {
                 </Layer>
                 <Layer id="image-layer">
                     {images
-                        .filter((image) => !groupSelectionRef.current.includes(image.id))
+                        .filter((image) => !selectionRef.current.includes(image.id))
                         .map((image: ImageProp, i: number) => {
                             return (
                                 <ImageElement
                                     draggable={view === APP_VIEW.select}
                                     key={i}
                                     image={image}
-                                    isSelected={groupSelectionRef.current.includes(image.id)}
+                                    isSelected={selectionRef.current.includes(image.id)}
                                     handleChange={(attributes: any) => {
                                         modifyImage(i, {
                                             ...image,
@@ -375,7 +368,7 @@ export default function App() {
                                     handleDragEnd={handleDragEnd(images, setImages)}
                                     transformFlag={transformFlag}
                                     setTransformFlag={setTransformFlag}
-                                    groupSelectionRef={groupSelectionRef}
+                                    selectionRef={selectionRef}
                                     updateResetGroup={updateResetGroup}
                                 />
                             );
@@ -388,7 +381,7 @@ export default function App() {
                             updateResetGroup();
                         }}
                     >
-                        {groupSelectionRef.current.map((id) => {
+                        {selectionRef.current.map((id) => {
                             const idx = images.findIndex((image) => image.id === id);
                             if (idx === -1) return null;
                             const image = images[idx];
@@ -397,7 +390,7 @@ export default function App() {
                                     draggable={false}
                                     key={idx}
                                     image={image}
-                                    isSelected={groupSelectionRef.current.includes(image.id)}
+                                    isSelected={selectionRef.current.includes(image.id)}
                                     handleChange={(attributes: any) => {
                                         modifyImage(idx, {
                                             ...image,
@@ -407,7 +400,7 @@ export default function App() {
                                     handleSelect={handleSelect}
                                     transformFlag={transformFlag}
                                     setTransformFlag={setTransformFlag}
-                                    groupSelectionRef={groupSelectionRef}
+                                    selectionRef={selectionRef}
                                     updateResetGroup={updateResetGroup}
                                 />
                             );
