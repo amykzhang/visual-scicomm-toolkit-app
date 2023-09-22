@@ -21,18 +21,11 @@ import typography from "./styles/typography";
 import { ExportArea } from "./components/ExportArea";
 import { ExitCommentViewButton } from "./components/Components";
 import activity_visual_strategies from "./activity/activity";
-import {
-    CommentProp,
-    CommentViewProp,
-    ImageProp,
-    SelectionBoundsProp,
-    UiStateProp,
-} from "./utils/interfaces";
+import { CommentProp, ImageProp, SelectionBoundsProp, UiStateProp } from "./utils/interfaces";
 import { persistance } from "./functions";
 import { ImageElement } from "./Elements";
 import { ExportPanel } from "./Panels";
 import CommentElement from "./Elements/CommentElement";
-import { handleAddComment } from "./functions/comment";
 import Konva from "konva";
 import { SelectionRect } from "./components/SelectionRect";
 
@@ -155,7 +148,15 @@ export default function App() {
     );
 
     // Comment View
-    const commentView = CommentViewManager(setView);
+    const {
+        commentViewState,
+        setCommentViewState,
+        selectedComment,
+        setSelectedComment,
+        enterCommentView,
+        exitCommentView,
+        handleCommentViewClickOff,
+    } = CommentViewManager(setView, comments, setComments, stageRef);
 
     // Export
     const exportManager = ExportManager(activity, stageRef);
@@ -190,17 +191,26 @@ export default function App() {
             const stage = stageRef.current;
 
             const container = stage.getContent();
-            container.style.backgroundColor = commentView.state.backgroundColor;
+            container.style.backgroundColor = commentViewState.backgroundColor;
         }
-    }, [commentView.state.backgroundColor, stageRef]);
+    }, [commentViewState.backgroundColor, stageRef]);
 
     return (
         <div>
             <PanelsContainer>
                 <TopZone>
                     <TitlePanel name={activity.name} />
-                    <ToolbarPanel view={view} setView={setView} commentView={commentView} />
-                    <ExitCommentView commentView={commentView} />
+                    <ToolbarPanel
+                        view={view}
+                        setView={setView}
+                        exitCommentView={exitCommentView}
+                        enterCommentView={enterCommentView}
+                        commentViewState={commentViewState}
+                    />
+                    <ExitCommentView
+                        commentViewState={commentViewState}
+                        exitCommentView={exitCommentView}
+                    />
                     <ExportPanel activity={activity} exportManager={exportManager} />
                 </TopZone>
                 <ActivityPanel
@@ -242,8 +252,8 @@ export default function App() {
                 onWheel={handleWheel}
                 onClick={
                     // handle unfocus
-                    commentView.state.active
-                        ? handleAddComment(comments, setComments, stageRef)
+                    commentViewState.active
+                        ? handleCommentViewClickOff
                         : (e) => {
                               if (view === APP_VIEW.select) {
                                   if (e.target === stageRef.current) {
@@ -327,16 +337,18 @@ export default function App() {
                     )}
                 </Layer>
                 <Layer id="comment-layer">
-                    {commentView.state.active &&
+                    {commentViewState.active &&
                         comments.map((comment, i) => {
                             return (
                                 <CommentElement
                                     draggable={view === APP_VIEW.select}
                                     key={i}
+                                    selected={selectedComment === comment.id}
                                     comment={comment}
                                     comments={comments}
                                     setComments={setComments}
                                     stageRef={stageRef}
+                                    handleSelect={() => setSelectedComment(comment.id)}
                                 />
                             );
                         })}
@@ -407,14 +419,18 @@ export default function App() {
 }
 
 interface ExitCommentStateProps {
-    commentView: CommentViewProp;
+    commentViewState: { active: boolean };
+    exitCommentView: () => void;
 }
 
-const ExitCommentView: React.FC<ExitCommentStateProps> = ({ commentView }) => {
-    const displayStyle = commentView.state.active ? {} : { display: "none" };
+const ExitCommentView: React.FC<ExitCommentStateProps> = ({
+    commentViewState,
+    exitCommentView,
+}) => {
+    const displayStyle = commentViewState.active ? {} : { display: "none" };
 
     return (
-        <ExitCommentViewButton style={displayStyle} onClick={commentView.exit}>
+        <ExitCommentViewButton style={displayStyle} onClick={exitCommentView}>
             <typography.LargeText>Exit Comment Mode</typography.LargeText>
         </ExitCommentViewButton>
     );

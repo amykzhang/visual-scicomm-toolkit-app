@@ -11,6 +11,7 @@ interface CommentElementProp {
     draggable: boolean;
     selected: boolean;
     stageRef: React.MutableRefObject<Konva.Stage | null>;
+    handleSelect: () => void;
 }
 
 const CommentElement = ({
@@ -20,6 +21,7 @@ const CommentElement = ({
     draggable,
     selected,
     stageRef,
+    handleSelect,
 }: CommentElementProp) => {
     const textRef = React.useRef<Konva.Text | null>(null);
     const groupRef = React.useRef<Konva.Group | null>(null);
@@ -27,18 +29,12 @@ const CommentElement = ({
     const rectRef = React.useRef<Konva.Rect | null>(null);
 
     // Constants
-    const padding = 15;
+    const padding = 20;
     const backgroundColor = color.yellow;
     const cornerRadius = 20;
 
-    function handleDblClick() {
-        console.log("dblclick");
-        if (
-            textRef.current !== null &&
-            transformerRef.current !== null &&
-            stageRef.current !== null &&
-            rectRef.current !== null
-        ) {
+    function handleDblClick(e: Konva.KonvaEventObject<MouseEvent>) {
+        if (textRef.current !== null && stageRef.current !== null && rectRef.current !== null) {
             const textNode = textRef.current;
             const rectNode = rectRef.current;
             const tr = transformerRef.current;
@@ -47,7 +43,7 @@ const CommentElement = ({
             // hide text node and transformer:
             textNode.hide();
             rectNode.hide();
-            tr.hide();
+            tr?.hide();
 
             // first find position of text node relative to the stage:
             const textPosition = textNode.absolutePosition();
@@ -103,7 +99,6 @@ const CommentElement = ({
             textarea.style.transform = transform;
 
             // reset height
-            textarea.style.height = "auto";
             // after browsers resized it we can set actual value
             textarea.style.height = textarea.scrollHeight + 3 + "px";
             textarea.focus();
@@ -131,8 +126,8 @@ const CommentElement = ({
 
                     textNode.show();
                     rectNode.show();
-                    tr.show();
-                    tr.forceUpdate();
+                    tr?.show();
+                    tr?.forceUpdate();
                 }
             };
 
@@ -207,7 +202,7 @@ const CommentElement = ({
             transformer.nodes([textRef.current]);
             transformer.getLayer()?.batchDraw();
         }
-    }, []);
+    }, [selected]);
 
     return (
         <Fragment>
@@ -224,7 +219,7 @@ const CommentElement = ({
                 <Text
                     type="comment"
                     ref={textRef}
-                    text={comment.text}
+                    text={selected ? "selecteed" : comment.text}
                     x={comment.x}
                     y={comment.y}
                     fontSize={20}
@@ -233,21 +228,24 @@ const CommentElement = ({
                     height={comment.height}
                     padding={padding}
                     onTransform={handleTransform}
+                    onClick={handleSelect}
                     onDblClick={handleDblClick}
                 />
             </Group>
-            <Transformer
-                ref={transformerRef}
-                enabledAnchors={["middle-left", "middle-right", "top-center", "bottom-center"]}
-                rotateEnabled={false}
-                boundBoxFunc={(oldBox, newBox) => {
-                    // limit resize so box can't be negative
-                    if (newBox.width < 60 || newBox.height < 60) {
-                        return oldBox;
-                    }
-                    return newBox;
-                }}
-            />
+            {selected && (
+                <Transformer
+                    ref={transformerRef}
+                    enabledAnchors={["middle-left", "middle-right", "top-center", "bottom-center"]}
+                    rotateEnabled={false}
+                    boundBoxFunc={(oldBox, newBox) => {
+                        // limit resize so box can't be negative
+                        if (newBox.width < 60 || newBox.height < 60) {
+                            return oldBox;
+                        }
+                        return newBox;
+                    }}
+                />
+            )}
         </Fragment>
     );
 };

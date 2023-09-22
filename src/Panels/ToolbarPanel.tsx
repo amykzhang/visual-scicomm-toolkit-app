@@ -1,5 +1,4 @@
 import { APP_VIEW } from "../utils/enums";
-import { CommentViewProp } from "../utils/interfaces";
 import { Divider, SquareButton } from "../components/Components";
 import { CommentTool } from "../components/CommentTool";
 import { ReactComponent as SelectIcon } from "../assets/select.svg";
@@ -17,13 +16,17 @@ const ToolbarPanelContainer = styled(CenterBar)`
 interface ToolbarPanelProps {
     view: APP_VIEW;
     setView: (view: APP_VIEW) => void;
-    commentView: CommentViewProp;
+    exitCommentView: () => void;
+    enterCommentView: () => void;
+    commentViewState: { active: boolean };
 }
 
 export const ToolbarPanel: React.FC<ToolbarPanelProps> = ({
     view,
     setView,
-    commentView,
+    exitCommentView,
+    enterCommentView,
+    commentViewState,
 }) => {
     return (
         <ToolbarPanelContainer>
@@ -42,7 +45,9 @@ export const ToolbarPanel: React.FC<ToolbarPanelProps> = ({
             <CommentTool
                 view={view}
                 setView={setView}
-                commentView={commentView}
+                exitCommentView={exitCommentView}
+                enterCommentView={enterCommentView}
+                commentViewState={commentViewState}
             ></CommentTool>
             <Divider />
             <SquareButton

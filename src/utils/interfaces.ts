@@ -5,12 +5,12 @@ export interface CommentStateProp {
     backgroundColor: string;
 }
 
-export interface CommentViewProp {
-    state: CommentStateProp;
-    setState: React.Dispatch<React.SetStateAction<CommentStateProp>>;
-    enter: () => void;
-    exit: () => void;
-}
+// export interface CommentViewProp {
+//     state: CommentStateProp;
+//     setState: React.Dispatch<React.SetStateAction<CommentStateProp>>;
+//     enter: () => void;
+//     exit: () => void;
+// }
 
 export interface ExportOptions {
     exportPNG: () => void;
