@@ -49,7 +49,6 @@ export const ImageTool: FC<ImageToolProps> = ({
                 width: dimensions.width,
                 height: dimensions.height,
                 rotation: 0,
-                isDragging: false,
                 image: imageElement,
                 src: src,
             },

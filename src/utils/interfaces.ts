@@ -47,7 +47,6 @@ export interface ImageProp {
     width: number;
     height: number;
     rotation: number;
-    isDragging: boolean;
     image: HTMLImageElement | undefined;
     src: string;
 }
@@ -56,7 +55,8 @@ export interface CommentProp {
     id: string;
     x: number;
     y: number;
-    isDragging: boolean;
+    width: number;
+    height: number;
     isEditing: boolean;
     text: string;
 }

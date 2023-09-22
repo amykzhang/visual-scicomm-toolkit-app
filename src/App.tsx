@@ -148,10 +148,10 @@ export default function App() {
                 e.preventDefault();
                 selectionRef.current = images.map((image) => image.id);
             } else if (e.key === "=") {
-                console.log(selectionRef.current);
+                console.log("debug");
             }
         },
-        [ctrlKey, images, deleteSelected, selectionRef]
+        [ctrlKey, images, deleteSelected]
     );
 
     // Comment View
@@ -193,10 +193,6 @@ export default function App() {
             container.style.backgroundColor = commentView.state.backgroundColor;
         }
     }, [commentView.state.backgroundColor, stageRef]);
-
-    useEffect(() => {
-        console.log("selectionRef.current", selectionRef.current);
-    }, [selectionRef]);
 
     return (
         <div>
@@ -301,10 +297,7 @@ export default function App() {
                         setIsSelectionMode(false);
 
                         // Get Elements within bounds
-                        const newSelection = getElementsWithinBounds(selectionBounds, images);
-
-                        console.log("newSelection", newSelection);
-                        selectionRef.current = newSelection;
+                        selectionRef.current = getElementsWithinBounds(selectionBounds, images);
                     }
                 }}
                 onContextMenu={(e) => {
@@ -343,6 +336,7 @@ export default function App() {
                                     comment={comment}
                                     comments={comments}
                                     setComments={setComments}
+                                    stageRef={stageRef}
                                 />
                             );
                         })}

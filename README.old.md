@@ -83,8 +83,11 @@ SEPTEMBER 13:
 SEPTEMBER 14:
 
 -   Multiple select: rework drag with selection to use selection IDs instead of isDragging ✅
--   drag select bounding box 🐛
+-   drag select bounding box ✅
 -   Comment elements (text, change text onClick) 🚧
+    -   resize
+    -   edit
+    -   delete
 
 SEPTEMBER 21:
 (Amy::svgs of the things)

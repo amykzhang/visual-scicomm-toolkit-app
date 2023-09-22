@@ -15,8 +15,9 @@ function addComment(
             id: id,
             x: x,
             y: y,
+            width: 200,
+            height: 80,
             text: "hello world",
-            isDragging: false,
             isEditing: false,
         },
     ]);
@@ -28,7 +29,8 @@ export const handleAddComment = (
     stageRef: React.RefObject<Konva.Stage>
 ) => {
     return (e: Konva.KonvaEventObject<MouseEvent>) => {
-        if (stageRef.current !== null) {
+        // if clicked anywhere other than a comment
+        if (stageRef.current !== null && e.target.getAttrs().type !== "comment") {
             const stage = stageRef.current;
             const x = (e.evt.clientX - stage.x()) / stage.scaleX();
             const y = (e.evt.clientY - stage.y()) / stage.scaleX();
