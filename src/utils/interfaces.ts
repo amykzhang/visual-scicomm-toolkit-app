@@ -5,13 +5,6 @@ export interface CommentStateProp {
     backgroundColor: string;
 }
 
-// export interface CommentViewProp {
-//     state: CommentStateProp;
-//     setState: React.Dispatch<React.SetStateAction<CommentStateProp>>;
-//     enter: () => void;
-//     exit: () => void;
-// }
-
 export interface ExportOptions {
     exportPNG: () => void;
     exportJPEG: () => void;
@@ -22,10 +15,6 @@ export interface CanvasStateProp {
     images: ImageProp[];
     comments: CommentProp[];
 }
-
-// export interface CanvasStateStringsProp {
-//     images: string;
-// }
 
 export interface UiStateProp {
     view: APP_VIEW;
@@ -57,7 +46,6 @@ export interface CommentProp {
     y: number;
     width: number;
     height: number;
-    isEditing: boolean;
     text: string;
 }
 

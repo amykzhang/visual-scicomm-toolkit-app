@@ -88,9 +88,9 @@ SEPTEMBER 14:
     -   resize✅
     -   edit✅
     -   delete ✅
-    -   persistance text
-    -   persistance position
-    -   persistance size
+    -   persistance text ✅
+    -   persistance position ✅
+    -   persistance size ✅
 
 SEPTEMBER 21:
 (Amy::svgs of the things)

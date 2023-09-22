@@ -129,25 +129,23 @@ export default function App() {
     // Comment View
     const {
         commentViewState,
-        setCommentViewState,
         selectedComment,
         setSelectedComment,
         enterCommentView,
         exitCommentView,
         handleCommentViewClickOff,
-        removeComment,
     } = CommentViewManager(setView, comments, setComments, stageRef);
 
     // Key Presses
     const handleKeyPress = useCallback(
         (e: KeyboardEvent) => {
-            console.log(e.key);
             if (e.key === "Escape") {
                 selectionRef.current = [];
-            } else if (e.key === "Delete" || e.key === "Backspace") {
+            }
+            if (e.key === "Delete" || e.key === "Backspace") {
                 if (commentViewState.active) {
                     if (selectedComment !== null) {
-                        removeComment(selectedComment, comments, setComments);
+                        setComments(comments.filter((comment) => comment.id !== selectedComment));
                         setSelectedComment(null);
                     }
                 } else {
@@ -155,14 +153,25 @@ export default function App() {
                         deleteSelected();
                     }
                 }
-            } else if (e.key === "a" && ctrlKey) {
+            }
+            if (e.key === "a" && ctrlKey) {
                 e.preventDefault();
                 selectionRef.current = images.map((image) => image.id);
-            } else if (e.key === "=") {
+            }
+            if (e.key === "=") {
                 console.log("debug");
             }
         },
-        [ctrlKey, images, deleteSelected, selectionRef, commentViewState.active, selectedComment]
+        [
+            ctrlKey,
+            images,
+            deleteSelected,
+            selectionRef,
+            commentViewState.active,
+            selectedComment,
+            comments,
+            setSelectedComment,
+        ]
     );
 
     // Export
@@ -343,23 +352,6 @@ export default function App() {
                         />
                     )}
                 </Layer>
-                <Layer id="comment-layer">
-                    {commentViewState.active &&
-                        comments.map((comment, i) => {
-                            return (
-                                <CommentElement
-                                    draggable={view === APP_VIEW.select}
-                                    key={i}
-                                    selected={selectedComment === comment.id}
-                                    comment={comment}
-                                    comments={comments}
-                                    setComments={setComments}
-                                    stageRef={stageRef}
-                                    handleSelect={() => setSelectedComment(comment.id)}
-                                />
-                            );
-                        })}
-                </Layer>
                 <Layer id="image-layer">
                     {images
                         .filter((image) => !selectionRef.current.includes(image.id))
@@ -419,6 +411,23 @@ export default function App() {
                             );
                         })}
                     </Group>
+                </Layer>
+                <Layer id="comment-layer">
+                    {commentViewState.active &&
+                        comments.map((comment, i) => {
+                            return (
+                                <CommentElement
+                                    draggable={view === APP_VIEW.select}
+                                    key={i}
+                                    selected={selectedComment === comment.id}
+                                    comment={comment}
+                                    comments={comments}
+                                    setComments={setComments}
+                                    stageRef={stageRef}
+                                    handleSelect={() => setSelectedComment(comment.id)}
+                                />
+                            );
+                        })}
                 </Layer>
             </Stage>
         </div>

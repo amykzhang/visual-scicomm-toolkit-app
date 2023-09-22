@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect } from "react";
 import { Group, Rect, Text, Transformer } from "react-konva";
 import { CommentProp } from "../utils/interfaces";
 import Konva from "konva";
@@ -33,7 +33,7 @@ const CommentElement = ({
     const backgroundColor = color.darkerYellow;
     const cornerRadius = 20;
 
-    function handleDblClick(e: Konva.KonvaEventObject<MouseEvent>) {
+    function enterEditTextMode() {
         if (textRef.current !== null && stageRef.current !== null && rectRef.current !== null) {
             const textNode = textRef.current;
             const rectNode = rectRef.current;
@@ -85,6 +85,7 @@ const CommentElement = ({
             textarea.style.transformOrigin = "left top";
             textarea.style.textAlign = textNode.align();
             textarea.style.color = textNode.fill();
+            textarea.style.zIndex = "600";
             let transform = "";
 
             let px = 0;
@@ -149,7 +150,7 @@ const CommentElement = ({
             });
 
             const handleBlur = (e: FocusEvent) => {
-                textNode.text(textarea.value);
+                updateText(textarea.value);
                 textNode.setAttrs({
                     width: textarea.scrollWidth / stage.scaleX(),
                     height: textarea.scrollHeight / stage.scaleX(),
@@ -168,6 +169,25 @@ const CommentElement = ({
             textarea.addEventListener("blur", handleBlur);
             window.addEventListener("wheel", handleWheel);
         }
+    }
+
+    function updateText(newText: string) {
+        const text = newText === "" ? "empty comment" : newText;
+        const newComments = comments.map((comment_i) => {
+            if (comment.id === comment_i.id) {
+                return {
+                    ...comment_i,
+                    text: text,
+                };
+            } else {
+                return comment_i;
+            }
+        });
+        setComments(newComments);
+    }
+
+    function handleDblClick(e: Konva.KonvaEventObject<MouseEvent>) {
+        enterEditTextMode();
     }
 
     function handleTransform() {
@@ -190,6 +210,53 @@ const CommentElement = ({
         }
     }
 
+    function handleTransformEnd() {
+        if (textRef.current !== null) {
+            const text = textRef.current;
+            const x = text.x();
+            const y = text.y();
+            const width = text.width() * text.scaleX();
+            const height = text.height() * text.scaleY();
+
+            const newComments = comments.map((comment_i) => {
+                if (comment.id === comment_i.id) {
+                    return {
+                        ...comment_i,
+                        x: x,
+                        y: y,
+                        width: width,
+                        height: height,
+                    };
+                } else {
+                    return comment_i;
+                }
+            });
+            setComments(newComments);
+        }
+    }
+
+    const handleDragEnd = (e: Konva.KonvaEventObject<DragEvent>) => {
+        if (groupRef.current !== null) {
+            const group = groupRef.current;
+
+            // Update comment position with group offset
+            const newComments = comments.map((comment_i) => {
+                if (comment.id === comment_i.id) {
+                    return {
+                        ...comment_i,
+                        x: comment_i.x + group.x(),
+                        y: comment_i.y + group.y(),
+                    };
+                } else {
+                    return comment_i;
+                }
+            });
+            setComments(newComments);
+            group.x(0);
+            group.y(0);
+        }
+    };
+
     useEffect(() => {
         // we need to attach transformer manually
         if (
@@ -204,9 +271,13 @@ const CommentElement = ({
         }
     }, [selected]);
 
+    // useEffect(() => {
+    //     enterEditTextMode();
+    // }, []);
+
     return (
         <Fragment>
-            <Group ref={groupRef} draggable>
+            <Group ref={groupRef} draggable onDragEnd={handleDragEnd}>
                 <Rect
                     ref={rectRef}
                     x={comment.x}
@@ -234,8 +305,10 @@ const CommentElement = ({
                     height={comment.height}
                     padding={padding}
                     onTransform={handleTransform}
+                    onTransformEnd={handleTransformEnd}
                     onClick={handleSelect}
                     onDblClick={handleDblClick}
+                    on
                 />
             </Group>
             {selected && (
@@ -261,27 +334,3 @@ const CommentElement = ({
 };
 
 export default CommentElement;
-
-// onDragStart={(e) => {}}
-// onDragEnd={(e) => {
-//     console.log("end");
-
-//     if (groupRef.current !== null) {
-//         const group = groupRef.current;
-
-//         const newComments = comments.map((com) => {
-//             if (comment.id === com.id) {
-//                 return {
-//                     ...com,
-//                     x: com.x + group.x(),
-//                     y: com.y + group.y(),
-//                 };
-//             } else {
-//                 return com;
-//             }
-//         });
-//         setComments(newComments);
-//         group.x(0);
-//         group.y(0);
-//     }
-// }}

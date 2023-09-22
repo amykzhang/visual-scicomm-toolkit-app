@@ -54,19 +54,10 @@ export const CommentViewManager = (
                 x: x,
                 y: y,
                 width: 200,
-                height: 80,
-                text: "hello world",
-                isEditing: false,
+                height: 55,
+                text: "",
             },
         ]);
-    }
-
-    function removeComment(
-        id: string,
-        comments: CommentProp[],
-        setComments: React.Dispatch<React.SetStateAction<CommentProp[]>>
-    ) {
-        setComments(comments.filter((comment) => comment.id !== id));
     }
 
     const handleAddComment = (
@@ -101,7 +92,5 @@ export const CommentViewManager = (
         enterCommentView,
         exitCommentView,
         handleCommentViewClickOff,
-        addComment,
-        removeComment,
     };
 };
