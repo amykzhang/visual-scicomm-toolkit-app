@@ -9,6 +9,7 @@ interface CommentElementProp {
     comments: CommentProp[];
     setComments: React.Dispatch<React.SetStateAction<CommentProp[]>>;
     draggable: boolean;
+    selected: boolean;
     stageRef: React.MutableRefObject<Konva.Stage | null>;
 }
 
@@ -17,10 +18,9 @@ const CommentElement = ({
     comments,
     setComments,
     draggable,
+    selected,
     stageRef,
 }: CommentElementProp) => {
-    const [showTransform, setShowTransform] = useState(true);
-
     const textRef = React.useRef<Konva.Text | null>(null);
     const groupRef = React.useRef<Konva.Group | null>(null);
     const transformerRef = React.useRef<Konva.Transformer | null>(null);
@@ -29,7 +29,7 @@ const CommentElement = ({
     // Constants
     const padding = 15;
     const backgroundColor = color.yellow;
-    const borderRadius = 10;
+    const cornerRadius = 20;
 
     function handleDblClick() {
         console.log("dblclick");
@@ -62,6 +62,8 @@ const CommentElement = ({
             const textarea = document.createElement("textarea");
             document.body.appendChild(textarea);
 
+            const scale = stage.scaleX();
+
             // apply many styles to match text on canvas as close as possible
             // remember that text rendering on canvas and on the textarea can be different
             // and sometimes it is hard to make it 100% the same. But we will try...
@@ -69,18 +71,20 @@ const CommentElement = ({
             textarea.style.position = "absolute";
             textarea.style.top = areaPosition.y + "px";
             textarea.style.left = areaPosition.x + "px";
-            textarea.style.width = textNode.width() * stage.scaleX() + "px";
-            textarea.style.height = textNode.height() * stage.scaleX() + "px";
-            textarea.style.fontSize = textNode.fontSize() * stage.scaleX() + "px";
+            textarea.style.width = textNode.width() * scale + "px";
+            textarea.style.height = textNode.height() * scale + "px";
+            textarea.style.fontSize = textNode.fontSize() * scale + "px";
             textarea.style.border = "none";
-            textarea.style.padding = textNode.padding() * stage.scaleX() + "px";
+            textarea.style.padding = textNode.padding() * scale + "px";
             textarea.style.margin = "1px";
             textarea.style.overflow = "hidden";
             textarea.style.background = backgroundColor;
-            textarea.style.borderRadius = "10px 10px 10px 0";
+            textarea.style.borderRadius = `${cornerRadius * scale}px ${cornerRadius / scale}px ${
+                cornerRadius / scale
+            }px 0`;
             textarea.style.outline = "none";
             textarea.style.resize = "none";
-            textarea.style.lineHeight = textNode.lineHeight() * 20 * stage.scaleX() + "px";
+            textarea.style.lineHeight = textNode.lineHeight() * 20 * scale + "px";
             textarea.style.fontFamily = textNode.fontFamily();
             textarea.style.transformOrigin = "left top";
             textarea.style.textAlign = textNode.align();
@@ -194,6 +198,7 @@ const CommentElement = ({
     useEffect(() => {
         // we need to attach transformer manually
         if (
+            selected &&
             transformerRef.current !== null &&
             textRef.current !== null &&
             rectRef.current !== null
@@ -214,7 +219,7 @@ const CommentElement = ({
                     width={comment.width}
                     height={comment.height}
                     fill={backgroundColor}
-                    cornerRadius={[4, 4, 4, 0]}
+                    cornerRadius={[cornerRadius, cornerRadius, cornerRadius, 0]}
                 />
                 <Text
                     type="comment"
