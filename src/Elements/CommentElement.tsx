@@ -75,8 +75,8 @@ const CommentElement = ({
             textarea.style.margin = "1px";
             textarea.style.overflow = "hidden";
             textarea.style.background = backgroundColor;
-            textarea.style.borderRadius = `${cornerRadius * scale}px ${cornerRadius / scale}px ${
-                cornerRadius / scale
+            textarea.style.borderRadius = `${cornerRadius * scale}px ${cornerRadius * scale}px ${
+                cornerRadius * scale
             }px 0`;
             textarea.style.outline = "none";
             textarea.style.resize = "none";
