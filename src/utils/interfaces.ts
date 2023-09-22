@@ -13,6 +13,7 @@ export interface ExportOptions {
 
 export interface CanvasStateProp {
     images: ImageProp[];
+    shapes: ShapeProp[];
     comments: CommentProp[];
 }
 
@@ -47,6 +48,19 @@ export interface CommentProp {
     width: number;
     height: number;
     text: string;
+}
+
+export interface ShapeProp {
+    id: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    rotation: number;
+    fill: string;
+    stroke: string;
+    strokeWidth: number;
+    type: string;
 }
 
 export interface SelectionBoundsProp {

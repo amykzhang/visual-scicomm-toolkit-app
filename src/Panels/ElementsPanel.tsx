@@ -1,6 +1,6 @@
 import { FC } from "react";
 import Konva from "konva";
-import { ImageProp } from "../utils/interfaces";
+import { ImageProp, ShapeProp } from "../utils/interfaces";
 import { Activity } from "../activity/activity";
 import { ReactComponent as LeftArrow } from "../assets/arrowhead-left.svg";
 import { ReactComponent as RightArrow } from "../assets/arrowhead-right.svg";
@@ -8,6 +8,7 @@ import { ReactComponent as PenAndRuler } from "../assets/penandruler.svg";
 import { ReactComponent as Doodle } from "../assets/doodle.svg";
 import { ImageTool } from "../components/ImageTool";
 import { TextTool } from "../components/TextTool";
+import { RectangleTool } from "../components/RectangleTool";
 import typography from "../styles/typography";
 import {
     SideBar,
@@ -67,6 +68,8 @@ interface ElementsMenuProps {
     activity: Activity;
     images: ImageProp[];
     setImages: React.Dispatch<React.SetStateAction<ImageProp[]>>;
+    shapes: ShapeProp[];
+    setShapes: React.Dispatch<React.SetStateAction<ShapeProp[]>>;
     stageRef: React.MutableRefObject<Konva.Stage | null>;
     isOpen: boolean;
     handleToggle: () => void;
@@ -76,6 +79,8 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     activity,
     images,
     setImages,
+    shapes,
+    setShapes,
     stageRef,
     isOpen,
     handleToggle,
@@ -85,8 +90,8 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
 
     const elements = activity.elements;
     const image_sections = activity.elements.images.sections;
-    const shapes = activity.elements.shapes;
-    const lines = activity.elements.lines;
+    const activity_shapes = activity.elements.shapes;
+    const activity_lines = activity.elements.lines;
 
     const TextSection = () => {
         return (
@@ -116,10 +121,10 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     };
 
     const LinesSection = () => {
-        const { srcs, icons, sizes } = lines;
+        const { srcs, icons, sizes } = activity_lines;
         return (
             <>
-                <ImageSubheadingText>{lines.heading}</ImageSubheadingText>
+                <ImageSubheadingText>{activity_lines.heading}</ImageSubheadingText>
                 <ElementsRow>
                     {srcs.map((src, i) => {
                         return (
@@ -140,19 +145,17 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     };
 
     const ShapeSection = () => {
-        const { heading, srcs, icons, sizes } = shapes;
+        const { heading, srcs, icons, sizes } = activity_shapes;
         return (
             <>
                 <ImageSubheadingText>{heading}</ImageSubheadingText>
                 <ElementsRow>
                     {srcs.map((src, i) => (
-                        <ImageTool
+                        <RectangleTool
                             key={i}
                             src={src}
-                            name={icons[i]}
-                            dimensions={sizes[i]}
-                            images={images}
-                            setImages={setImages}
+                            shapes={shapes}
+                            setShapes={setShapes}
                             stageRef={stageRef}
                         />
                     ))}

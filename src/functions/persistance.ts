@@ -4,6 +4,7 @@ import {
     StageStateProp,
     CanvasStateProp,
     CommentProp,
+    ShapeProp,
 } from "../utils/interfaces";
 
 const LOCALSTORAGE_CANVAS_STATE_KEY = "visual-toolkit-canvas";
@@ -26,11 +27,12 @@ function reconstructImagesFromJSON(imagesJSON: string): ImageProp[] {
 }
 
 // Saves each canvas layer/group as string, then stringify canvasState and save to local storage
-function persistCanvasState(images: ImageProp[], comments: CommentProp[]) {
+function persistCanvasState(images: ImageProp[], shapes: ShapeProp[], comments: CommentProp[]) {
     window.localStorage.setItem(
         LOCALSTORAGE_CANVAS_STATE_KEY,
         JSON.stringify({
             images: JSON.stringify(images),
+            shapes: shapes,
             comments: comments,
         })
     );
@@ -45,9 +47,8 @@ function retrieveCanvasState() {
 
         const persistedCanvasState: CanvasStateProp = {
             // images have a field called image which is an HTMLImageElement, which needed to be stringified
-            images: reconstructImagesFromJSON(
-                canvasState.images
-            ) as ImageProp[],
+            images: reconstructImagesFromJSON(canvasState.images) as ImageProp[],
+            shapes: canvasState.shapes as ShapeProp[],
             comments: canvasState.comments as CommentProp[],
         };
 
@@ -57,10 +58,7 @@ function retrieveCanvasState() {
 
 // save UI state to local storage
 function persistUiState(state: UiStateProp) {
-    window.localStorage.setItem(
-        LOCALSTORAGE_UI_STATE_KEY,
-        JSON.stringify(state)
-    );
+    window.localStorage.setItem(LOCALSTORAGE_UI_STATE_KEY, JSON.stringify(state));
 }
 
 function retrieveUiState(): UiStateProp | undefined {
@@ -72,10 +70,7 @@ function retrieveUiState(): UiStateProp | undefined {
 }
 
 function persistStageState(state: StageStateProp) {
-    window.localStorage.setItem(
-        LOCALSTORAGE_STAGE_STATE_KEY,
-        JSON.stringify(state)
-    );
+    window.localStorage.setItem(LOCALSTORAGE_STAGE_STATE_KEY, JSON.stringify(state));
 }
 
 function retrieveStageState(): StageStateProp | undefined {

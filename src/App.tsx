@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Stage, Layer, Group } from "react-konva";
+import { Stage, Layer, Group, Rect } from "react-konva";
 import { PanelsContainer } from "./styles/containers";
 import {
     ExportManager,
@@ -21,7 +21,13 @@ import typography from "./styles/typography";
 import { ExportArea } from "./components/ExportArea";
 import { ExitCommentViewButton } from "./components/Components";
 import activity_visual_strategies from "./activity/activity";
-import { CommentProp, ImageProp, SelectionBoundsProp, UiStateProp } from "./utils/interfaces";
+import {
+    CommentProp,
+    ImageProp,
+    SelectionBoundsProp,
+    ShapeProp,
+    UiStateProp,
+} from "./utils/interfaces";
 import { persistance } from "./functions";
 import { ImageElement } from "./Elements";
 import { ExportPanel } from "./Panels";
@@ -67,6 +73,15 @@ export default function App() {
 
         if (saved !== undefined && saved.images !== undefined) {
             return saved.images;
+        } else return [];
+    });
+
+    // shapes
+    const [shapes, setShapes] = useState<ShapeProp[]>(() => {
+        const saved = persistance.retrieveCanvasState();
+
+        if (saved !== undefined && saved.shapes !== undefined) {
+            return saved.shapes;
         } else return [];
     });
 
@@ -184,8 +199,8 @@ export default function App() {
 
     // Side effect for canvas state
     useEffect(() => {
-        persistance.persistCanvasState(images, comments);
-    }, [images, comments]);
+        persistance.persistCanvasState(images, shapes, comments);
+    }, [images, shapes, comments]);
 
     // Side effect for UI state
     useEffect(() => {
@@ -243,6 +258,8 @@ export default function App() {
                     activity={activity}
                     images={images}
                     setImages={setImages}
+                    shapes={shapes}
+                    setShapes={setShapes}
                     stageRef={stageRef}
                     isOpen={uiState.isRightPanelOpen}
                     handleToggle={() => {
@@ -377,6 +394,14 @@ export default function App() {
                                     updateResetGroup={updateResetGroup}
                                 />
                             );
+                        })}
+                    {shapes
+                        .filter(
+                            (shape) =>
+                                !selectionRef.current.includes(shape.id) && shape.type === "rect"
+                        )
+                        .map((shape: ShapeProp, i: number) => {
+                            return <Rect {...shape} key={i} draggable={view === APP_VIEW.select} />;
                         })}
 
                     <Group
