@@ -126,27 +126,6 @@ export default function App() {
         groupRef
     );
 
-    // Key Presses
-    const handleKeyPress = useCallback(
-        (e: KeyboardEvent) => {
-            if (e.key === "Escape") {
-                selectionRef.current = [];
-            } else if (e.key === "Backspace") {
-                deleteSelected();
-            } else if (e.key === "Delete") {
-                if (selectionRef.current.length > 0) {
-                    deleteSelected();
-                }
-            } else if (e.key === "a" && ctrlKey) {
-                e.preventDefault();
-                selectionRef.current = images.map((image) => image.id);
-            } else if (e.key === "=") {
-                console.log("debug");
-            }
-        },
-        [ctrlKey, images, deleteSelected]
-    );
-
     // Comment View
     const {
         commentViewState,
@@ -156,7 +135,35 @@ export default function App() {
         enterCommentView,
         exitCommentView,
         handleCommentViewClickOff,
+        removeComment,
     } = CommentViewManager(setView, comments, setComments, stageRef);
+
+    // Key Presses
+    const handleKeyPress = useCallback(
+        (e: KeyboardEvent) => {
+            console.log(e.key);
+            if (e.key === "Escape") {
+                selectionRef.current = [];
+            } else if (e.key === "Delete" || e.key === "Backspace") {
+                if (commentViewState.active) {
+                    if (selectedComment !== null) {
+                        removeComment(selectedComment, comments, setComments);
+                        setSelectedComment(null);
+                    }
+                } else {
+                    if (selectionRef.current.length > 0) {
+                        deleteSelected();
+                    }
+                }
+            } else if (e.key === "a" && ctrlKey) {
+                e.preventDefault();
+                selectionRef.current = images.map((image) => image.id);
+            } else if (e.key === "=") {
+                console.log("debug");
+            }
+        },
+        [ctrlKey, images, deleteSelected, selectionRef, commentViewState.active, selectedComment]
+    );
 
     // Export
     const exportManager = ExportManager(activity, stageRef);

@@ -101,5 +101,7 @@ export const CommentViewManager = (
         enterCommentView,
         exitCommentView,
         handleCommentViewClickOff,
+        addComment,
+        removeComment,
     };
 };
