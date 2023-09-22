@@ -239,10 +239,14 @@ const CommentElement = ({
                     rotateEnabled={false}
                     boundBoxFunc={(oldBox, newBox) => {
                         // limit resize so box can't be negative
-                        if (newBox.width < 60 || newBox.height < 60) {
-                            return oldBox;
+                        if (stageRef.current !== null) {
+                            const scale = stageRef.current.scaleX();
+                            if (newBox.width < 55 * scale || newBox.height < 55 * scale) {
+                                return oldBox;
+                            }
+                            return newBox;
                         }
-                        return newBox;
+                        return oldBox;
                     }}
                 />
             )}
