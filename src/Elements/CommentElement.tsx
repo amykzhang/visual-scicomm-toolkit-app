@@ -30,7 +30,7 @@ const CommentElement = ({
 
     // Constants
     const padding = 20;
-    const backgroundColor = color.yellow;
+    const backgroundColor = color.darkerYellow;
     const cornerRadius = 20;
 
     function handleDblClick(e: Konva.KonvaEventObject<MouseEvent>) {
@@ -214,12 +214,18 @@ const CommentElement = ({
                     width={comment.width}
                     height={comment.height}
                     fill={backgroundColor}
+                    shadowEnabled={true}
+                    shadowColor="black"
+                    shadowBlur={5}
+                    shadowOffsetX={2}
+                    shadowOffsetY={2}
+                    shadowOpacity={0.2}
                     cornerRadius={[cornerRadius, cornerRadius, cornerRadius, 0]}
                 />
                 <Text
                     type="comment"
                     ref={textRef}
-                    text={selected ? "selecteed" : comment.text}
+                    text={comment.text}
                     x={comment.x}
                     y={comment.y}
                     fontSize={20}
