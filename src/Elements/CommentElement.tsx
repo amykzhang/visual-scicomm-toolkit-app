@@ -29,8 +29,10 @@ const CommentElement = ({
     // Constants
     const padding = 15;
     const backgroundColor = color.yellow;
+    const borderRadius = 10;
 
     function handleDblClick() {
+        console.log("dblclick");
         if (
             textRef.current !== null &&
             transformerRef.current !== null &&
@@ -44,13 +46,10 @@ const CommentElement = ({
 
             // hide text node and transformer:
             textNode.hide();
+            rectNode.hide();
             tr.hide();
 
-            // create textarea over canvas with absolute position
-            // first we need to find position for textarea
-            // how to find it?
-
-            // at first lets find position of text node relative to the stage:
+            // first find position of text node relative to the stage:
             const textPosition = textNode.absolutePosition();
 
             // so position of textarea will be the sum of positions above:
@@ -68,16 +67,17 @@ const CommentElement = ({
             // and sometimes it is hard to make it 100% the same. But we will try...
             textarea.value = textNode.text();
             textarea.style.position = "absolute";
-            textarea.style.top = areaPosition.y - 2 + "px";
+            textarea.style.top = areaPosition.y + "px";
             textarea.style.left = areaPosition.x + "px";
             textarea.style.width = textNode.width() * stage.scaleX() + "px";
-            textarea.style.height = textNode.height() * stage.scaleX() + 5 + "px";
+            textarea.style.height = textNode.height() * stage.scaleX() + "px";
             textarea.style.fontSize = textNode.fontSize() * stage.scaleX() + "px";
             textarea.style.border = "none";
             textarea.style.padding = textNode.padding() * stage.scaleX() + "px";
-            textarea.style.margin = "0px";
+            textarea.style.margin = "1px";
             textarea.style.overflow = "hidden";
-            textarea.style.background = "none";
+            textarea.style.background = backgroundColor;
+            textarea.style.borderRadius = "10px 10px 10px 0";
             textarea.style.outline = "none";
             textarea.style.resize = "none";
             textarea.style.lineHeight = textNode.lineHeight() * 20 * stage.scaleX() + "px";
@@ -86,9 +86,6 @@ const CommentElement = ({
             textarea.style.textAlign = textNode.align();
             textarea.style.color = textNode.fill();
             let transform = "";
-
-            textarea.style.backgroundColor = "red"; //
-            textarea.style.opacity = "0.5"; //
 
             let px = 0;
             // also we need to slightly move textarea on firefox
@@ -105,26 +102,15 @@ const CommentElement = ({
             textarea.style.height = "auto";
             // after browsers resized it we can set actual value
             textarea.style.height = textarea.scrollHeight + 3 + "px";
-
-            // Resize rect
-            rectRef.current?.setAttrs({
-                height: textarea.scrollHeight / stage.scaleX(),
-            });
-
             textarea.focus();
 
             const setTextareaWidth = (newWidth: number) => {
-                //     if (!newWidth) {
-                //         // set width for placeholder
-                //         newWidth = textNode.placeholder.length * textNode.fontSize();
-                //     }
                 // some extra fixes on different browsers
                 var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
                 var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
                 if (isSafari || isFirefox) {
                     newWidth = Math.ceil(newWidth);
                 }
-
                 var isEdge = /Edge/.test(navigator.userAgent);
                 if (isEdge) {
                     newWidth += 1;
@@ -134,10 +120,10 @@ const CommentElement = ({
 
             const removeTextarea = () => {
                 if (textarea.parentNode !== null) {
-                    textarea.parentNode.removeChild(textarea);
-
                     textarea.removeEventListener("click", handleBlur);
                     window.removeEventListener("wheel", handleWheel);
+
+                    textarea.remove();
 
                     textNode.show();
                     rectNode.show();
@@ -160,12 +146,7 @@ const CommentElement = ({
 
                 const scale = textNode.getAbsoluteScale().x;
                 setTextareaWidth(textNode.width() * scale);
-
                 textarea.style.height = textarea.scrollHeight + "px";
-                rectRef.current?.setAttrs({
-                    // width: textarea.scrollWidth,
-                    height: textarea.scrollHeight / scale,
-                });
             });
 
             const handleBlur = (e: FocusEvent) => {
@@ -174,8 +155,11 @@ const CommentElement = ({
                     width: textarea.scrollWidth / stage.scaleX(),
                     height: textarea.scrollHeight / stage.scaleX(),
                 });
+                rectNode.setAttrs({
+                    width: textarea.scrollWidth / stage.scaleX(),
+                    height: textarea.scrollHeight / stage.scaleX(),
+                });
                 removeTextarea();
-                // window.resizeTo(window.screen.availWidth / 2, window.screen.availHeight / 2);
             };
 
             const handleWheel = (e: WheelEvent) => {
@@ -203,8 +187,6 @@ const CommentElement = ({
                 y: text.y(),
                 width: text.width(),
                 height: text.height(),
-                scaleX: 1,
-                scaleY: 1,
             });
         }
     }
@@ -232,7 +214,7 @@ const CommentElement = ({
                     width={comment.width}
                     height={comment.height}
                     fill={backgroundColor}
-                    cornerRadius={[5, 5, 5, 0]}
+                    cornerRadius={[4, 4, 4, 0]}
                 />
                 <Text
                     type="comment"
