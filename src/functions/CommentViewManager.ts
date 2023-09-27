@@ -28,6 +28,8 @@ export const CommentViewManager = (
                 backgroundColor: commentBackgroundColor,
             };
         });
+
+        document.body.style.cursor = "crosshair";
     }
 
     function exitCommentView() {
@@ -38,6 +40,8 @@ export const CommentViewManager = (
                 backgroundColor: defaultBackgroundColor,
             };
         });
+
+        document.body.style.cursor = "default";
     }
 
     function addComment(

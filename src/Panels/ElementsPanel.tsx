@@ -145,7 +145,7 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     };
 
     const ShapeSection = () => {
-        const { heading, srcs, icons, sizes } = activity_shapes;
+        const { heading, srcs } = activity_shapes;
         return (
             <>
                 <ImageSubheadingText>{heading}</ImageSubheadingText>

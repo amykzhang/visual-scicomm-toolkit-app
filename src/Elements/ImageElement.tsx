@@ -2,7 +2,6 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import Konva from "konva";
 import { Image, Transformer } from "react-konva";
 import { ImageProp } from "../utils/interfaces";
-import color from "../styles/color";
 
 interface ImageElementProp {
     image: ImageProp;

@@ -220,11 +220,13 @@ export default function App() {
     useEffect(() => {
         if (stageRef.current !== null) {
             const stage = stageRef.current;
-
             const container = stage.getContent();
             container.style.backgroundColor = commentViewState.backgroundColor;
+
+            // update comment selection
+            setSelectedComment(null);
         }
-    }, [commentViewState.backgroundColor, stageRef]);
+    }, [commentViewState, stageRef, setSelectedComment]);
 
     return (
         <div>

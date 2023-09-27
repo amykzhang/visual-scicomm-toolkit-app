@@ -313,7 +313,17 @@ const CommentElement = ({
 
     return (
         <Fragment>
-            <Group ref={groupRef} draggable onDragEnd={handleDragEnd}>
+            <Group
+                ref={groupRef}
+                draggable
+                onDragEnd={handleDragEnd}
+                onMouseEnter={(e) => {
+                    document.body.style.cursor = "default";
+                }}
+                onMouseLeave={(e) => {
+                    document.body.style.cursor = "crosshair";
+                }}
+            >
                 <Rect
                     ref={rectRef}
                     x={comment.x}
