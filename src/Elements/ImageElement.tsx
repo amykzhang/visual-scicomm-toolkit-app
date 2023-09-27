@@ -50,7 +50,6 @@ const ImageElement = ({
         // Show transformer when the image is selected or dragged
         if (showTransform) {
             // we need to attach transformer manually
-            // TODO: make a transformer state for removing transformer nodes while exporting
             if (transformerRef.current !== null && imageRef.current !== null) {
                 const transformer = transformerRef.current;
                 transformer.nodes([imageRef.current]);
