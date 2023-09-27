@@ -54,5 +54,5 @@ export const RectangleTool: FC<RectangleToolProps> = ({ src, shapes, setShapes, 
         }
     };
 
-    return <StyledImage src={src} width={50} height={50} onDragEnd={handleImageDragEnd} />;
+    return <StyledImage src={src} width={30} height={30} onDragEnd={handleImageDragEnd} />;
 };

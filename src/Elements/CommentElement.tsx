@@ -4,6 +4,8 @@ import { CommentProp } from "../utils/interfaces";
 import Konva from "konva";
 import color from "../styles/color";
 
+const resizeAnchors = ["top-left", "top-right", "bottom-right", "bottom-left"];
+
 interface CommentElementProp {
     comment: CommentProp;
     comments: CommentProp[];
@@ -190,43 +192,72 @@ const CommentElement = ({
         enterEditTextMode();
     }
 
-    function handleTransform() {
+    function handleTransform(e: Konva.KonvaEventObject<Event>) {
         // reset scale, so only width is changing by transformer
-        if (textRef.current !== null && rectRef.current !== null) {
+        if (
+            textRef.current !== null &&
+            rectRef.current !== null &&
+            transformerRef.current !== null
+        ) {
             const text = textRef.current;
             const rect = rectRef.current;
-            text.setAttrs({
-                width: text.width() * text.scaleX(),
-                height: text.height() * text.scaleY(),
-                scaleX: 1,
-                scaleY: 1,
-            });
-            rect.setAttrs({
-                x: text.x(),
-                y: text.y(),
-                width: text.width(),
-                height: text.height(),
-            });
+            const transformer = transformerRef.current;
+
+            const activeAnchor = transformer.getActiveAnchor();
+            if (resizeAnchors.includes(activeAnchor)) {
+                console.log("resize");
+                rect.setAttrs({
+                    x: text.x(),
+                    y: text.y(),
+                    width: text.width(),
+                    height: text.height(),
+                    scaleX: text.scaleX(),
+                    scaleY: text.scaleY(),
+                });
+            } else {
+                text.setAttrs({
+                    width: (text.width() * text.scaleX()) / comment.scale,
+                    height: (text.height() * text.scaleY()) / comment.scale,
+                    scaleX: comment.scale,
+                    scaleY: comment.scale,
+                });
+                rect.setAttrs({
+                    x: text.x(),
+                    y: text.y(),
+                    width: text.width(),
+                    height: text.height(),
+                });
+            }
         }
     }
 
     function handleTransformEnd() {
-        if (textRef.current !== null) {
+        if (textRef.current !== null && transformerRef.current !== null) {
             const text = textRef.current;
-            const x = text.x();
-            const y = text.y();
-            const width = text.width() * text.scaleX();
-            const height = text.height() * text.scaleY();
+            const transformer = transformerRef.current;
+            const activeAnchor = transformer.getActiveAnchor();
+            const transformedComment = resizeAnchors.includes(activeAnchor)
+                ? {
+                      // resizing
+                      ...comment,
+                      x: text.x(),
+                      y: text.y(),
+                      width: text.width(),
+                      height: text.height(),
+                      scale: text.scaleX(),
+                  }
+                : {
+                      // box dimensions
+                      ...comment,
+                      x: text.x(),
+                      y: text.y(),
+                      width: text.width(),
+                      height: text.height(),
+                  };
 
             const newComments = comments.map((comment_i) => {
                 if (comment.id === comment_i.id) {
-                    return {
-                        ...comment_i,
-                        x: x,
-                        y: y,
-                        width: width,
-                        height: height,
-                    };
+                    return transformedComment;
                 } else {
                     return comment_i;
                 }
@@ -284,6 +315,8 @@ const CommentElement = ({
                     y={comment.y}
                     width={comment.width}
                     height={comment.height}
+                    scaleX={comment.scale}
+                    scaleY={comment.scale}
                     fill={backgroundColor}
                     shadowEnabled={true}
                     shadowColor="black"
@@ -303,6 +336,8 @@ const CommentElement = ({
                     draggable={draggable}
                     width={comment.width}
                     height={comment.height}
+                    scaleX={comment.scale}
+                    scaleY={comment.scale}
                     padding={padding}
                     onTransform={handleTransform}
                     onTransformEnd={handleTransformEnd}
@@ -314,8 +349,8 @@ const CommentElement = ({
             {selected && (
                 <Transformer
                     ref={transformerRef}
-                    enabledAnchors={["middle-left", "middle-right", "top-center", "bottom-center"]}
                     rotateEnabled={false}
+                    borderEnabled={false}
                     boundBoxFunc={(oldBox, newBox) => {
                         // limit resize so box can't be negative
                         if (stageRef.current !== null) {

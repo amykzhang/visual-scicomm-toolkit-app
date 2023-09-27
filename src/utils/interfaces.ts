@@ -47,6 +47,7 @@ export interface CommentProp {
     y: number;
     width: number;
     height: number;
+    scale: number;
     text: string;
 }
 

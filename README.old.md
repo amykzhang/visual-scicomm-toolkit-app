@@ -95,17 +95,17 @@ SEPTEMBER 14:
 SEPTEMBER 21:
 (Amy::svgs of the things)
 
--   Shapes Elements
--   text box (https://konvajs.org/docs/sandbox/Editable_Text.html)
-    -   sides transform changes bounds
+-   Shapes Elements 🚧
+-   text box (https://konvajs.org/docs/sandbox/Editable_Text.html) 🚧
+    -   sides transform changes bounds ✅
     -   corner transform changes scale
 -   freehand draw (https://konvajs.org/docs/sandbox/Free_Drawing.html)
--   contextmenu for copy paste change color etc.
 
 SEPTEMBER 28: (Provide link for testing)
 
 -   Undo/redo stack (https://konvajs.org/docs/react/Undo-Redo.html)
 -   fix shortcuts for commands
+-   contextmenu for copy paste change color etc.
 
 OCTOBER 5:
 
@@ -119,3 +119,12 @@ OCTOBER 15 :: PAPER SUBMISSION DEADLINE
 buggies:
 
 -   fullscreen doesnt render stage when changing vw/vh
+
+context menu 1:
+
+-   colour
+-   stroke
+
+context menu 2:
+
+-   text

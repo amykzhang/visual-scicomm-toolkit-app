@@ -55,6 +55,7 @@ export const CommentViewManager = (
                 y: y,
                 width: 200,
                 height: 55,
+                scale: 1,
                 text: "",
             },
         ]);
