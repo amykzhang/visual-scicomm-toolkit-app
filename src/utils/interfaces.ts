@@ -6,8 +6,7 @@ export interface CommentStateProp {
 }
 
 export interface CanvasStateProp {
-    images: ImageProp[];
-    shapes: ShapeProp[];
+    elements: ElementProp[];
     comments: CommentProp[];
 }
 
@@ -24,15 +23,27 @@ export interface StageStateProp {
 
 // Elements
 
-export interface ImageProp {
+export type ElementProp = ImageProp | ShapeProp;
+
+interface BaseProp {
     id: string;
+    type: "image" | "shape";
     x: number;
     y: number;
     width: number;
     height: number;
     rotation: number;
-    image: HTMLImageElement | undefined;
+}
+
+export interface ImageProp extends BaseProp {
     src: string;
+}
+
+export interface ShapeProp extends BaseProp {
+    fill: string;
+    stroke: string;
+    strokeWidth: number;
+    shape: string;
 }
 
 export interface CommentProp {
@@ -43,19 +54,6 @@ export interface CommentProp {
     height: number;
     scale: number;
     text: string;
-}
-
-export interface ShapeProp {
-    id: string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    rotation: number;
-    fill: string;
-    stroke: string;
-    strokeWidth: number;
-    type: string;
 }
 
 export interface SelectionBoundsProp {

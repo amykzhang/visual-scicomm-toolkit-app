@@ -1,6 +1,6 @@
 import { FC } from "react";
 import Konva from "konva";
-import { ImageProp, ShapeProp } from "../utils/interfaces";
+import { ElementProp } from "../utils/interfaces";
 import { Activity } from "../activity/activity";
 import { ReactComponent as LeftArrow } from "../assets/arrowhead-left.svg";
 import { ReactComponent as RightArrow } from "../assets/arrowhead-right.svg";
@@ -66,10 +66,8 @@ const ImageSubheadingText = styled(typography.BoldSmallText)`
 
 interface ElementsMenuProps {
     activity: Activity;
-    images: ImageProp[];
-    setImages: React.Dispatch<React.SetStateAction<ImageProp[]>>;
-    shapes: ShapeProp[];
-    setShapes: React.Dispatch<React.SetStateAction<ShapeProp[]>>;
+    elements: ElementProp[];
+    setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>;
     stageRef: React.MutableRefObject<Konva.Stage | null>;
     isOpen: boolean;
     handleToggle: () => void;
@@ -77,10 +75,8 @@ interface ElementsMenuProps {
 
 export const ElementsPanel: FC<ElementsMenuProps> = ({
     activity,
-    images,
-    setImages,
-    shapes,
-    setShapes,
+    elements,
+    setElements,
     stageRef,
     isOpen,
     handleToggle,
@@ -88,7 +84,6 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     // For expanding and collapsing the sidebar
     const Arrow = isOpen ? RightArrow : LeftArrow;
 
-    const elements = activity.elements;
     const image_sections = activity.elements.images.sections;
     const activity_shapes = activity.elements.shapes;
     const activity_lines = activity.elements.lines;
@@ -96,7 +91,7 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     const TextSection = () => {
         return (
             <>
-                <ImageSubheadingText>{elements.text.heading}</ImageSubheadingText>
+                <ImageSubheadingText>{activity.elements.text.heading}</ImageSubheadingText>
                 <ElementsRow>
                     <TextTool />
                 </ElementsRow>
@@ -105,7 +100,7 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     };
 
     const DrawSection = () => {
-        const { heading, contents } = elements.draw;
+        const { heading, contents } = activity.elements.draw;
         return (
             <>
                 <ImageSubheadingText>{heading}</ImageSubheadingText>
@@ -133,8 +128,8 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
                                 src={src}
                                 name={icons[i]}
                                 dimensions={sizes[i]}
-                                images={images}
-                                setImages={setImages}
+                                elements={elements}
+                                setElements={setElements}
                                 stageRef={stageRef}
                             />
                         );
@@ -154,8 +149,8 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
                         <RectangleTool
                             key={i}
                             src={src}
-                            shapes={shapes}
-                            setShapes={setShapes}
+                            elements={elements}
+                            setElements={setElements}
                             stageRef={stageRef}
                         />
                     ))}
@@ -178,8 +173,8 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
                                     src={src}
                                     dimensions={section.sizes[j]}
                                     name={section.icons[j]}
-                                    images={images}
-                                    setImages={setImages}
+                                    elements={elements}
+                                    setElements={setElements}
                                     stageRef={stageRef}
                                 />
                             ))}

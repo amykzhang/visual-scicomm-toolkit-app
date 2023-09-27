@@ -1,7 +1,7 @@
 import { FC } from "react";
 import Konva from "konva";
 import styled from "styled-components";
-import { ShapeProp } from "../utils/interfaces";
+import { ElementProp, ShapeProp } from "../utils/interfaces";
 import { v4 as uuid } from "uuid";
 import color from "../styles/color";
 
@@ -20,27 +20,28 @@ const StyledImage = styled.img`
 
 interface RectangleToolProps {
     src: string;
-    shapes: ShapeProp[];
-    setShapes: React.Dispatch<React.SetStateAction<ShapeProp[]>>;
+    elements: ElementProp[];
+    setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>;
     stageRef: React.MutableRefObject<Konva.Stage | null>;
 }
 
-export const RectangleTool: FC<RectangleToolProps> = ({ src, shapes, setShapes, stageRef }) => {
+export const RectangleTool: FC<RectangleToolProps> = ({ src, elements, setElements, stageRef }) => {
     function addShape(x: number, y: number, type: string) {
-        setShapes([
-            ...shapes,
+        setElements([
+            ...elements,
             {
                 id: uuid(),
+                type: "shape",
                 x: x,
                 y: y,
                 width: 50,
                 height: 50,
                 rotation: 0,
-                type: type,
                 fill: color.darkGrey,
                 stroke: "",
                 strokeWidth: 2,
-            },
+                shape: type,
+            } as ShapeProp,
         ]);
     }
 

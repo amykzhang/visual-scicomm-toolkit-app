@@ -41,6 +41,11 @@ const ImageElement = ({
     const imageRef = useRef<Konva.Image | null>(null);
     const transformerRef = useRef<Konva.Transformer | null>(null);
 
+    const imageElement = new window.Image();
+    imageElement.width = image.width;
+    imageElement.height = image.height;
+    imageElement.src = image.src;
+
     useEffect(() => {
         // Show transformer when the image is selected or dragged
         if (showTransform) {
@@ -58,6 +63,7 @@ const ImageElement = ({
         <Fragment>
             <Image
                 {...image}
+                image={imageElement}
                 ref={imageRef}
                 perfectDrawEnabled={perfectDrawEnabled}
                 draggable={draggable}

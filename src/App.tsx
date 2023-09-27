@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Stage, Layer, Group, Rect } from "react-konva";
 import { PanelsContainer } from "./styles/containers";
 import {
@@ -23,6 +23,7 @@ import { ExitCommentViewButton } from "./components/Components";
 import activity_visual_strategies from "./activity/activity";
 import {
     CommentProp,
+    ElementProp,
     ImageProp,
     SelectionBoundsProp,
     ShapeProp,
@@ -35,7 +36,6 @@ import CommentElement from "./Elements/CommentElement";
 import Konva from "konva";
 import { SelectionRect } from "./components/SelectionRect";
 
-// TODO: make this easier to customize, more modular for creators?
 const activity = activity_visual_strategies;
 
 export default function App() {
@@ -67,21 +67,12 @@ export default function App() {
         }
     }
 
-    // images
-    const [images, setImages] = useState<ImageProp[]>(() => {
+    // Elements
+    const [elements, setElements] = useState<ElementProp[]>(() => {
         const saved = persistance.retrieveCanvasState();
 
-        if (saved !== undefined && saved.images !== undefined) {
-            return saved.images;
-        } else return [];
-    });
-
-    // shapes
-    const [shapes, setShapes] = useState<ShapeProp[]>(() => {
-        const saved = persistance.retrieveCanvasState();
-
-        if (saved !== undefined && saved.shapes !== undefined) {
-            return saved.shapes;
+        if (saved !== undefined) {
+            return saved.elements;
         } else return [];
     });
 
@@ -107,24 +98,15 @@ export default function App() {
         if (saved !== undefined && saved.comments !== undefined) {
             return saved.comments;
         } else {
-            return [
-                // {
-                //     id: "0",
-                //     x: 100,
-                //     y: 100,
-                //     isDragging: false,
-                //     isEditing: false,
-                //     text: "Hello World!",
-                // },
-            ];
+            return [];
         }
     });
 
-    // Splices the indexed imaged with the new image
-    const modifyImage = (idx: number, newImage: ImageProp) => {
-        const newImages = images.slice();
-        newImages[idx] = newImage;
-        setImages(newImages);
+    // Splices the indexed element with the new image
+    const modifyElement = (idx: number, newImage: ImageProp) => {
+        const newElements = elements.slice();
+        newElements[idx] = newImage;
+        setElements(newElements);
     };
 
     // Stage View
@@ -133,8 +115,8 @@ export default function App() {
 
     // Selection
     const { handleSelect, deleteSelected, updateResetGroup } = SelectionManager(
-        images,
-        setImages,
+        elements,
+        setElements,
         view,
         shiftKey,
         selectionRef,
@@ -171,7 +153,7 @@ export default function App() {
             }
             if (e.key === "a" && ctrlKey) {
                 e.preventDefault();
-                selectionRef.current = images.map((image) => image.id);
+                selectionRef.current = elements.map((element) => element.id);
             }
             if (e.key === "=") {
                 console.log("debug");
@@ -179,7 +161,7 @@ export default function App() {
         },
         [
             ctrlKey,
-            images,
+            elements,
             deleteSelected,
             selectionRef,
             commentViewState.active,
@@ -199,8 +181,8 @@ export default function App() {
 
     // Side effect for canvas state
     useEffect(() => {
-        persistance.persistCanvasState(images, shapes, comments);
-    }, [images, shapes, comments]);
+        persistance.persistCanvasState(elements, comments);
+    }, [elements, comments]);
 
     // Side effect for UI state
     useEffect(() => {
@@ -227,6 +209,45 @@ export default function App() {
             setSelectedComment(null);
         }
     }, [commentViewState, stageRef, setSelectedComment]);
+
+    // Given an elementProp, return a ReactElement representing the type of element
+    function elementToReactElement(element: ElementProp, i: number): React.ReactElement {
+        if (element.type === "image") {
+            const image = element as ImageProp;
+            return (
+                <ImageElement
+                    key={i}
+                    image={image}
+                    draggable={view === APP_VIEW.select}
+                    isSelected={selectionRef.current.includes(image.id)}
+                    handleChange={(attributes: any) => {
+                        modifyElement(i, {
+                            ...image,
+                            ...attributes,
+                        });
+                    }}
+                    handleSelect={handleSelect}
+                    handleDragStart={handleDragStart(elements, setElements)}
+                    handleDragEnd={handleDragEnd(elements, setElements)}
+                    transformFlag={transformFlag}
+                    setTransformFlag={setTransformFlag}
+                    selectionRef={selectionRef}
+                    updateResetGroup={updateResetGroup}
+                />
+            );
+        } else if (element.type === "shape") {
+            const shape = element as ShapeProp;
+            return (
+                <Rect
+                    key={i}
+                    {...shape}
+                    draggable={view === APP_VIEW.select}
+                    onDragStart={handleDragStart(elements, setElements)}
+                    onDragEnd={handleDragEnd(elements, setElements)}
+                />
+            );
+        } else return <></>;
+    }
 
     return (
         <div>
@@ -258,10 +279,8 @@ export default function App() {
                 />
                 <ElementsPanel
                     activity={activity}
-                    images={images}
-                    setImages={setImages}
-                    shapes={shapes}
-                    setShapes={setShapes}
+                    elements={elements}
+                    setElements={setElements}
                     stageRef={stageRef}
                     isOpen={uiState.isRightPanelOpen}
                     handleToggle={() => {
@@ -342,7 +361,7 @@ export default function App() {
                         setIsSelectionMode(false);
 
                         // Get Elements within bounds
-                        selectionRef.current = getElementsWithinBounds(selectionBounds, images);
+                        selectionRef.current = getElementsWithinBounds(selectionBounds, elements);
                     }
                 }}
                 onContextMenu={(e) => {
@@ -371,41 +390,10 @@ export default function App() {
                         />
                     )}
                 </Layer>
-                <Layer id="image-layer">
-                    {images
-                        .filter((image) => !selectionRef.current.includes(image.id))
-                        .map((image: ImageProp, i: number) => {
-                            return (
-                                <ImageElement
-                                    draggable={view === APP_VIEW.select}
-                                    key={i}
-                                    image={image}
-                                    isSelected={selectionRef.current.includes(image.id)}
-                                    handleChange={(attributes: any) => {
-                                        modifyImage(i, {
-                                            ...image,
-                                            ...attributes,
-                                        });
-                                    }}
-                                    handleSelect={handleSelect}
-                                    handleDragStart={handleDragStart(images, setImages)}
-                                    handleDragEnd={handleDragEnd(images, setImages)}
-                                    transformFlag={transformFlag}
-                                    setTransformFlag={setTransformFlag}
-                                    selectionRef={selectionRef}
-                                    updateResetGroup={updateResetGroup}
-                                />
-                            );
-                        })}
-                    {shapes
-                        .filter(
-                            (shape) =>
-                                !selectionRef.current.includes(shape.id) && shape.type === "rect"
-                        )
-                        .map((shape: ShapeProp, i: number) => {
-                            return <Rect {...shape} key={i} draggable={view === APP_VIEW.select} />;
-                        })}
-
+                <Layer id="elements-layer">
+                    {elements
+                        .filter((element) => !selectionRef.current.includes(element.id))
+                        .map(elementToReactElement)}
                     <Group
                         draggable
                         ref={groupRef}
@@ -414,28 +402,8 @@ export default function App() {
                         }}
                     >
                         {selectionRef.current.map((id) => {
-                            const idx = images.findIndex((image) => image.id === id);
-                            if (idx === -1) return null;
-                            const image = images[idx];
-                            return (
-                                <ImageElement
-                                    draggable={false}
-                                    key={idx}
-                                    image={image}
-                                    isSelected={selectionRef.current.includes(image.id)}
-                                    handleChange={(attributes: any) => {
-                                        modifyImage(idx, {
-                                            ...image,
-                                            ...attributes,
-                                        });
-                                    }}
-                                    handleSelect={handleSelect}
-                                    transformFlag={transformFlag}
-                                    setTransformFlag={setTransformFlag}
-                                    selectionRef={selectionRef}
-                                    updateResetGroup={updateResetGroup}
-                                />
-                            );
+                            const idx = elements.findIndex((element) => element.id === id);
+                            return idx !== -1 ? elementToReactElement(elements[idx], idx) : null;
                         })}
                     </Group>
                 </Layer>
@@ -479,7 +447,7 @@ const ExitCommentView: React.FC<ExitCommentStateProps> = ({
     );
 };
 
-function getElementsWithinBounds(selectionBounds: SelectionBoundsProp, images: ImageProp[]) {
+function getElementsWithinBounds(selectionBounds: SelectionBoundsProp, elements: ElementProp[]) {
     const actualBounds = {
         x:
             selectionBounds.width > 0
@@ -493,14 +461,14 @@ function getElementsWithinBounds(selectionBounds: SelectionBoundsProp, images: I
         height: Math.abs(selectionBounds.height),
     };
 
-    const newSelection = images
+    const newSelection = elements
         .filter(
-            (image) =>
-                image.x > actualBounds.x &&
-                image.y > actualBounds.y &&
-                image.x + image.width < actualBounds.x + actualBounds.width &&
-                image.y + image.height < actualBounds.y + actualBounds.height
+            (element) =>
+                element.x > actualBounds.x &&
+                element.y > actualBounds.y &&
+                element.x + element.width < actualBounds.x + actualBounds.width &&
+                element.y + element.height < actualBounds.y + actualBounds.height
         )
-        .map((image) => image.id);
+        .map((element) => element.id);
     return newSelection;
 }

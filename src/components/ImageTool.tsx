@@ -1,7 +1,7 @@
 import { FC } from "react";
 import Konva from "konva";
 import styled from "styled-components";
-import { ImageProp } from "../utils/interfaces";
+import { ElementProp, ImageProp } from "../utils/interfaces";
 import { v4 as uuid } from "uuid";
 
 const StyledImage = styled.img`
@@ -21,8 +21,8 @@ interface ImageToolProps {
     src: string;
     name: string;
     dimensions: { width: number; height: number };
-    images: ImageProp[];
-    setImages: React.Dispatch<React.SetStateAction<ImageProp[]>>;
+    elements: ElementProp[];
+    setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>;
     stageRef: React.MutableRefObject<Konva.Stage | null>;
 }
 
@@ -30,28 +30,28 @@ export const ImageTool: FC<ImageToolProps> = ({
     src,
     name,
     dimensions,
-    images,
-    setImages,
+    elements,
+    setElements,
     stageRef,
 }) => {
     function addImage(x: number, y: number, offset: { x: number; y: number }) {
-        const imageElement = new Image();
-        imageElement.width = dimensions.width;
-        imageElement.height = dimensions.height;
-        imageElement.src = src;
+        // const imageElement = new Image();
+        // imageElement.width = dimensions.width;
+        // imageElement.height = dimensions.height;
+        // imageElement.src = src;
 
-        setImages([
-            ...images,
+        setElements([
+            ...elements,
             {
                 id: uuid(),
+                type: "image",
                 x: x - offset.x,
                 y: y - offset.y,
                 width: dimensions.width,
                 height: dimensions.height,
                 rotation: 0,
-                image: imageElement,
                 src: src,
-            },
+            } as ImageProp,
         ]);
     }
 
