@@ -36,7 +36,12 @@ const CommentElement = ({
     const cornerRadius = 20;
 
     function enterEditTextMode() {
-        if (textRef.current !== null && stageRef.current !== null && rectRef.current !== null) {
+        if (
+            textRef.current !== null &&
+            stageRef.current !== null &&
+            rectRef.current !== null &&
+            transformerRef.current !== null
+        ) {
             const textNode = textRef.current;
             const rectNode = rectRef.current;
             const tr = transformerRef.current;
@@ -45,7 +50,7 @@ const CommentElement = ({
             // hide text node and transformer:
             textNode.hide();
             rectNode.hide();
-            tr?.hide();
+            tr.hide();
 
             // first find position of text node relative to the stage:
             const textPosition = textNode.absolutePosition();
@@ -60,7 +65,7 @@ const CommentElement = ({
             const textarea = document.createElement("textarea");
             document.body.appendChild(textarea);
 
-            const scale = stage.scaleX();
+            const scale = stage.scaleX() * comment.scale;
 
             // apply many styles to match text on canvas as close as possible
             // remember that text rendering on canvas and on the textarea can be different
@@ -74,7 +79,7 @@ const CommentElement = ({
             textarea.style.fontSize = textNode.fontSize() * scale + "px";
             textarea.style.border = "none";
             textarea.style.padding = textNode.padding() * scale + "px";
-            textarea.style.margin = "1px";
+            textarea.style.margin = "0";
             textarea.style.overflow = "hidden";
             textarea.style.background = backgroundColor;
             textarea.style.borderRadius = `${cornerRadius * scale}px ${cornerRadius * scale}px ${
@@ -129,8 +134,8 @@ const CommentElement = ({
 
                     textNode.show();
                     rectNode.show();
-                    tr?.show();
-                    tr?.forceUpdate();
+                    tr.show();
+                    tr.forceUpdate();
                 }
             };
 
@@ -154,12 +159,12 @@ const CommentElement = ({
             const handleBlur = (e: FocusEvent) => {
                 updateText(textarea.value);
                 textNode.setAttrs({
-                    width: textarea.scrollWidth / stage.scaleX(),
-                    height: textarea.scrollHeight / stage.scaleX(),
+                    width: textarea.scrollWidth / scale,
+                    height: textarea.scrollHeight / scale,
                 });
                 rectNode.setAttrs({
-                    width: textarea.scrollWidth / stage.scaleX(),
-                    height: textarea.scrollHeight / stage.scaleX(),
+                    width: textarea.scrollWidth / scale,
+                    height: textarea.scrollHeight / scale,
                 });
                 removeTextarea();
             };
