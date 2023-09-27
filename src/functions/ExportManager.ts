@@ -1,15 +1,16 @@
 import Konva from "konva";
 import { Activity } from "../activity/activity";
 import { jsPDF } from "jspdf";
-import { ExportOptions } from "../utils/interfaces";
+import { useCallback, useEffect, useState } from "react";
 
 export function ExportManager(
     activity: Activity,
-    stageRef: React.MutableRefObject<Konva.Stage | null>
-    // selection: string[],
-    // setSelection: React.Dispatch<React.SetStateAction<string[]>>
-): ExportOptions {
+    stageRef: React.MutableRefObject<Konva.Stage | null>,
+    setTransformFlag: React.Dispatch<React.SetStateAction<boolean>>
+) {
     const exportSize = activity.canvas_size;
+
+    const [exportType, setExportType] = useState<"png" | "jpeg" | "pdf" | null>(null);
 
     function downloadURI(uri: string, name: string) {
         const link = document.createElement("a");
@@ -24,51 +25,54 @@ export function ExportManager(
     type ImageFormat = "png" | "jpeg";
 
     // Get DataURL of image of stage
-    const exportImage = (format: ImageFormat = "png") => {
-        if (stageRef.current !== null) {
-            const stage = stageRef.current;
+    const exportImage = useCallback(
+        (format: ImageFormat = "png") => {
+            if (stageRef.current !== null) {
+                const stage = stageRef.current;
 
-            // save position, scale, and selected IDs
-            const oldPos = stage.position();
-            const oldScale = stage.scale();
+                // save position, scale, and selected IDs
+                const oldPos = stage.position();
+                const oldScale = stage.scale();
 
-            // reset stage
-            stage.position({ x: 0, y: 0 });
-            stage.scale({ x: 1, y: 1 });
+                // reset stage
+                stage.position({ x: 0, y: 0 });
+                stage.scale({ x: 1, y: 1 });
 
-            const dataURL = stage.toDataURL({
-                pixelRatio: 2,
-                x: 0,
-                y: 0,
-                width: exportSize.width,
-                height: exportSize.height,
-                quality: 1,
-                mimeType: "image/" + format,
-            });
+                const dataURL = stage.toDataURL({
+                    pixelRatio: 2,
+                    x: 0,
+                    y: 0,
+                    width: exportSize.width,
+                    height: exportSize.height,
+                    quality: 1,
+                    mimeType: "image/" + format,
+                });
 
-            // restore stage and selected IDs
-            stage.position(oldPos);
-            stage.scale(oldScale);
+                // restore stage and selected IDs
+                stage.position(oldPos);
+                stage.scale(oldScale);
 
-            return dataURL;
-        }
-    };
+                return dataURL;
+            }
+        },
+        [exportSize.width, exportSize.height, stageRef]
+    );
 
-    const exportPNG = () => {
+    const exportPNG = useCallback(() => {
         const dataURL = exportImage("png");
         if (dataURL !== undefined) {
             downloadURI(dataURL, activity.name + ".png");
         }
-    };
+    }, [activity.name, exportImage]);
 
-    const exportJPEG = () => {
+    const exportJPEG = useCallback(() => {
         const dataURL = exportImage("jpeg");
         if (dataURL !== undefined) {
             downloadURI(dataURL, activity.name + ".jpeg");
         }
-    };
+    }, [activity.name, exportImage]);
 
-    const exportPDF = () => {
+    const exportPDF = useCallback(() => {
         if (stageRef.current !== null) {
             const stage = stageRef.current;
 
@@ -93,11 +97,31 @@ export function ExportManager(
                 pdf.save(activity.name + ".pdf");
             }
         }
+    }, [activity.name, exportImage, exportSize, stageRef]);
+
+    const startExportProcess = (type: "png" | "jpeg" | "pdf" | null) => {
+        setTransformFlag(false);
+        setExportType(type);
     };
 
-    return {
-        exportPNG,
-        exportJPEG,
-        exportPDF,
-    };
+    // Effect for catching when exportType is set other than null and begin export process
+    useEffect(() => {
+        if (exportType !== null) {
+            switch (exportType) {
+                case "png":
+                    exportPNG();
+                    break;
+                case "jpeg":
+                    exportJPEG();
+                    break;
+                case "pdf":
+                    exportPDF();
+                    break;
+            }
+            setExportType(null);
+            setTransformFlag(true);
+        }
+    }, [exportType, setTransformFlag, exportPNG, exportJPEG, exportPDF]);
+
+    return startExportProcess;
 }

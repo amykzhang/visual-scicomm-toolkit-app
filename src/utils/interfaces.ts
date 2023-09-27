@@ -5,12 +5,6 @@ export interface CommentStateProp {
     backgroundColor: string;
 }
 
-export interface ExportOptions {
-    exportPNG: () => void;
-    exportJPEG: () => void;
-    exportPDF: () => void;
-}
-
 export interface CanvasStateProp {
     images: ImageProp[];
     shapes: ShapeProp[];

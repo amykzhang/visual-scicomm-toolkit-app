@@ -4,7 +4,6 @@ import { InformationTool } from "../components/InformationTool";
 import { ReactComponent as UploadIcon } from "../assets/upload.svg";
 import { Activity } from "../activity/activity";
 import typography from "../styles/typography";
-import { ExportOptions } from "../utils/interfaces";
 import color from "../styles/color";
 import { SettingTool } from "../components/SettingTool";
 
@@ -52,13 +51,10 @@ const ExportText = styled(typography.LargeText)`
 
 interface ExportPanelProps {
     activity: Activity;
-    exportManager: ExportOptions;
+    startExportProcess: (type: "png" | "jpeg" | "pdf" | null) => void;
 }
 
-export const ExportPanel: React.FC<ExportPanelProps> = ({
-    activity,
-    exportManager,
-}) => {
+export const ExportPanel: React.FC<ExportPanelProps> = ({ activity, startExportProcess }) => {
     const [isExportOptionsOpen, setIsExportOptionsOpen] = useState(false);
 
     function toggleExportOptions() {
@@ -69,10 +65,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
         <ExportPanelContainer>
             <InformationTool content={activity.info} />
             <SettingTool />
-            <ExportButton
-                data-isactive={isExportOptionsOpen}
-                onClick={toggleExportOptions}
-            >
+            <ExportButton data-isactive={isExportOptionsOpen} onClick={toggleExportOptions}>
                 <UploadIcon />
                 <ExportText>Share Canvas</ExportText>
             </ExportButton>
@@ -82,33 +75,27 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
                     <ExportOptionsContainer>
                         <ExportOption
                             onClick={() => {
-                                exportManager.exportPNG();
+                                startExportProcess("png");
                                 toggleExportOptions();
                             }}
                         >
-                            <typography.MediumText>
-                                Export as PNG
-                            </typography.MediumText>
+                            <typography.MediumText>Export as PNG</typography.MediumText>
                         </ExportOption>
                         <ExportOption
                             onClick={() => {
-                                exportManager.exportJPEG();
+                                startExportProcess("jpeg");
                                 toggleExportOptions();
                             }}
                         >
-                            <typography.MediumText>
-                                Export as JPEG
-                            </typography.MediumText>
+                            <typography.MediumText>Export as JPEG</typography.MediumText>
                         </ExportOption>
                         <ExportOption
                             onClick={() => {
-                                exportManager.exportPDF();
+                                startExportProcess("pdf");
                                 toggleExportOptions();
                             }}
                         >
-                            <typography.MediumText>
-                                Export as PDF
-                            </typography.MediumText>
+                            <typography.MediumText>Export as PDF</typography.MediumText>
                         </ExportOption>
                     </ExportOptionsContainer>
                 </>

@@ -190,7 +190,7 @@ export default function App() {
     );
 
     // Export
-    const exportManager = ExportManager(activity, stageRef);
+    const startExportProcess = ExportManager(activity, stageRef, setTransformFlag);
 
     // Dragging Behaviour depending on View
     const stageConstants = {
@@ -244,7 +244,7 @@ export default function App() {
                         commentViewState={commentViewState}
                         exitCommentView={exitCommentView}
                     />
-                    <ExportPanel activity={activity} exportManager={exportManager} />
+                    <ExportPanel activity={activity} startExportProcess={startExportProcess} />
                 </TopZone>
                 <ActivityPanel
                     activity={activity}
