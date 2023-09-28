@@ -241,6 +241,7 @@ const TextElement = ({
         <Fragment>
             <Text
                 ref={textRef}
+                id={text.id}
                 text={text.text}
                 x={text.x}
                 y={text.y}
@@ -275,11 +276,10 @@ const TextElement = ({
                 onTransformEnd={handleTransformEnd}
                 onContextMenu={(e) => {
                     e.evt.preventDefault();
-                    console.log("onContextMenu\n", text.id);
                 }}
                 onDblClick={handleDblClick}
             />
-            {isSelected && (
+            {showTransform && (
                 <Transformer
                     ref={transformerRef}
                     rotateEnabled={false}

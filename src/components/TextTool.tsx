@@ -6,14 +6,24 @@ const StyledTextContainer = styled.div``;
 const StyledTextButton = styled.button`
     background: ${color.white};
     border: 1px solid ${color.lightBlue};
-    border-radius: 0px;
+
+    &[data-isactive="true"] {
+        background: ${color.lightBlue};
+        border: 1px solid ${color.blue};
+    }
 `;
 
-export const TextTool = () => {
+interface TextToolProps {
+    isTextMode: boolean;
+    toggleTextMode: () => void;
+}
 
+export const TextTool = ({ isTextMode, toggleTextMode }: TextToolProps) => {
     return (
         <StyledTextContainer>
-            <StyledTextButton>Text Box</StyledTextButton>
+            <StyledTextButton data-isactive={isTextMode} onClick={toggleTextMode}>
+                Text Box
+            </StyledTextButton>
         </StyledTextContainer>
     );
 };

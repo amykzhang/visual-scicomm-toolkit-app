@@ -108,7 +108,6 @@ const ImageElement = ({
                 }}
                 onContextMenu={(e) => {
                     e.evt.preventDefault();
-                    console.log("onContextMenu\n", image.id);
                 }}
             />
             {showTransform && (

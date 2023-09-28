@@ -5,3 +5,4 @@ export { handleDragStart, handleDragEnd } from "./dragging";
 export { KeyPressManager } from "./KeyPressManager";
 export { ExportManager } from "./ExportManager";
 export { SelectionManager } from "./SelectionManager";
+export { TextModeManager } from "./TextModeManager";

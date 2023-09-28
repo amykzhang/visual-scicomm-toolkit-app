@@ -19,6 +19,7 @@ import {
 } from "../styles/containers";
 import styled from "styled-components";
 import color from "../styles/color";
+import { APP_VIEW } from "../utils/enums";
 
 const ElementsPanelContainer = styled(SideBar)`
     right: 0;
@@ -71,6 +72,8 @@ interface ElementsMenuProps {
     stageRef: React.MutableRefObject<Konva.Stage | null>;
     isOpen: boolean;
     handleToggle: () => void;
+    toggleTextMode: () => void;
+    view: APP_VIEW;
 }
 
 export const ElementsPanel: FC<ElementsMenuProps> = ({
@@ -80,6 +83,8 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     stageRef,
     isOpen,
     handleToggle,
+    toggleTextMode,
+    view,
 }) => {
     // For expanding and collapsing the sidebar
     const Arrow = isOpen ? RightArrow : LeftArrow;
@@ -93,7 +98,7 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
             <>
                 <ImageSubheadingText>{activity.elements.text.heading}</ImageSubheadingText>
                 <ElementsRow>
-                    <TextTool />
+                    <TextTool isTextMode={view === APP_VIEW.text} toggleTextMode={toggleTextMode} />
                 </ElementsRow>
             </>
         );

@@ -210,7 +210,6 @@ const CommentElement = ({
 
             const activeAnchor = transformer.getActiveAnchor();
             if (resizeAnchors.includes(activeAnchor)) {
-                console.log("resize");
                 rect.setAttrs({
                     x: text.x(),
                     y: text.y(),

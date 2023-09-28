@@ -111,7 +111,6 @@ const ShapeElement = ({
                 }}
                 onContextMenu={(e) => {
                     e.evt.preventDefault();
-                    console.log("onContextMenu\n", shape.id);
                 }}
             />
             {showTransform && (

@@ -99,7 +99,6 @@ export const ShapeTool: FC<ShapeToolProps> = ({ shape, fill, elements, setElemen
     }
 
     function addShape(x: number, y: number, type: string) {
-        console.log(x, y, type);
         setElements([
             ...elements,
             {

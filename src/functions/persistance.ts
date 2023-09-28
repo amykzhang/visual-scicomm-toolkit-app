@@ -10,16 +10,6 @@ const LOCALSTORAGE_CANVAS_STATE_KEY = "visual-toolkit-canvas";
 const LOCALSTORAGE_UI_STATE_KEY = "visual-toolkit-ui";
 const LOCALSTORAGE_STAGE_STATE_KEY = "visual-toolkit-stage";
 
-// function reconstructElementsFromJSON(elementsJSON: string): ElementProp[] {
-//     const elements = JSON.parse(elementsJSON);
-//     const reconstructedImages: ImageProp[] = elements.map((elements) => {
-//             ...image,
-//             image: imageElement,
-//         };
-//     });
-//     return reconstructedImages;
-// }
-
 // Saves each canvas layer/group as string, then stringify canvasState and save to local storage
 function persistCanvasState(elements: ElementProp[], comments: CommentProp[]) {
     window.localStorage.setItem(

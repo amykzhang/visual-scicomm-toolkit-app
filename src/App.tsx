@@ -6,6 +6,7 @@ import {
     KeyPressManager,
     SelectionManager,
     StageViewManager,
+    TextModeManager,
     handleDragEnd,
     handleDragStart,
 } from "./functions";
@@ -60,12 +61,16 @@ export default function App() {
     });
 
     const view = uiState.view;
-    function setView(view: APP_VIEW) {
-        setUiState({ ...uiState, view: view });
-        if (view !== APP_VIEW.select) {
-            selectionRef.current = [];
-        }
-    }
+
+    const setView = useCallback(
+        (view: APP_VIEW) => {
+            setUiState({ ...uiState, view: view });
+            if (view !== APP_VIEW.select) {
+                selectionRef.current = [];
+            }
+        },
+        [uiState]
+    );
 
     // Elements
     const [elements, setElements] = useState<ElementProp[]>(() => {
@@ -126,11 +131,20 @@ export default function App() {
         handleCommentViewClickOff,
     } = CommentViewManager(setView, comments, setComments, stageRef);
 
+    const { toggleTextMode, handleTextClick } = TextModeManager(
+        view,
+        setView,
+        elements,
+        setElements,
+        stageRef
+    );
+
     // Key Presses
     const handleKeyPress = useCallback(
         (e: KeyboardEvent) => {
             if (e.key === "Escape") {
                 selectionRef.current = [];
+                setView(APP_VIEW.select);
             }
             if (e.key === "Delete" || e.key === "Backspace") {
                 if (commentViewState.active) {
@@ -161,6 +175,7 @@ export default function App() {
             selectedComment,
             comments,
             setSelectedComment,
+            setView,
         ]
     );
 
@@ -283,6 +298,15 @@ export default function App() {
         } else return <></>;
     }
 
+    function handleClickOff(e: Konva.KonvaEventObject<MouseEvent>) {
+        if (view === APP_VIEW.select) {
+            selectionRef.current = [];
+        } else if (view === APP_VIEW.text) {
+            selectionRef.current = [];
+            handleTextClick(e);
+        }
+    }
+
     return (
         <div>
             <PanelsContainer>
@@ -323,6 +347,8 @@ export default function App() {
                             isRightPanelOpen: !uiState.isRightPanelOpen,
                         });
                     }}
+                    toggleTextMode={toggleTextMode}
+                    view={view}
                 />
                 <BottomZone>
                     <ZoomPanel
@@ -338,18 +364,17 @@ export default function App() {
                 width={window.innerWidth}
                 height={window.innerHeight}
                 onWheel={handleWheel}
-                onClick={
-                    // handle unfocus
-                    commentViewState.active
-                        ? handleCommentViewClickOff
-                        : (e) => {
-                              if (view === APP_VIEW.select) {
-                                  if (e.target === stageRef.current) {
-                                      selectionRef.current = [];
-                                  }
-                              }
-                          }
-                }
+                onClick={(e) => {
+                    // handle unfocus/click on stage
+                    if (commentViewState.active) {
+                        handleCommentViewClickOff(e);
+                    } else {
+                        // handle all different view modes
+                        if (e.target === stageRef.current) {
+                            handleClickOff(e);
+                        }
+                    }
+                }}
                 onMouseDown={(e) => {
                     if (view === APP_VIEW.select && stageRef.current !== null) {
                         const stage = stageRef.current;
@@ -408,11 +433,7 @@ export default function App() {
                     <ExportArea
                         exportAreaRef={exportAreaRef}
                         {...activity.canvas_size}
-                        onClick={() => {
-                            if (view === APP_VIEW.select) {
-                                selectionRef.current = [];
-                            }
-                        }}
+                        onClick={(e) => handleClickOff(e)}
                     />
                     {isSelectionMode && view === APP_VIEW.select && (
                         <SelectionRect
