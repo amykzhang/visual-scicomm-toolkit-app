@@ -94,10 +94,8 @@ SEPTEMBER 14:
 
 SEPTEMBER 21:
 
--   Shapes Elements 🚧
+-   Shapes Elements ✅
 -   text box (https://konvajs.org/docs/sandbox/Editable_Text.html) 🚧
-    -   sides transform changes bounds ✅
-    -   corner transform changes scale
 -   freehand draw (https://konvajs.org/docs/sandbox/Free_Drawing.html)
 
 SEPTEMBER 28: (Provide link for testing)

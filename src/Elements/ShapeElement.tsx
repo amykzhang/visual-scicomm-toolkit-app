@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import Konva from "konva";
-import { Rect, Circle, RegularPolygon, Transformer, KonvaNodeComponent } from "react-konva";
+import { Rect, Circle, RegularPolygon, Transformer } from "react-konva";
 import { ShapeProp } from "../utils/interfaces";
 
 interface ShapeElementProp {

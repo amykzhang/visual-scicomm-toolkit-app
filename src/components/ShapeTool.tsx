@@ -1,6 +1,6 @@
-import { FC, ReactElement } from "react";
+import { FC } from "react";
 import Konva from "konva";
-import styled, { IStyledComponent } from "styled-components";
+import styled from "styled-components";
 import { ElementProp, ShapeProp } from "../utils/interfaces";
 import { v4 as uuid } from "uuid";
 import color from "../styles/color";

@@ -243,7 +243,7 @@ const CommentElement = ({
             const activeAnchor = transformer.getActiveAnchor();
             const transformedComment = resizeAnchors.includes(activeAnchor)
                 ? {
-                      // resizing
+                      // corner = rescaling
                       ...comment,
                       x: text.x(),
                       y: text.y(),
@@ -252,7 +252,7 @@ const CommentElement = ({
                       scale: text.scaleX(),
                   }
                 : {
-                      // box dimensions
+                      // resizing
                       ...comment,
                       x: text.x(),
                       y: text.y(),
@@ -306,10 +306,6 @@ const CommentElement = ({
             transformer.getLayer()?.batchDraw();
         }
     }, [selected]);
-
-    // useEffect(() => {
-    //     enterEditTextMode();
-    // }, []);
 
     return (
         <Fragment>

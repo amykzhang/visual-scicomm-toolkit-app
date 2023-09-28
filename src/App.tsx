@@ -27,10 +27,11 @@ import {
     ImageProp,
     SelectionBoundsProp,
     ShapeProp,
+    TextProp,
     UiStateProp,
 } from "./utils/interfaces";
 import { persistance } from "./functions";
-import { ImageElement, CommentElement, ShapeElement } from "./Elements";
+import { ImageElement, CommentElement, ShapeElement, TextElement } from "./Elements";
 import { ExportPanel } from "./Panels";
 import Konva from "konva";
 import { SelectionRect } from "./components/SelectionRect";
@@ -252,6 +253,30 @@ export default function App() {
                     transformFlag={transformFlag}
                     setTransformFlag={setTransformFlag}
                     selectionRef={selectionRef}
+                    updateResetGroup={updateResetGroup}
+                />
+            );
+        } else if (element.type === "text") {
+            const text = element as TextProp;
+            return (
+                <TextElement
+                    key={i}
+                    text={text}
+                    selectionRef={selectionRef}
+                    stageRef={stageRef}
+                    draggable={draggable}
+                    handleChange={(attributes: any) => {
+                        setElements([
+                            ...elements.slice(0, i),
+                            { ...text, ...attributes },
+                            ...elements.slice(i + 1),
+                        ]);
+                    }}
+                    handleSelect={handleSelect}
+                    handleDragStart={handleDragStart(elements, setElements)}
+                    handleDragEnd={handleDragEnd(elements, setElements)}
+                    transformFlag={transformFlag}
+                    setTransformFlag={setTransformFlag}
                     updateResetGroup={updateResetGroup}
                 />
             );
