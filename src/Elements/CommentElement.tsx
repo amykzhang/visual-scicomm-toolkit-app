@@ -194,6 +194,8 @@ const CommentElement = ({
     }
 
     function handleDblClick(e: Konva.KonvaEventObject<MouseEvent>) {
+        e.evt.stopPropagation();
+        console.log("dblclick");
         enterEditTextMode();
     }
 
@@ -312,10 +314,10 @@ const CommentElement = ({
                 ref={groupRef}
                 draggable
                 onDragEnd={handleDragEnd}
-                onMouseEnter={(e) => {
+                onMouseEnter={() => {
                     document.body.style.cursor = "default";
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={() => {
                     document.body.style.cursor = "crosshair";
                 }}
             >
