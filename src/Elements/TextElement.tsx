@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { Text, Transformer } from "react-konva";
 import { TextProp } from "../utils/interfaces";
 import Konva from "konva";
@@ -9,6 +9,7 @@ interface TextElementProp {
     text: TextProp;
     draggable: boolean;
     selectionRef: React.MutableRefObject<string[]>;
+    // isEditing: boolean;
     stageRef: React.MutableRefObject<Konva.Stage | null>;
     transformFlag: boolean;
     setTransformFlag: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,12 +18,14 @@ interface TextElementProp {
     handleDragStart: (e: Konva.KonvaEventObject<DragEvent>) => void;
     handleDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => void;
     updateResetGroup: () => void;
+    // setClicks: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const TextElement = ({
     text,
     draggable,
     selectionRef,
+    // isEditing,
     stageRef,
     transformFlag,
     setTransformFlag,
@@ -31,10 +34,12 @@ const TextElement = ({
     handleDragStart,
     handleDragEnd,
     updateResetGroup,
-}: TextElementProp) => {
+}: // setClicks,
+TextElementProp) => {
     const isSelected = selectionRef.current.includes(text.id);
     // When the element is dragged selected but not selected yet (to show transformer when dragging and globalflag is disabled)
     const [dragSelected, setDragSelected] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
 
     // If transformFlag is disabled from App, no transformer will be shown unless the specific element is drag selected
     // Otherwise, show if it is selected or drag selected
@@ -43,7 +48,7 @@ const TextElement = ({
     const textRef = useRef<Konva.Text | null>(null);
     const transformerRef = useRef<Konva.Transformer | null>(null);
 
-    function enterEditTextMode() {
+    const enterEditTextMode = useCallback(() => {
         if (
             textRef.current !== null &&
             stageRef.current !== null &&
@@ -82,7 +87,7 @@ const TextElement = ({
             textarea.style.width = textNode.width() * scale + "px";
             textarea.style.height = textNode.height() * scale + "px";
             textarea.style.fontSize = textNode.fontSize() * scale + "px";
-            textarea.style.border = "none";
+            textarea.style.border = "1px solid " + transformerNode.borderStroke();
             textarea.style.padding = textNode.padding() * scale + "px";
             textarea.style.margin = "0";
             textarea.style.overflow = "hidden";
@@ -139,14 +144,8 @@ const TextElement = ({
             };
 
             textarea.addEventListener("keydown", (e) => {
-                // hide on enter
-                // but don't hide on shift + enter
-                if (e.key === "Enter" && !e.shiftKey) {
+                if (e.key === "Escape") {
                     textNode.text(textarea.value);
-                    textarea.blur();
-                }
-                // on esc do not set value back to node
-                else if (e.key === "Escape") {
                     textarea.blur();
                 }
 
@@ -156,8 +155,12 @@ const TextElement = ({
             });
 
             const handleBlur = (e: FocusEvent) => {
-                handleChange({ text: textarea.value });
                 textNode.setAttrs({
+                    width: textarea.scrollWidth / scale,
+                    height: textarea.scrollHeight / scale,
+                });
+                handleChange({
+                    text: textarea.value,
                     width: textarea.scrollWidth / scale,
                     height: textarea.scrollHeight / scale,
                 });
@@ -171,12 +174,13 @@ const TextElement = ({
             textarea.addEventListener("blur", handleBlur);
             window.addEventListener("wheel", handleWheel);
         }
-    }
+    }, [handleChange, stageRef, text.scale]);
 
-    function handleDblClick(e: Konva.KonvaEventObject<MouseEvent>) {
-        console.log("dblclick");
-        enterEditTextMode();
-    }
+    // function handleDblClick(e: Konva.KonvaEventObject<MouseEvent>) {
+    //     e.evt.stopPropagation();
+    //     console.log("dblclick");
+    //     enterEditTextMode();
+    // }
 
     function handleTransform(e: Konva.KonvaEventObject<Event>) {
         // reset scale, so only width is changing by transformer
@@ -226,6 +230,18 @@ const TextElement = ({
         }
     }
 
+    const handleKeyPress = useCallback(
+        (e: KeyboardEvent) => {
+            if (e.key === "Enter") {
+                if (isSelected) {
+                    enterEditTextMode();
+                    setIsEditing(true);
+                }
+            }
+        },
+        [isSelected, enterEditTextMode, setIsEditing]
+    );
+
     useEffect(() => {
         // Show transformer when the text is selected or dragged
         if (showTransform) {
@@ -237,6 +253,25 @@ const TextElement = ({
             }
         }
     }, [showTransform]);
+
+    // Selected ID key press listeners
+    useEffect(() => {
+        if (isEditing) {
+            window.removeEventListener("keyup", handleKeyPress);
+        } else {
+            window.addEventListener("keyup", handleKeyPress);
+        }
+
+        return () => {
+            window.removeEventListener("keyup", handleKeyPress);
+        };
+    }, [handleKeyPress, isEditing]);
+
+    // useEffect(() => {
+    //     if (isEditing) {
+    //         enterEditTextMode();
+    //     }
+    // }, [isEditing]);
 
     return (
         <Fragment>
@@ -256,8 +291,10 @@ const TextElement = ({
                 fontStyle={text.fontStyle}
                 fill={text.fill}
                 draggable={draggable}
-                onClick={handleSelect}
-                onDblClick={handleDblClick}
+                onClick={(e) => {
+                    // setClicks((clicks) => [...clicks, text.id]);
+                    handleSelect();
+                }}
                 onMouseDown={() => {
                     updateResetGroup();
                 }}
@@ -281,8 +318,6 @@ const TextElement = ({
             {showTransform && (
                 <Transformer
                     ref={transformerRef}
-                    rotateEnabled={false}
-                    borderEnabled={false}
                     boundBoxFunc={(oldBox, newBox) => {
                         // limit resize
                         if (newBox.width < 5 || newBox.height < 5) {
