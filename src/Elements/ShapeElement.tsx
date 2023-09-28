@@ -9,7 +9,7 @@ interface ShapeElementProp {
     transformFlag: boolean;
     setTransformFlag: React.Dispatch<React.SetStateAction<boolean>>;
     handleChange: (attributes: any) => void;
-    handleSelect: (id: string) => void;
+    handleSelect: () => void;
     handleDragStart: (e: Konva.KonvaEventObject<DragEvent>) => void;
     handleDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => void;
     selectionRef: React.MutableRefObject<string[]>;
@@ -68,9 +68,7 @@ const ShapeElement = ({
                 sides={3} // For Triangle
                 ref={shapeRef as any}
                 draggable={draggable}
-                onClick={() => {
-                    handleSelect(shape.id);
-                }}
+                onClick={handleSelect}
                 onMouseDown={() => {
                     updateResetGroup();
                 }}

@@ -239,7 +239,7 @@ export default function App() {
                             ...elements.slice(i + 1),
                         ]);
                     }}
-                    handleSelect={handleSelect}
+                    handleSelect={() => handleSelect(image.id)}
                     handleDragStart={handleDragStart(elements, setElements)}
                     handleDragEnd={handleDragEnd(elements, setElements)}
                     transformFlag={transformFlag}
@@ -262,7 +262,7 @@ export default function App() {
                             ...elements.slice(i + 1),
                         ]);
                     }}
-                    handleSelect={handleSelect}
+                    handleSelect={() => handleSelect(shape.id)}
                     handleDragStart={handleDragStart(elements, setElements)}
                     handleDragEnd={handleDragEnd(elements, setElements)}
                     transformFlag={transformFlag}
@@ -287,7 +287,7 @@ export default function App() {
                             ...elements.slice(i + 1),
                         ]);
                     }}
-                    handleSelect={handleSelect}
+                    handleSelect={() => handleSelect(text.id)}
                     handleDragStart={handleDragStart(elements, setElements)}
                     handleDragEnd={handleDragEnd(elements, setElements)}
                     transformFlag={transformFlag}

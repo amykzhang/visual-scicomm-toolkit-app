@@ -13,7 +13,7 @@ interface TextElementProp {
     transformFlag: boolean;
     setTransformFlag: React.Dispatch<React.SetStateAction<boolean>>;
     handleChange: (attributes: any) => void;
-    handleSelect: (id: string) => void;
+    handleSelect: () => void;
     handleDragStart: (e: Konva.KonvaEventObject<DragEvent>) => void;
     handleDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => void;
     updateResetGroup: () => void;
@@ -174,6 +174,7 @@ const TextElement = ({
     }
 
     function handleDblClick(e: Konva.KonvaEventObject<MouseEvent>) {
+        console.log("dblclick");
         enterEditTextMode();
     }
 
@@ -255,9 +256,8 @@ const TextElement = ({
                 fontStyle={text.fontStyle}
                 fill={text.fill}
                 draggable={draggable}
-                onClick={() => {
-                    handleSelect(text.id);
-                }}
+                onClick={handleSelect}
+                onDblClick={handleDblClick}
                 onMouseDown={() => {
                     updateResetGroup();
                 }}
@@ -277,7 +277,6 @@ const TextElement = ({
                 onContextMenu={(e) => {
                     e.evt.preventDefault();
                 }}
-                onDblClick={handleDblClick}
             />
             {showTransform && (
                 <Transformer
