@@ -211,14 +211,19 @@ export default function App() {
     }, [commentViewState, stageRef, setSelectedComment]);
 
     // Given an elementProp, return a ReactElement representing the type of element
-    function elementToReactElement(element: ElementProp, i: number): React.ReactElement {
+    function elementToReactElement(
+        element: ElementProp,
+        i: number,
+        group: boolean
+    ): React.ReactElement {
+        const draggable = view === APP_VIEW.select && !group;
         if (element.type === "image") {
             const image = element as ImageProp;
             return (
                 <ImageElement
                     key={i}
                     image={image}
-                    draggable={view === APP_VIEW.select}
+                    draggable={draggable}
                     isSelected={selectionRef.current.includes(image.id)}
                     handleChange={(attributes: any) => {
                         modifyElement(i, {
@@ -241,7 +246,7 @@ export default function App() {
                 <Rect
                     key={i}
                     {...shape}
-                    draggable={view === APP_VIEW.select}
+                    draggable={draggable}
                     onDragStart={handleDragStart(elements, setElements)}
                     onDragEnd={handleDragEnd(elements, setElements)}
                 />
@@ -393,7 +398,7 @@ export default function App() {
                 <Layer id="elements-layer">
                     {elements
                         .filter((element) => !selectionRef.current.includes(element.id))
-                        .map(elementToReactElement)}
+                        .map((element, i) => elementToReactElement(element, i, false))}
                     <Group
                         draggable
                         ref={groupRef}
@@ -403,7 +408,9 @@ export default function App() {
                     >
                         {selectionRef.current.map((id) => {
                             const idx = elements.findIndex((element) => element.id === id);
-                            return idx !== -1 ? elementToReactElement(elements[idx], idx) : null;
+                            return idx !== -1
+                                ? elementToReactElement(elements[idx], idx, true)
+                                : null;
                         })}
                     </Group>
                 </Layer>
