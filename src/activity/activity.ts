@@ -36,8 +36,7 @@ export type Activity = {
         shapes: {
             heading: string;
             shapes: string[];
-            icons: string[];
-            srcs: string[];
+            fill: boolean[];
             sizes: {
                 width: number;
                 height: number;
@@ -181,30 +180,8 @@ const activity_visual_strategies: Activity = {
         },
         shapes: {
             heading: "Shapes",
-            shapes: [
-                "rectangle_filled",
-                "circle_filled",
-                "triangle_filled",
-                "rectangle_outline",
-                "circle_outline",
-                "triangle_outline",
-            ],
-            icons: [
-                "rectangle_filled",
-                "circle_filled",
-                "triangle_filled",
-                "rectangle_outline",
-                "circle_outline",
-                "triangle_outline",
-            ],
-            srcs: [
-                "/activity/assets/rectangle_filled.png",
-                "/activity/assets/circle_filled.png",
-                "/activity/assets/triangle_filled.png",
-                "/activity/assets/rectangle_outline.png",
-                "/activity/assets/circle_outline.png",
-                "/activity/assets/triangle_outline.png",
-            ],
+            shapes: ["rectangle", "circle", "triangle", "rectangle", "circle", "triangle"],
+            fill: [true, true, true, false, false, false],
             sizes: [
                 { width: 20, height: 20 },
                 { width: 20, height: 20 },

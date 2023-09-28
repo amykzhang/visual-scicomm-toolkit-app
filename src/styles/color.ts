@@ -8,6 +8,7 @@ const darkerYellow = "#FFE142";
 const grey = "#D6D6D6";
 const lightGrey = "#ECECEC";
 const darkGrey = "#D9D9D9";
+const shapeGrey = "#7E8184";
 
 const color = {
     black,
@@ -20,6 +21,7 @@ const color = {
     grey,
     lightGrey,
     darkGrey,
+    shapeGrey,
     canvasBackground: lightGrey,
     commentBackground: darkGrey,
 };

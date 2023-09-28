@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Stage, Layer, Group, Rect } from "react-konva";
+import { Stage, Layer, Group } from "react-konva";
 import { PanelsContainer } from "./styles/containers";
 import {
     ExportManager,
@@ -30,9 +30,8 @@ import {
     UiStateProp,
 } from "./utils/interfaces";
 import { persistance } from "./functions";
-import { ImageElement } from "./Elements";
+import { ImageElement, CommentElement, ShapeElement } from "./Elements";
 import { ExportPanel } from "./Panels";
-import CommentElement from "./Elements/CommentElement";
 import Konva from "konva";
 import { SelectionRect } from "./components/SelectionRect";
 
@@ -101,13 +100,6 @@ export default function App() {
             return [];
         }
     });
-
-    // Splices the indexed element with the new image
-    const modifyElement = (idx: number, newImage: ImageProp) => {
-        const newElements = elements.slice();
-        newElements[idx] = newImage;
-        setElements(newElements);
-    };
 
     // Stage View
     const { stageRef, handleWheel, zoomLevel, zoomIn, zoomOut, zoomFit, toggleFullscreen } =
@@ -224,12 +216,12 @@ export default function App() {
                     key={i}
                     image={image}
                     draggable={draggable}
-                    isSelected={selectionRef.current.includes(image.id)}
                     handleChange={(attributes: any) => {
-                        modifyElement(i, {
-                            ...image,
-                            ...attributes,
-                        });
+                        setElements([
+                            ...elements.slice(0, i),
+                            { ...image, ...attributes },
+                            ...elements.slice(i + 1),
+                        ]);
                     }}
                     handleSelect={handleSelect}
                     handleDragStart={handleDragStart(elements, setElements)}
@@ -243,12 +235,24 @@ export default function App() {
         } else if (element.type === "shape") {
             const shape = element as ShapeProp;
             return (
-                <Rect
+                <ShapeElement
                     key={i}
-                    {...shape}
+                    shape={shape}
                     draggable={draggable}
-                    onDragStart={handleDragStart(elements, setElements)}
-                    onDragEnd={handleDragEnd(elements, setElements)}
+                    handleChange={(attributes: any) => {
+                        setElements([
+                            ...elements.slice(0, i),
+                            { ...shape, ...attributes },
+                            ...elements.slice(i + 1),
+                        ]);
+                    }}
+                    handleSelect={handleSelect}
+                    handleDragStart={handleDragStart(elements, setElements)}
+                    handleDragEnd={handleDragEnd(elements, setElements)}
+                    transformFlag={transformFlag}
+                    setTransformFlag={setTransformFlag}
+                    selectionRef={selectionRef}
+                    updateResetGroup={updateResetGroup}
                 />
             );
         } else return <></>;

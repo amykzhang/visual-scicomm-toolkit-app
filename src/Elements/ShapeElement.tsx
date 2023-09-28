@@ -1,10 +1,10 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import Konva from "konva";
-import { Image, Transformer } from "react-konva";
-import { ImageProp } from "../utils/interfaces";
+import { Rect, Circle, RegularPolygon, Transformer, KonvaNodeComponent } from "react-konva";
+import { ShapeProp } from "../utils/interfaces";
 
-interface ImageElementProp {
-    image: ImageProp;
+interface ShapeElementProp {
+    shape: ShapeProp;
     draggable: boolean;
     transformFlag: boolean;
     setTransformFlag: React.Dispatch<React.SetStateAction<boolean>>;
@@ -16,8 +16,8 @@ interface ImageElementProp {
     updateResetGroup: () => void;
 }
 
-const ImageElement = ({
-    image,
+const ShapeElement = ({
+    shape,
     draggable,
     transformFlag,
     setTransformFlag,
@@ -27,8 +27,8 @@ const ImageElement = ({
     handleDragEnd,
     selectionRef,
     updateResetGroup,
-}: ImageElementProp) => {
-    const isSelected = selectionRef.current.includes(image.id);
+}: ShapeElementProp) => {
+    const isSelected = selectionRef.current.includes(shape.id);
     // When the element is dragged selected but not selected yet (to show transformer when dragging and globalflag is disabled)
     const [dragSelected, setDragSelected] = useState(false);
 
@@ -36,21 +36,25 @@ const ImageElement = ({
     // Otherwise, show if it is selected or drag selected
     const showTransform = (transformFlag || dragSelected) && (isSelected || dragSelected);
 
-    const imageRef = useRef<Konva.Image | null>(null);
+    const shapeRef = useRef<Konva.Rect | Konva.Circle | Konva.RegularPolygon | null>(null);
     const transformerRef = useRef<Konva.Transformer | null>(null);
 
-    const imageElement = new window.Image();
-    imageElement.width = image.width;
-    imageElement.height = image.height;
-    imageElement.src = image.src;
+    // Assign Konva Shape based on shape type
+    const konvaShapeMap: Record<string, typeof Rect | typeof Circle | typeof RegularPolygon> = {
+        rectangle: Rect,
+        circle: Circle,
+        triangle: RegularPolygon,
+    };
+
+    const Shape = konvaShapeMap[shape.shape];
 
     useEffect(() => {
-        // Show transformer when the image is selected or dragged
+        // Show transformer when the shape is selected or dragged
         if (showTransform) {
             // we need to attach transformer manually
-            if (transformerRef.current !== null && imageRef.current !== null) {
+            if (transformerRef.current !== null && shapeRef.current !== null) {
                 const transformer = transformerRef.current;
-                transformer.nodes([imageRef.current]);
+                transformer.nodes([shapeRef.current]);
                 transformer.getLayer()?.batchDraw();
             }
         }
@@ -58,13 +62,14 @@ const ImageElement = ({
 
     return (
         <Fragment>
-            <Image
-                {...image}
-                image={imageElement}
-                ref={imageRef}
+            <Shape
+                {...shape}
+                radius={shape.width / 2} // For Circle
+                sides={3} // For Triangle
+                ref={shapeRef as any}
                 draggable={draggable}
                 onClick={() => {
-                    handleSelect(image.id);
+                    handleSelect(shape.id);
                 }}
                 onMouseDown={() => {
                     updateResetGroup();
@@ -76,7 +81,7 @@ const ImageElement = ({
                 }}
                 onDragEnd={(e) => {
                     handleDragEnd(e);
-                    selectionRef.current = [image.id];
+                    selectionRef.current = [shape.id];
                     setTransformFlag(true);
                     setDragSelected(false);
                 }}
@@ -85,8 +90,8 @@ const ImageElement = ({
                     // and NOT its width or height
                     // but in the store we have only width and height
                     // to match the data better we will reset scale on transform end
-                    if (imageRef.current !== null) {
-                        const node = imageRef.current;
+                    if (shapeRef.current !== null) {
+                        const node = shapeRef.current;
                         const scaleX = node.scaleX();
                         const scaleY = node.scaleY();
                         const rotation = node.rotation();
@@ -96,7 +101,7 @@ const ImageElement = ({
                         node.scaleY(1);
 
                         handleChange({
-                            ...image,
+                            ...shape,
                             x: node.x(),
                             y: node.y(),
                             // set minimal value
@@ -108,7 +113,7 @@ const ImageElement = ({
                 }}
                 onContextMenu={(e) => {
                     e.evt.preventDefault();
-                    console.log("onContextMenu\n", image.id);
+                    console.log("onContextMenu\n", shape.id);
                 }}
             />
             {showTransform && (
@@ -128,4 +133,4 @@ const ImageElement = ({
     );
 };
 
-export default ImageElement;
+export default ShapeElement;

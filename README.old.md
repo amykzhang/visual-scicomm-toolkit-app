@@ -93,7 +93,6 @@ SEPTEMBER 14:
     -   persistance size ✅
 
 SEPTEMBER 21:
-(Amy::svgs of the things)
 
 -   Shapes Elements 🚧
 -   text box (https://konvajs.org/docs/sandbox/Editable_Text.html) 🚧
@@ -102,6 +101,7 @@ SEPTEMBER 21:
 -   freehand draw (https://konvajs.org/docs/sandbox/Free_Drawing.html)
 
 SEPTEMBER 28: (Provide link for testing)
+(Amy::svgs of the things)
 
 -   Undo/redo stack (https://konvajs.org/docs/react/Undo-Redo.html)
 -   fix shortcuts for commands

@@ -8,7 +8,7 @@ import { ReactComponent as PenAndRuler } from "../assets/penandruler.svg";
 import { ReactComponent as Doodle } from "../assets/doodle.svg";
 import { ImageTool } from "../components/ImageTool";
 import { TextTool } from "../components/TextTool";
-import { RectangleTool } from "../components/RectangleTool";
+import { ShapeTool } from "../components/ShapeTool";
 import typography from "../styles/typography";
 import {
     SideBar,
@@ -140,15 +140,16 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     };
 
     const ShapeSection = () => {
-        const { heading, srcs } = activity_shapes;
+        const { heading, shapes, fill } = activity_shapes;
         return (
             <>
                 <ImageSubheadingText>{heading}</ImageSubheadingText>
                 <ElementsRow>
-                    {srcs.map((src, i) => (
-                        <RectangleTool
+                    {shapes.map((shape_icon, i) => (
+                        <ShapeTool
                             key={i}
-                            src={src}
+                            shape={shape_icon}
+                            fill={fill[i]}
                             elements={elements}
                             setElements={setElements}
                             stageRef={stageRef}
