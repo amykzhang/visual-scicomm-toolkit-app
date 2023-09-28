@@ -139,7 +139,7 @@ TextElementProp) => {
                     textarea.remove();
                     textNode.show();
                     transformerNode.show();
-                    transformerNode.forceUpdate();
+                    // transformerNode.forceUpdate();
                 }
             };
 

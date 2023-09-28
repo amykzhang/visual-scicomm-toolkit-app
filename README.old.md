@@ -95,7 +95,7 @@ SEPTEMBER 14:
 SEPTEMBER 21:
 
 -   Shapes Elements ✅
--   text box (https://konvajs.org/docs/sandbox/Editable_Text.html) 🚧
+-   text box (https://konvajs.org/docs/sandbox/Editable_Text.html) 🐛
 -   freehand draw (https://konvajs.org/docs/sandbox/Free_Drawing.html)
 
 SEPTEMBER 28: (Provide link for testing)

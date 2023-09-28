@@ -135,7 +135,7 @@ const CommentElement = ({
                     textNode.show();
                     rectNode.show();
                     tr.show();
-                    tr.forceUpdate();
+                    // tr.forceUpdate();
                 }
             };
 
