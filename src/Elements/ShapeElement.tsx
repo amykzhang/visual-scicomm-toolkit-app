@@ -64,6 +64,7 @@ const ShapeElement = ({
         <Fragment>
             <Shape
                 {...shape}
+                strokeScaleEnabled={false}
                 radius={shape.width / 2} // For Circle
                 sides={3} // For Triangle
                 ref={shapeRef as any}
