@@ -44,6 +44,8 @@ export interface ShapeProp extends BaseProp {
     stroke: string;
     strokeWidth: number;
     shape: string;
+    scaleX: number;
+    scaleY: number;
 }
 
 export interface CommentProp {

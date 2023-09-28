@@ -96,17 +96,15 @@ const ShapeElement = ({
                         const scaleY = node.scaleY();
                         const rotation = node.rotation();
 
-                        // we will reset it back
-                        node.scaleX(1);
-                        node.scaleY(1);
-
                         handleChange({
                             ...shape,
                             x: node.x(),
                             y: node.y(),
                             // set minimal value
-                            width: Math.max(5, node.width() * scaleX),
-                            height: Math.max(5, node.height() * scaleY),
+                            width: Math.max(5, node.width()),
+                            height: Math.max(5, node.height()),
+                            scaleX: scaleX,
+                            scaleY: scaleY,
                             rotation: rotation,
                         });
                     }

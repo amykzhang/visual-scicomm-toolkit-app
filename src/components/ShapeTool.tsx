@@ -7,7 +7,7 @@ import color from "../styles/color";
 
 const StyledBase = styled.div`
     cursor: move; /* fallback if grab cursor is unsupported */
-    // cursor: grab;
+    cursor: grab;
     cursor: -moz-grab;
     cursor: -webkit-grab;
 
@@ -109,6 +109,8 @@ export const ShapeTool: FC<ShapeToolProps> = ({ shape, fill, elements, setElemen
                 y: y,
                 width: 50,
                 height: 50,
+                scaleX: 1,
+                scaleY: 1,
                 rotation: 0,
                 fill: fill ? color.shapeGrey : "transparent",
                 stroke: fill ? "transparent" : color.shapeGrey,
