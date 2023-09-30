@@ -176,11 +176,15 @@ TextElementProp) => {
         }
     }, [handleChange, stageRef, text.scale]);
 
-    // function handleDblClick(e: Konva.KonvaEventObject<MouseEvent>) {
-    //     e.evt.stopPropagation();
-    //     console.log("dblclick");
-    //     enterEditTextMode();
-    // }
+    // Behaviour: If the element is selected, next click enters edit text mode
+    function handleClick(e: Konva.KonvaEventObject<MouseEvent>) {
+        if (isSelected) {
+            enterEditTextMode();
+            setIsEditing(true);
+        } else {
+            handleSelect();
+        }
+    }
 
     function handleTransform(e: Konva.KonvaEventObject<Event>) {
         // reset scale, so only width is changing by transformer
@@ -291,10 +295,7 @@ TextElementProp) => {
                 fontStyle={text.fontStyle}
                 fill={text.fill}
                 draggable={draggable}
-                onClick={(e) => {
-                    // setClicks((clicks) => [...clicks, text.id]);
-                    handleSelect();
-                }}
+                onClick={handleClick}
                 onMouseDown={() => {
                     updateResetGroup();
                 }}
