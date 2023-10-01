@@ -104,6 +104,7 @@ SEPTEMBER 28: (Provide link for testing)
 -   Undo/redo stack (https://konvajs.org/docs/react/Undo-Redo.html)
 -   fix shortcuts for commands
 -   contextmenu for copy paste change color etc.
+    -   simple implementation
 
 OCTOBER 5:
 
@@ -126,3 +127,25 @@ context menu 1:
 context menu 2:
 
 -   text
+
+28 notes:
+
+-   Comment:
+    -   Enter for newLine
+    -   Fix small gaps when editing
+-   Text:
+
+    -   Enter for newLine
+    -   Fix small gaps when editing
+
+-   ContextMenu:
+
+    -   edit (text)
+    -   copy
+    -   paste
+    -   bring to front
+    -   send to back
+    -   delete
+    -   change color (shape)
+
+    ![ContextMenu](image.png)

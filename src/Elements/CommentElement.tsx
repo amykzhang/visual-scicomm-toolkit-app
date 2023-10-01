@@ -11,7 +11,7 @@ interface CommentElementProp {
     comments: CommentProp[];
     setComments: React.Dispatch<React.SetStateAction<CommentProp[]>>;
     draggable: boolean;
-    selected: boolean;
+    isSelected: boolean;
     stageRef: React.MutableRefObject<Konva.Stage | null>;
     handleSelect: () => void;
 }
@@ -21,7 +21,7 @@ const CommentElement = ({
     comments,
     setComments,
     draggable,
-    selected,
+    isSelected,
     stageRef,
     handleSelect,
 }: CommentElementProp) => {
@@ -126,38 +126,17 @@ const CommentElement = ({
             };
 
             const removeTextarea = () => {
-                if (textarea.parentNode !== null) {
-                    textarea.removeEventListener("click", handleBlur);
-                    window.removeEventListener("wheel", handleWheel);
+                textarea.removeEventListener("click", handleBlur);
+                window.removeEventListener("wheel", handleWheel);
+                textarea.remove();
 
-                    textarea.remove();
-
-                    textNode.show();
-                    rectNode.show();
-                    tr.show();
-                    // tr.forceUpdate();
-                }
+                textNode.show();
+                rectNode.show();
+                tr.show();
             };
 
-            textarea.addEventListener("keydown", (e) => {
-                // hide on enter
-                // but don't hide on shift + enter
-                if (e.key === "Enter" && !e.shiftKey) {
-                    textNode.text(textarea.value);
-                    textarea.blur();
-                }
-                // on esc do not set value back to node
-                else if (e.key === "Escape") {
-                    textarea.blur();
-                }
-
-                const scale = textNode.getAbsoluteScale().x;
-                setTextareaWidth(textNode.width() * scale);
-                textarea.style.height = textarea.scrollHeight + "px";
-            });
-
             const handleBlur = (e: FocusEvent) => {
-                updateText(textarea.value);
+                e.stopPropagation();
                 textNode.setAttrs({
                     width: textarea.scrollWidth / scale,
                     height: textarea.scrollHeight / scale,
@@ -166,6 +145,8 @@ const CommentElement = ({
                     width: textarea.scrollWidth / scale,
                     height: textarea.scrollHeight / scale,
                 });
+
+                updateText(textarea.value);
                 removeTextarea();
             };
 
@@ -173,32 +154,48 @@ const CommentElement = ({
                 textarea.blur();
             };
 
+            textarea.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") {
+                    textNode.text(textarea.value);
+                    textarea.blur();
+                }
+                setTextareaWidth(textNode.width() * scale);
+                textarea.style.height = textarea.scrollHeight + "px";
+            });
+
             textarea.addEventListener("blur", handleBlur);
             window.addEventListener("wheel", handleWheel);
         }
     }
 
     function updateText(newText: string) {
-        const text = newText === "" ? "empty comment" : newText;
-        const newComments = comments.map((comment_i) => {
-            if (comment.id === comment_i.id) {
-                return {
-                    ...comment_i,
-                    text: text,
-                };
-            } else {
-                return comment_i;
-            }
-        });
-        setComments(newComments);
+        if (textRef.current !== null) {
+            const text = textRef.current;
+            const newComments = comments.map((comment_i) => {
+                if (comment.id === comment_i.id) {
+                    return {
+                        ...comment_i,
+                        text: newText,
+                        width: text.width(),
+                        height: text.height(),
+                        scale: text.scaleX(),
+                    };
+                } else {
+                    return comment_i;
+                }
+            });
+            setComments(newComments);
+        }
     }
 
-    function handleDblClick(e: Konva.KonvaEventObject<MouseEvent>) {
-        e.evt.stopPropagation();
-        console.log("dblclick");
-        enterEditTextMode();
+    // Behaviour: If the element is isSelected, next click enters edit text mode
+    function handleClick(e: Konva.KonvaEventObject<MouseEvent>) {
+        if (isSelected) {
+            enterEditTextMode();
+        } else {
+            handleSelect();
+        }
     }
-
     function handleTransform(e: Konva.KonvaEventObject<Event>) {
         // reset scale, so only width is changing by transformer
         if (
@@ -297,7 +294,7 @@ const CommentElement = ({
     useEffect(() => {
         // we need to attach transformer manually
         if (
-            selected &&
+            isSelected &&
             transformerRef.current !== null &&
             textRef.current !== null &&
             rectRef.current !== null
@@ -306,13 +303,13 @@ const CommentElement = ({
             transformer.nodes([textRef.current]);
             transformer.getLayer()?.batchDraw();
         }
-    }, [selected]);
+    }, [isSelected]);
 
     return (
         <Fragment>
             <Group
                 ref={groupRef}
-                draggable
+                draggable={draggable}
                 onDragEnd={handleDragEnd}
                 onMouseEnter={() => {
                     document.body.style.cursor = "default";
@@ -345,7 +342,6 @@ const CommentElement = ({
                     x={comment.x}
                     y={comment.y}
                     fontSize={20}
-                    draggable={draggable}
                     width={comment.width}
                     height={comment.height}
                     scaleX={comment.scale}
@@ -353,12 +349,10 @@ const CommentElement = ({
                     padding={padding}
                     onTransform={handleTransform}
                     onTransformEnd={handleTransformEnd}
-                    onClick={handleSelect}
-                    onDblClick={handleDblClick}
-                    on
+                    onClick={handleClick}
                 />
             </Group>
-            {selected && (
+            {isSelected && (
                 <Transformer
                     ref={transformerRef}
                     rotateEnabled={false}

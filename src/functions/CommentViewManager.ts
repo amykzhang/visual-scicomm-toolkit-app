@@ -8,6 +8,13 @@ import { v4 as uuid } from "uuid";
 const defaultBackgroundColor = color.canvasBackground;
 const commentBackgroundColor = color.commentBackground;
 
+const initialCommentProps = {
+    width: 200,
+    height: 55,
+    scale: 1,
+    text: "",
+};
+
 export const CommentViewManager = (
     setView: (view: APP_VIEW) => void,
     comments: CommentProp[],
@@ -21,7 +28,7 @@ export const CommentViewManager = (
     const [selectedComment, setSelectedComment] = useState<string | null>(null);
 
     function enterCommentView() {
-        setView(APP_VIEW.comment);
+        setView(APP_VIEW.select);
         setCommentViewState(() => {
             return {
                 active: true,
@@ -56,11 +63,8 @@ export const CommentViewManager = (
             {
                 id: id,
                 x: x,
-                y: y,
-                width: 200,
-                height: 55,
-                scale: 1,
-                text: "",
+                y: y - initialCommentProps.height,
+                ...initialCommentProps,
             },
         ]);
     }
@@ -71,8 +75,7 @@ export const CommentViewManager = (
         stageRef: React.RefObject<Konva.Stage>
     ) => {
         return (e: Konva.KonvaEventObject<MouseEvent>) => {
-            // if clicked anywhere other than a comment
-            if (stageRef.current !== null && e.target.getAttrs().type !== "comment") {
+            if (stageRef.current !== null) {
                 const stage = stageRef.current;
                 const x = (e.evt.clientX - stage.x()) / stage.scaleX();
                 const y = (e.evt.clientY - stage.y()) / stage.scaleX();

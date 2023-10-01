@@ -44,7 +44,7 @@ export default function App() {
     const exportAreaRef = useRef<Konva.Rect>(null);
     const selectionRectRef = useRef<Konva.Rect>(null);
 
-    const { shiftKey, ctrlKey, altKey, metaKey } = KeyPressManager();
+    const { shiftKey, ctrlKey, metaKey } = KeyPressManager();
 
     // App State (stage position, zoom, view, panels)
     const [uiState, setUiState] = useState<UiStateProp>(() => {
@@ -72,6 +72,11 @@ export default function App() {
         [uiState]
     );
 
+    // Dragging Behaviour depending on View
+    const stageConstants = {
+        draggable: view === APP_VIEW.pan,
+    };
+
     // Elements
     const [elements, setElements] = useState<ElementProp[]>(() => {
         const saved = persistance.retrieveCanvasState();
@@ -80,6 +85,29 @@ export default function App() {
             return saved.elements;
         } else return [];
     });
+
+    // // History
+    // const [currentElements, setCurrentElements] = useState<ElementProp[]>(elements);
+    // let history: ElementProp[][] = [];
+    // let historyStep = 0;
+
+    // const handleUndo = () => {
+    //     if (historyStep === 0) {
+    //         return;
+    //     }
+    //     historyStep -= 1;
+    //     const previous = history[historyStep];
+    //     setCurrentElements(previous);
+    // };
+
+    // const handleRedo = () => {
+    //     if (historyStep === history.length - 1) {
+    //         return;
+    //     }
+    //     historyStep += 1;
+    //     const next = history[historyStep];
+    //     setCurrentElements(next);
+    // };
 
     // Group Selection
     const selectionRef = useRef<string[]>([]);
@@ -142,81 +170,92 @@ export default function App() {
     // Key Presses
     const handleKeyPress = useCallback(
         (e: KeyboardEvent) => {
-            if (e.key === "Escape") {
-                selectionRef.current = [];
-                setView(APP_VIEW.select);
-            }
-            if (e.key === "Delete" || e.key === "Backspace") {
-                if (commentViewState.active) {
+            console.log({ key: e.key, ctrlKey, metaKey, shiftKey });
+            // COMMENT VIEW
+            if (commentViewState.active) {
+                console.log("comment view");
+                if (e.key === "Escape") {
+                    setView(APP_VIEW.select);
+                    exitCommentView();
+                } else if (e.key === "Delete" || e.key === "Backspace") {
                     if (selectedComment !== null) {
                         setComments(comments.filter((comment) => comment.id !== selectedComment));
                         setSelectedComment(null);
                     }
+                }
+                // SELECT VIEW
+            } else if (view === APP_VIEW.select) {
+                console.log("select view");
+                if (metaKey) {
+                    console.log("meta key");
+                    if (e.key === "a") {
+                        selectionRef.current = elements.map((element) => element.id);
+                        return;
+                    }
                 } else {
-                    if (selectionRef.current.length > 0) {
-                        deleteSelected();
+                    if (e.key === "Delete" || e.key === "Backspace") {
+                        if (selectionRef.current.length > 0) {
+                            deleteSelected();
+                        }
+                    } else if (e.key === "Escape") {
+                        selectionRef.current = [];
+                    } else if (e.key === "t") {
+                        setView(APP_VIEW.text);
                     }
                 }
+                // PAN VIEW
+            } else if (view === APP_VIEW.pan) {
+                console.log("pan view");
+                if (e.key === "Escape") {
+                    setView(APP_VIEW.select);
+                } else if (e.key === "t") {
+                    setView(APP_VIEW.text);
+                } else if (e.key === "v") {
+                    setView(APP_VIEW.select);
+                }
+            } else if (view === APP_VIEW.text) {
+                if (e.key === "Escape") {
+                    setView(APP_VIEW.select);
+                } else if (e.key === "t") {
+                    setView(APP_VIEW.select);
+                } else if (e.key === "v") {
+                    setView(APP_VIEW.select);
+                }
             }
-            if (e.key === "a" && ctrlKey) {
-                e.preventDefault();
-                selectionRef.current = elements.map((element) => element.id);
-            }
-            if (e.key === "=") {
-                console.log("debug");
-            }
+
+            // if (metaKey) {
+            //     if (e.key === "z") {
+            //         e.preventDefault();
+            //         if (!shiftKey) {
+            //             handleUndo();
+            //         } else {
+            //             handleRedo();
+            //         }
+            //     }
+            // }
+            // if (e.key === "=") {
+
+            //     console.log("debug");
+            // }
         },
         [
-            ctrlKey,
-            elements,
-            deleteSelected,
-            selectionRef,
             commentViewState.active,
-            selectedComment,
             comments,
+            ctrlKey,
+            deleteSelected,
+            elements,
+            exitCommentView,
+            metaKey,
+            selectedComment,
             setSelectedComment,
             setView,
+            shiftKey,
+            view,
         ]
     );
 
     // Export
     const startExportProcess = ExportManager(activity, stageRef, setTransformFlag);
-
-    // Dragging Behaviour depending on View
-    const stageConstants = {
-        draggable: view === APP_VIEW.pan,
-    };
-
-    // Side effect for canvas state
-    useEffect(() => {
-        persistance.persistCanvasState(elements, comments);
-    }, [elements, comments]);
-
-    // Side effect for UI state
-    useEffect(() => {
-        persistance.persistUiState(uiState);
-    }, [uiState]);
-
-    // Selected ID key press listeners
-    useEffect(() => {
-        window.addEventListener("keyup", handleKeyPress);
-
-        return () => {
-            window.removeEventListener("keyup", handleKeyPress);
-        };
-    }, [shiftKey, ctrlKey, altKey, metaKey, handleKeyPress]);
-
-    // For Comment View
-    useEffect(() => {
-        if (stageRef.current !== null) {
-            const stage = stageRef.current;
-            const container = stage.getContent();
-            container.style.backgroundColor = commentViewState.backgroundColor;
-
-            // update comment selection
-            setSelectedComment(null);
-        }
-    }, [commentViewState, stageRef, setSelectedComment]);
 
     // Given an elementProp, return a ReactElement representing the type of element
     function elementToReactElement(
@@ -306,6 +345,36 @@ export default function App() {
             handleTextClick(e);
         }
     }
+
+    // Side effect for canvas state
+    useEffect(() => {
+        persistance.persistCanvasState(elements, comments);
+    }, [elements, comments]);
+
+    // Side effect for UI state
+    useEffect(() => {
+        persistance.persistUiState(uiState);
+    }, [uiState]);
+
+    useEffect(() => {
+        document.addEventListener("keydown", handleKeyPress);
+
+        return () => {
+            document.removeEventListener("keydown", handleKeyPress);
+        };
+    }, [handleKeyPress]);
+
+    // For Comment View
+    useEffect(() => {
+        if (stageRef.current !== null) {
+            const stage = stageRef.current;
+            const container = stage.getContent();
+            container.style.backgroundColor = commentViewState.backgroundColor;
+
+            // update comment selection
+            setSelectedComment(null);
+        }
+    }, [commentViewState, stageRef, setSelectedComment]);
 
     return (
         <div>
@@ -471,7 +540,7 @@ export default function App() {
                                 <CommentElement
                                     draggable={view === APP_VIEW.select}
                                     key={i}
-                                    selected={selectedComment === comment.id}
+                                    isSelected={selectedComment === comment.id}
                                     comment={comment}
                                     comments={comments}
                                     setComments={setComments}

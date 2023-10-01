@@ -12,16 +12,12 @@ interface CommentToolProp {
 }
 
 export const CommentTool: React.FC<CommentToolProp> = ({
-    view,
-    setView,
     exitCommentView,
     enterCommentView,
     commentViewState,
 }) => {
-    const isCommentView = view === APP_VIEW.comment;
-
     function handleToggle() {
-        if (isCommentView) {
+        if (commentViewState.active) {
             exitCommentView();
         } else {
             enterCommentView();
