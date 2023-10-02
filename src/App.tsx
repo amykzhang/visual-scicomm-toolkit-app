@@ -170,73 +170,74 @@ export default function App() {
     // Key Presses
     const handleKeyPress = useCallback(
         (e: KeyboardEvent) => {
-            console.log({ key: e.key, ctrlKey, metaKey, shiftKey });
             // COMMENT VIEW
             if (commentViewState.active) {
-                console.log("comment view");
-                if (e.key === "Escape") {
-                    setView(APP_VIEW.select);
-                    exitCommentView();
-                } else if (e.key === "Delete" || e.key === "Backspace") {
-                    if (selectedComment !== null) {
-                        setComments(comments.filter((comment) => comment.id !== selectedComment));
-                        setSelectedComment(null);
-                    }
+                switch (e.key) {
+                    case "Escape":
+                        setView(APP_VIEW.select);
+                        exitCommentView();
+                        break;
+                    case "Delete":
+                    case "Backspace":
+                        if (selectedComment !== null) {
+                            setComments(
+                                comments.filter((comment) => comment.id !== selectedComment)
+                            );
+                            setSelectedComment(null);
+                        }
+                        break;
+                    default:
+                        break;
                 }
                 // SELECT VIEW
             } else if (view === APP_VIEW.select) {
-                console.log("select view");
-                if (metaKey) {
-                    console.log("meta key");
-                    if (e.key === "a") {
-                        selectionRef.current = elements.map((element) => element.id);
-                        return;
-                    }
-                } else {
-                    if (e.key === "Delete" || e.key === "Backspace") {
-                        if (selectionRef.current.length > 0) {
+                switch (e.key) {
+                    case "a":
+                        if (metaKey) {
+                            selectionRef.current = elements.map((element) => element.id);
+                        }
+                        break;
+                    case "Delete":
+                    case "Backspace":
+                        if (!metaKey && selectionRef.current.length > 0) {
                             deleteSelected();
                         }
-                    } else if (e.key === "Escape") {
-                        selectionRef.current = [];
-                    } else if (e.key === "t") {
-                        setView(APP_VIEW.text);
-                    }
+                        break;
+                    case "Escape":
+                        if (!metaKey) {
+                            selectionRef.current = [];
+                        }
+                        break;
+                    case "t":
+                        if (!metaKey) {
+                            setView(APP_VIEW.text);
+                        }
+                        break;
+                    default:
+                        break;
                 }
                 // PAN VIEW
             } else if (view === APP_VIEW.pan) {
-                console.log("pan view");
-                if (e.key === "Escape") {
-                    setView(APP_VIEW.select);
-                } else if (e.key === "t") {
-                    setView(APP_VIEW.text);
-                } else if (e.key === "v") {
-                    setView(APP_VIEW.select);
+                switch (e.key) {
+                    case "Escape":
+                        setView(APP_VIEW.select);
+                        break;
+                    case "t":
+                        setView(APP_VIEW.text);
+                        break;
                 }
             } else if (view === APP_VIEW.text) {
-                if (e.key === "Escape") {
-                    setView(APP_VIEW.select);
-                } else if (e.key === "t") {
-                    setView(APP_VIEW.select);
-                } else if (e.key === "v") {
-                    setView(APP_VIEW.select);
+                switch (e.key) {
+                    case "Escape":
+                        setView(APP_VIEW.select);
+                        break;
+                    case "v":
+                        setView(APP_VIEW.select);
+                        break;
+                    default:
+                        break;
                 }
             }
-
-            // if (metaKey) {
-            //     if (e.key === "z") {
-            //         e.preventDefault();
-            //         if (!shiftKey) {
-            //             handleUndo();
-            //         } else {
-            //             handleRedo();
-            //         }
-            //     }
-            // }
-            // if (e.key === "=") {
-
-            //     console.log("debug");
-            // }
         },
         [
             commentViewState.active,
