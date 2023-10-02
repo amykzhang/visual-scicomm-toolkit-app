@@ -20,34 +20,27 @@ export const CommentViewManager = (
     stageRef: React.RefObject<Konva.Stage>
 ) => {
     const [commentViewState, setCommentViewState] = useState<CommentStateProp>({
-        active: false,
         backgroundColor: color.canvasBackground,
     });
     const [selectedComment, setSelectedComment] = useState<string | null>(null);
 
-    function enterCommentView() {
-        setView(APP_VIEW.select);
-        setCommentViewState(() => {
-            return {
-                active: true,
-                backgroundColor: color.commentViewBackground,
-            };
-        });
+    // function enterCommentView() {
+    //     setCommentViewState({
+    //         active: true,
+    //         backgroundColor: color.commentViewBackground,
+    //     });
 
-        document.body.style.cursor = "crosshair";
-    }
+    //     document.body.style.cursor = "crosshair";
+    // }
 
-    function exitCommentView() {
-        setView(APP_VIEW.select);
-        setCommentViewState(() => {
-            return {
-                active: false,
-                backgroundColor: color.canvasBackground,
-            };
-        });
+    // function exitCommentView() {
+    //     setCommentViewState({
+    //         active: false,
+    //         backgroundColor: color.canvasBackground,
+    //     });
 
-        document.body.style.cursor = "default";
-    }
+    //     document.body.style.cursor = "default";
+    // }
 
     function addComment(
         x: number,
@@ -254,8 +247,6 @@ export const CommentViewManager = (
         setCommentViewState,
         selectedComment,
         setSelectedComment,
-        enterCommentView,
-        exitCommentView,
         handleCommentViewClickOff,
         editComment,
     };

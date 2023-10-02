@@ -36,6 +36,7 @@ import { ImageElement, CommentElement, ShapeElement, TextElement } from "./Eleme
 import { ExportPanel } from "./Panels";
 import Konva from "konva";
 import { SelectionRect } from "./components/SelectionRect";
+import color from "./styles/color";
 
 const activity = activity_visual_strategies;
 
@@ -152,10 +153,9 @@ export default function App() {
     // Comment View
     const {
         commentViewState,
+        setCommentViewState,
         selectedComment,
         setSelectedComment,
-        enterCommentView,
-        exitCommentView,
         handleCommentViewClickOff,
         editComment,
     } = CommentViewManager(setView, comments, setComments, stageRef);
@@ -172,12 +172,8 @@ export default function App() {
     const handleKeyPress = useCallback(
         (e: KeyboardEvent) => {
             // COMMENT VIEW
-            if (commentViewState.active) {
+            if (view === APP_VIEW.comment) {
                 switch (e.key) {
-                    case "Escape":
-                        setView(APP_VIEW.select);
-                        exitCommentView();
-                        break;
                     case "Delete":
                     case "Backspace":
                         if (selectedComment !== null) {
@@ -241,11 +237,9 @@ export default function App() {
             }
         },
         [
-            commentViewState.active,
             comments,
             deleteSelected,
             elements,
-            exitCommentView,
             metaKey,
             selectedComment,
             setSelectedComment,
@@ -346,12 +340,12 @@ export default function App() {
         }
     }
 
-    // Side effect for canvas state
+    // Save canvas state
     useEffect(() => {
         persistance.persistCanvasState(elements, comments);
     }, [elements, comments]);
 
-    // Side effect for UI state
+    // Save UI state
     useEffect(() => {
         persistance.persistUiState(uiState);
     }, [uiState]);
@@ -376,22 +370,28 @@ export default function App() {
         }
     }, [commentViewState, stageRef, setSelectedComment]);
 
+    // side effect comment view state properties
+    useEffect(() => {
+        if (view === APP_VIEW.comment) {
+            setCommentViewState({
+                backgroundColor: color.commentViewBackground,
+            });
+            document.body.style.cursor = "crosshair";
+        } else {
+            setCommentViewState({
+                backgroundColor: color.canvasBackground,
+            });
+            document.body.style.cursor = "default";
+        }
+    }, [setView, view, setCommentViewState]);
+
     return (
         <div>
             <PanelsContainer>
                 <TopZone>
                     <TitlePanel name={activity.name} />
-                    <ToolbarPanel
-                        view={view}
-                        setView={setView}
-                        exitCommentView={exitCommentView}
-                        enterCommentView={enterCommentView}
-                        commentViewState={commentViewState}
-                    />
-                    <ExitCommentView
-                        commentViewState={commentViewState}
-                        exitCommentView={exitCommentView}
-                    />
+                    <ToolbarPanel view={view} setView={setView} />
+                    <ExitCommentView view={view} setView={setView} />
                     <ExportPanel activity={activity} startExportProcess={startExportProcess} />
                 </TopZone>
                 <ActivityPanel
@@ -435,7 +435,7 @@ export default function App() {
                 onWheel={handleWheel}
                 onClick={(e) => {
                     // handle unfocus/click on stage
-                    if (commentViewState.active) {
+                    if (view === APP_VIEW.comment) {
                         handleCommentViewClickOff(e);
                     } else {
                         // handle all different view modes
@@ -534,11 +534,11 @@ export default function App() {
                     </Group>
                 </Layer>
                 <Layer id="comment-layer">
-                    {commentViewState.active &&
+                    {view === APP_VIEW.comment &&
                         comments.map((comment, i) => {
                             return (
                                 <CommentElement
-                                    draggable={view === APP_VIEW.select}
+                                    draggable
                                     key={i}
                                     isSelected={selectedComment === comment.id}
                                     comment={comment}
@@ -557,18 +557,15 @@ export default function App() {
 }
 
 interface ExitCommentStateProps {
-    commentViewState: { active: boolean };
-    exitCommentView: () => void;
+    view: APP_VIEW;
+    setView: (view: APP_VIEW) => void;
 }
 
-const ExitCommentView: React.FC<ExitCommentStateProps> = ({
-    commentViewState,
-    exitCommentView,
-}) => {
-    const displayStyle = commentViewState.active ? {} : { display: "none" };
+const ExitCommentView: React.FC<ExitCommentStateProps> = ({ view, setView }) => {
+    const displayStyle = view === APP_VIEW.comment ? {} : { display: "none" };
 
     return (
-        <ExitCommentViewButton style={displayStyle} onClick={exitCommentView}>
+        <ExitCommentViewButton style={displayStyle} onClick={() => setView(APP_VIEW.select)}>
             <typography.LargeText>Exit Comment Mode</typography.LargeText>
         </ExitCommentViewButton>
     );

@@ -1,7 +1,6 @@
 import { APP_VIEW } from "./enums";
 
 export interface CommentStateProp {
-    active: boolean;
     backgroundColor: string;
 }
 

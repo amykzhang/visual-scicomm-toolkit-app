@@ -16,18 +16,9 @@ const ToolbarPanelContainer = styled(CenterBar)`
 interface ToolbarPanelProps {
     view: APP_VIEW;
     setView: (view: APP_VIEW) => void;
-    exitCommentView: () => void;
-    enterCommentView: () => void;
-    commentViewState: { active: boolean };
 }
 
-export const ToolbarPanel: React.FC<ToolbarPanelProps> = ({
-    view,
-    setView,
-    exitCommentView,
-    enterCommentView,
-    commentViewState,
-}) => {
+export const ToolbarPanel: React.FC<ToolbarPanelProps> = ({ view, setView }) => {
     return (
         <ToolbarPanelContainer>
             <SquareButton
@@ -42,13 +33,7 @@ export const ToolbarPanel: React.FC<ToolbarPanelProps> = ({
             >
                 <PanIcon />
             </SquareButton>
-            <CommentTool
-                view={view}
-                setView={setView}
-                exitCommentView={exitCommentView}
-                enterCommentView={enterCommentView}
-                commentViewState={commentViewState}
-            ></CommentTool>
+            <CommentTool view={view} setView={setView}></CommentTool>
             <Divider />
             <SquareButton
             // onClick={() => app.undo()}

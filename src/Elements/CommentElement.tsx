@@ -3,6 +3,7 @@ import { Group, Rect, Text, Transformer } from "react-konva";
 import { CommentProp } from "../utils/interfaces";
 import Konva from "konva";
 import constants from "../styles/constants";
+import color from "../styles/color";
 
 // Constants
 const resizeAnchors = ["top-left", "top-right", "bottom-right", "bottom-left"];
@@ -186,7 +187,7 @@ const CommentElement = ({
                     scaleY={comment.scale}
                     fill={constants.comment.background}
                     shadowEnabled={true}
-                    shadowColor="black"
+                    shadowColor={color.black}
                     shadowBlur={5}
                     shadowOffsetX={2}
                     shadowOffsetY={2}

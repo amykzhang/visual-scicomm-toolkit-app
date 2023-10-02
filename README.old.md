@@ -95,18 +95,21 @@ SEPTEMBER 14:
 SEPTEMBER 21:
 
 -   Shapes Elements ✅
--   text box (https://konvajs.org/docs/sandbox/Editable_Text.html) 🐛
--   freehand draw (https://konvajs.org/docs/sandbox/Free_Drawing.html)
 
 SEPTEMBER 28: (Provide link for testing)
 (Amy::svgs of the things)
 
+OCTOBER 5:
+
+-   Comment edit mode adjustments
+-   text box (https://konvajs.org/docs/sandbox/Editable_Text.html) 🐛
+-   freehand draw (https://konvajs.org/docs/sandbox/Free_Drawing.html)
+
 -   Undo/redo stack (https://konvajs.org/docs/react/Undo-Redo.html)
 -   fix shortcuts for commands
 -   contextmenu for copy paste change color etc.
-    -   simple implementation
 
-OCTOBER 5:
+    -   simple implementation
 
 -   Landing Page (AMY will do)
 -   Add support for chrome, safari, firefox, edge
