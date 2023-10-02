@@ -23,7 +23,7 @@ const color = {
     darkGrey,
     shapeGrey,
     canvasBackground: lightGrey,
-    commentBackground: darkGrey,
+    commentViewBackground: darkGrey,
 };
 
 export default color;

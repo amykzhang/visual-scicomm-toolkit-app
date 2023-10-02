@@ -44,7 +44,7 @@ export default function App() {
     const exportAreaRef = useRef<Konva.Rect>(null);
     const selectionRectRef = useRef<Konva.Rect>(null);
 
-    const { shiftKey, ctrlKey, metaKey } = KeyPressManager();
+    const { shiftKey, metaKey } = KeyPressManager();
 
     // App State (stage position, zoom, view, panels)
     const [uiState, setUiState] = useState<UiStateProp>(() => {
@@ -157,6 +157,7 @@ export default function App() {
         enterCommentView,
         exitCommentView,
         handleCommentViewClickOff,
+        editComment,
     } = CommentViewManager(setView, comments, setComments, stageRef);
 
     const { toggleTextMode, handleTextClick } = TextModeManager(
@@ -242,7 +243,6 @@ export default function App() {
         [
             commentViewState.active,
             comments,
-            ctrlKey,
             deleteSelected,
             elements,
             exitCommentView,
@@ -250,7 +250,6 @@ export default function App() {
             selectedComment,
             setSelectedComment,
             setView,
-            shiftKey,
             view,
         ]
     );
@@ -547,6 +546,7 @@ export default function App() {
                                     setComments={setComments}
                                     stageRef={stageRef}
                                     handleSelect={() => setSelectedComment(comment.id)}
+                                    editComment={editComment}
                                 />
                             );
                         })}
