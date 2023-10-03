@@ -24,24 +24,6 @@ export const CommentViewManager = (
     });
     const [selectedComment, setSelectedComment] = useState<string | null>(null);
 
-    // function enterCommentView() {
-    //     setCommentViewState({
-    //         active: true,
-    //         backgroundColor: color.commentViewBackground,
-    //     });
-
-    //     document.body.style.cursor = "crosshair";
-    // }
-
-    // function exitCommentView() {
-    //     setCommentViewState({
-    //         active: false,
-    //         backgroundColor: color.canvasBackground,
-    //     });
-
-    //     document.body.style.cursor = "default";
-    // }
-
     function addComment(
         x: number,
         y: number,
@@ -134,8 +116,9 @@ export const CommentViewManager = (
             textarea.style.height = textNode.height() * scale + "px";
             textarea.style.fontSize = textNode.fontSize() * scale + "px";
             textarea.style.border = "none";
-            textarea.style.padding = textNode.padding() * scale + "px";
-            textarea.style.margin = "0";
+            textarea.style.padding = `${(textNode.padding() - 1.3) * scale}px ${
+                textNode.padding() * scale
+            }px ${textNode.padding() * scale}px ${textNode.padding() * scale}px`;
             textarea.style.overflow = "hidden";
             textarea.style.background = constants.comment.background;
             textarea.style.borderRadius = `${cornerRadius * scale}px ${cornerRadius * scale}px ${
