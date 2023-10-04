@@ -161,7 +161,7 @@ export default function App() {
         editComment,
     } = CommentViewManager(setView, comments, setComments, stageRef);
 
-    const { toggleTextMode, handleTextClick, editText, justCreated } = TextViewManager(
+    const { toggleTextMode, handleTextClick, editText, isEditing, justCreated } = TextViewManager(
         view,
         setView,
         elements,
@@ -173,79 +173,82 @@ export default function App() {
     // Key Presses
     const handleKeyPress = useCallback(
         (e: KeyboardEvent) => {
-            // Then account for specific views
-            // COMMENT VIEW
-            if (view === APP_VIEW.select) {
-                switch (e.key) {
-                    case "a":
-                        if (metaKey) {
-                            selectionRef.current = elements.map((element) => element.id);
-                        }
-                        break;
-                    case "Delete":
-                    case "Backspace":
-                        if (!metaKey && selectionRef.current.length > 0) {
-                            deleteSelected();
-                        }
-                        break;
-                    case "Escape":
-                        if (!metaKey) {
+            if (selectionRef.current !== null) {
+                // Then account for specific views
+                // COMMENT VIEW
+                if (view === APP_VIEW.select) {
+                    switch (e.key) {
+                        case "a":
+                            if (metaKey) {
+                                if (!isEditing) {
+                                    selectionRef.current = elements.map((element) => element.id);
+                                }
+                            }
+                            break;
+                        case "Delete":
+                        case "Backspace":
+                            if (!metaKey && selectionRef.current.length > 0) {
+                                deleteSelected();
+                            }
+                            break;
+                        case "Escape":
                             selectionRef.current = [];
-                        }
-                        break;
-                    case "t":
-                        if (!metaKey) {
-                            setView(APP_VIEW.text);
-                        }
-                        break;
-                    default:
-                        break;
+                            break;
+                        case "t":
+                            if (!metaKey) {
+                                setView(APP_VIEW.text);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 // PAN VIEW
-            } else if (view === APP_VIEW.pan) {
-                switch (e.key) {
-                    case "Escape":
-                        setView(APP_VIEW.select);
-                        break;
-                    case "t":
-                        setView(APP_VIEW.text);
-                        break;
-                    case "v":
-                        setView(APP_VIEW.select);
-                        break;
-                    default:
-                        break;
+                else if (view === APP_VIEW.pan) {
+                    switch (e.key) {
+                        case "Escape":
+                            setView(APP_VIEW.select);
+                            break;
+                        case "t":
+                            setView(APP_VIEW.text);
+                            break;
+                        case "v":
+                            setView(APP_VIEW.select);
+                            break;
+                        default:
+                            break;
+                    }
+                    // TEXT VIEW
+                } else if (view === APP_VIEW.text) {
+                    switch (e.key) {
+                        case "Escape":
+                            setView(APP_VIEW.select);
+                            break;
+                        case "v":
+                            setView(APP_VIEW.select);
+                            break;
+                        default:
+                            break;
+                    }
+                } else if (view === APP_VIEW.comment) {
+                    switch (e.key) {
+                        case "Delete":
+                        case "Backspace":
+                            if (selectedComment !== null) {
+                                setComments(
+                                    comments.filter((comment) => comment.id !== selectedComment)
+                                );
+                                setSelectedComment(null);
+                            }
+                            break;
+                        case "=":
+                            console.log(comments);
+                            break;
+                        default:
+                            break;
+                    }
+                    // SELECT VIEW
                 }
-                // TEXT VIEW
-            } else if (view === APP_VIEW.text) {
-                switch (e.key) {
-                    case "Escape":
-                        setView(APP_VIEW.select);
-                        break;
-                    case "v":
-                        setView(APP_VIEW.select);
-                        break;
-                    default:
-                        break;
-                }
-            } else if (view === APP_VIEW.comment) {
-                switch (e.key) {
-                    case "Delete":
-                    case "Backspace":
-                        if (selectedComment !== null) {
-                            setComments(
-                                comments.filter((comment) => comment.id !== selectedComment)
-                            );
-                            setSelectedComment(null);
-                        }
-                        break;
-                    case "=":
-                        console.log(comments);
-                        break;
-                    default:
-                        break;
-                }
-                // SELECT VIEW
             }
         },
         [

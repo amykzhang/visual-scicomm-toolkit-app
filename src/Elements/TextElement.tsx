@@ -114,7 +114,6 @@ const TextElement = ({
     // Enter edit mode when first added
     useEffect(() => {
         if (isJustCreated) {
-            console.log("side effect editText");
             editText(text, handleChange, textRef, transformerRef);
         }
         // eslint-disable-next-line
