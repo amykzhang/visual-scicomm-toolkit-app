@@ -6,7 +6,7 @@ import {
     KeyPressManager,
     SelectionManager,
     StageViewManager,
-    TextModeManager,
+    TextViewManager,
     handleDragEnd,
     handleDragStart,
 } from "./functions";
@@ -145,6 +145,7 @@ export default function App() {
         elements,
         setElements,
         view,
+        setView,
         shiftKey,
         selectionRef,
         groupRef
@@ -160,7 +161,7 @@ export default function App() {
         editComment,
     } = CommentViewManager(setView, comments, setComments, stageRef);
 
-    const { toggleTextMode, handleTextClick } = TextModeManager(
+    const { toggleTextMode, handleTextClick, editText } = TextViewManager(
         view,
         setView,
         elements,
@@ -324,12 +325,16 @@ export default function App() {
                             ...elements.slice(i + 1),
                         ]);
                     }}
-                    handleSelect={() => handleSelect(text.id)}
+                    handleSelect={() => {
+                        setView(APP_VIEW.select);
+                        handleSelect(text.id);
+                    }}
                     handleDragStart={handleDragStart(elements, setElements)}
                     handleDragEnd={handleDragEnd(elements, setElements)}
                     transformFlag={transformFlag}
                     setTransformFlag={setTransformFlag}
                     updateResetGroup={updateResetGroup}
+                    editText={editText}
                 />
             );
         } else return <></>;
@@ -337,15 +342,24 @@ export default function App() {
 
     // Handle click off stage for all views
     function handleCanvasClick(e: Konva.KonvaEventObject<MouseEvent>) {
-        if (view === APP_VIEW.select) {
-            selectionRef.current = [];
-        }
-        if (view === APP_VIEW.text) {
-            selectionRef.current = [];
-            handleTextClick(e);
-        }
-        if (view === APP_VIEW.comment) {
-            handleCommentViewClickOff(e);
+        switch (view) {
+            case APP_VIEW.select:
+                selectionRef.current = [];
+                break;
+            case APP_VIEW.pan:
+                // do something for pan view
+                break;
+            case APP_VIEW.comment:
+                handleCommentViewClickOff(e);
+                break;
+            case APP_VIEW.draw:
+                // do something for draw view
+                break;
+            case APP_VIEW.text:
+                handleTextClick(e);
+                break;
+            default:
+                break;
         }
     }
 
@@ -392,7 +406,7 @@ export default function App() {
             });
             document.body.style.cursor = "default";
         }
-    }, [setView, view, setCommentViewState]);
+    }, [view, setView, setCommentViewState]);
 
     return (
         <div>

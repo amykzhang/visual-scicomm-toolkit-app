@@ -7,6 +7,7 @@ export const SelectionManager = (
     elements: ElementProp[],
     setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>,
     view: APP_VIEW,
+    setView_: (view: APP_VIEW) => void,
     shiftKey: boolean,
     selectionRef: React.MutableRefObject<string[]>,
     groupRef: React.MutableRefObject<Konva.Group | null>
@@ -32,6 +33,10 @@ export const SelectionManager = (
                 }
             }
             updateResetGroup();
+        }
+        if (view === APP_VIEW.text) {
+            setView_(APP_VIEW.select);
+            selectionRef.current = [id];
         }
     };
 
