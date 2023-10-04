@@ -192,6 +192,7 @@ export const CommentViewManager = (
             // };
 
             const removeTextarea = () => {
+                textarea.removeEventListener("keypress", handleKeyPress);
                 textarea.removeEventListener("click", handleBlur);
                 textarea.removeEventListener("input", handleResize);
                 window.removeEventListener("wheel", handleWheel);
@@ -264,13 +265,14 @@ export const CommentViewManager = (
                 textarea.style.height = height + "px";
             };
 
-            textarea.addEventListener("keydown", (e) => {
+            const handleKeyPress = (e: KeyboardEvent) => {
                 if (e.key === "Escape") {
-                    textNode.text(textarea.value);
+                    e.preventDefault();
                     textarea.blur();
                 }
-            });
+            };
 
+            textarea.addEventListener("keypress", handleKeyPress);
             textarea.addEventListener("input", handleResize);
             textarea.addEventListener("blur", handleBlur);
             window.addEventListener("wheel", handleWheel);
