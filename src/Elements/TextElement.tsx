@@ -8,7 +8,6 @@ interface TextElementProp {
     text: TextProp;
     draggable: boolean;
     selectionRef: React.MutableRefObject<string[]>;
-    // isEditing: boolean;
     stageRef: React.MutableRefObject<Konva.Stage | null>;
     transformFlag: boolean;
     setTransformFlag: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,14 +16,12 @@ interface TextElementProp {
     handleDragStart: (e: Konva.KonvaEventObject<DragEvent>) => void;
     handleDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => void;
     updateResetGroup: () => void;
-    // setClicks: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const TextElement = ({
     text,
     draggable,
     selectionRef,
-    // isEditing,
     stageRef,
     transformFlag,
     setTransformFlag,
@@ -33,8 +30,7 @@ const TextElement = ({
     handleDragStart,
     handleDragEnd,
     updateResetGroup,
-}: // setClicks,
-TextElementProp) => {
+}: TextElementProp) => {
     const isSelected = selectionRef.current.includes(text.id);
     // When the element is dragged selected but not selected yet (to show transformer when dragging and globalflag is disabled)
     const [dragSelected, setDragSelected] = useState(false);
@@ -47,11 +43,13 @@ TextElementProp) => {
     const textRef = useRef<Konva.Text | null>(null);
     const transformerRef = useRef<Konva.Transformer | null>(null);
 
+    // Similar to CommentViewManager.editComment()
+    // Hides konva element, creates a textarea, and updates konva elements on blur
     const enterEditTextMode = useCallback(() => {
         if (
             textRef.current !== null &&
-            stageRef.current !== null &&
-            transformerRef.current !== null
+            transformerRef.current !== null &&
+            stageRef.current !== null
         ) {
             const textNode = textRef.current;
             const transformerNode = transformerRef.current;

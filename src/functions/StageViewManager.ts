@@ -4,14 +4,10 @@ import { persistance } from "./persistance";
 
 const zoomScale = 1.1;
 const zoomConstants = [
-    2, 3, 6, 13, 25, 50, 100, 200, 300, 400, 800, 1600, 3200, 6400, 12800,
-    25600,
+    2, 3, 6, 13, 25, 50, 100, 200, 300, 400, 800, 1600, 3200, 6400, 12800, 25600,
 ];
 
-export const StageViewManager = (canvas_size: {
-    width: number;
-    height: number;
-}) => {
+export const StageViewManager = (canvas_size: { width: number; height: number }) => {
     const [zoomLevel, setZoomLevel] = useState(() => {
         const saved = persistance.retrieveStageState();
         if (saved !== undefined) {
@@ -22,7 +18,7 @@ export const StageViewManager = (canvas_size: {
         }
     });
 
-    const stageRef = useRef<Konva.Stage | null>(null);
+    const stageRef = useRef<Konva.Stage>(null);
 
     function handleZoom(
         oldScale: number,
@@ -73,8 +69,7 @@ export const StageViewManager = (canvas_size: {
                 stage.batchDraw();
             } else {
                 const oldScale = stage.scaleX();
-                const newScale =
-                    dy < 0 ? oldScale * zoomScale : oldScale / zoomScale;
+                const newScale = dy < 0 ? oldScale * zoomScale : oldScale / zoomScale;
 
                 const pointer = stage.getPointerPosition();
                 if (pointer !== null) handleZoom(oldScale, newScale, pointer);
@@ -162,9 +157,7 @@ export const StageViewManager = (canvas_size: {
     function toggleFullscreen() {
         if (document.fullscreenElement) {
             document.exitFullscreen().catch((err) => {
-                alert(
-                    `Error attempting to enable fullscreen mode: ${err.message} (${err.name})`
-                );
+                alert(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
             });
         } else {
             document.body.requestFullscreen();

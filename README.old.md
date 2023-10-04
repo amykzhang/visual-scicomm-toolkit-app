@@ -96,26 +96,28 @@ SEPTEMBER 21:
 
 -   Shapes Elements ✅
 
-SEPTEMBER 28: (Provide link for testing)
-(Amy::svgs of the things)
+October 3:
 
-OCTOBER 5:
+-   Comment edit mode adjustments ✅
 
--   Comment edit mode adjustments
--   text box (https://konvajs.org/docs/sandbox/Editable_Text.html) 🐛
--   freehand draw (https://konvajs.org/docs/sandbox/Free_Drawing.html)
+October 4:
 
--   Undo/redo stack (https://konvajs.org/docs/react/Undo-Redo.html)
--   fix shortcuts for commands
--   contextmenu for copy paste change color etc.
+-   text box : transfer comment fixes to text (height adjustments, delete, edit...) (1h)
+-   freehand draw (https://konvajs.org/docs/sandbox/Free_Drawing.html) (2h)
+-   Undo/redo stack (https://konvajs.org/docs/react/Undo-Redo.html) (2h)
+-   contextmenu for copy paste change color etc. (3h)
 
-    -   simple implementation
+October 5:
 
--   Landing Page (AMY will do)
--   Add support for chrome, safari, firefox, edge
--   Production and staging servers
+-   Add shortcuts for commands (1h)
+-   Add support for chrome, safari, firefox, edge (2h)
+-   Landing Page (look into it) (1h)
+-   Production and staging servers (1h)
+
+October 6:: testing
 
 OCTOBER 8 :: APP DEADLINE
+
 OCTOBER 15 :: PAPER SUBMISSION DEADLINE
 
 buggies:
@@ -133,16 +135,7 @@ context menu 2:
 
 28 notes:
 
--   Comment:
-    -   Enter for newLine
-    -   Fix small gaps when editing
--   Text:
-
-    -   Enter for newLine
-    -   Fix small gaps when editing
-
 -   ContextMenu:
-
     -   edit (text)
     -   copy
     -   paste
@@ -150,5 +143,4 @@ context menu 2:
     -   send to back
     -   delete
     -   change color (shape)
-
-    ![ContextMenu](image.png)
+        ![ContextMenu](image.png)
