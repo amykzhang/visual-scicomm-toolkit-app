@@ -172,22 +172,7 @@ export default function App() {
     const handleKeyPress = useCallback(
         (e: KeyboardEvent) => {
             // COMMENT VIEW
-            if (view === APP_VIEW.comment) {
-                switch (e.key) {
-                    case "Delete":
-                    case "Backspace":
-                        if (selectedComment !== null) {
-                            setComments(
-                                comments.filter((comment) => comment.id !== selectedComment)
-                            );
-                            setSelectedComment(null);
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                // SELECT VIEW
-            } else if (view === APP_VIEW.select) {
+            if (view === APP_VIEW.select) {
                 switch (e.key) {
                     case "a":
                         if (metaKey) {
@@ -223,6 +208,7 @@ export default function App() {
                         setView(APP_VIEW.text);
                         break;
                 }
+                // TEXT VIEW
             } else if (view === APP_VIEW.text) {
                 switch (e.key) {
                     case "Escape":
@@ -234,6 +220,24 @@ export default function App() {
                     default:
                         break;
                 }
+            } else if (view === APP_VIEW.comment) {
+                switch (e.key) {
+                    case "Delete":
+                    case "Backspace":
+                        if (selectedComment !== null) {
+                            setComments(
+                                comments.filter((comment) => comment.id !== selectedComment)
+                            );
+                            setSelectedComment(null);
+                        }
+                        break;
+                    case "=":
+                        console.log(comments);
+                        break;
+                    default:
+                        break;
+                }
+                // SELECT VIEW
             }
         },
         [
