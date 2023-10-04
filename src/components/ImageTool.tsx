@@ -35,11 +35,6 @@ export const ImageTool: FC<ImageToolProps> = ({
     stageRef,
 }) => {
     function addImage(x: number, y: number, offset: { x: number; y: number }) {
-        // const imageElement = new Image();
-        // imageElement.width = dimensions.width;
-        // imageElement.height = dimensions.height;
-        // imageElement.src = src;
-
         setElements([
             ...elements,
             {
