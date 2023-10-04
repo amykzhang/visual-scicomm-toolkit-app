@@ -1,4 +1,4 @@
-import color from "./color";
+import color from "../styles/color";
 
 const constants = {
     comment: {
@@ -8,6 +8,7 @@ const constants = {
         cornerRadius: 20,
         padding: 20,
     },
+    resizeAnchors: ["top-left", "top-right", "bottom-right", "bottom-left"],
 };
 
 export default constants;

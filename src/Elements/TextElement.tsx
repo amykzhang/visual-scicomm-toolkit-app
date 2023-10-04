@@ -2,8 +2,7 @@ import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { Text, Transformer } from "react-konva";
 import { TextProp } from "../utils/interfaces";
 import Konva from "konva";
-
-const resizeAnchors = ["top-left", "top-right", "bottom-right", "bottom-left"];
+import constants from "../utils/constants";
 
 interface TextElementProp {
     text: TextProp;
@@ -193,7 +192,7 @@ TextElementProp) => {
             const transformerNode = transformerRef.current;
 
             const activeAnchor = transformerNode.getActiveAnchor();
-            if (!resizeAnchors.includes(activeAnchor)) {
+            if (!constants.resizeAnchors.includes(activeAnchor)) {
                 textNode.setAttrs({
                     width: (textNode.width() * textNode.scaleX()) / text.scale,
                     height: (textNode.height() * textNode.scaleY()) / text.scale,
@@ -210,7 +209,7 @@ TextElementProp) => {
             const transformerNode = transformerRef.current;
 
             const activeAnchor = transformerNode.getActiveAnchor();
-            const transformedComment = resizeAnchors.includes(activeAnchor)
+            const transformedComment = constants.resizeAnchors.includes(activeAnchor)
                 ? {
                       // corner drag = rescaling
                       ...text,

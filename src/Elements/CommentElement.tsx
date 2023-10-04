@@ -2,11 +2,8 @@ import React, { Fragment, useEffect } from "react";
 import { Group, Rect, Text, Transformer } from "react-konva";
 import { CommentProp } from "../utils/interfaces";
 import Konva from "konva";
-import constants from "../styles/constants";
+import constants from "../utils/constants";
 import color from "../styles/color";
-
-// Constants
-const resizeAnchors = ["top-left", "top-right", "bottom-right", "bottom-left"];
 
 interface CommentElementProp {
     comment: CommentProp;
@@ -60,7 +57,7 @@ const CommentElement = ({
             const transformer = transformerRef.current;
 
             const activeAnchor = transformer.getActiveAnchor();
-            if (resizeAnchors.includes(activeAnchor)) {
+            if (constants.resizeAnchors.includes(activeAnchor)) {
                 rect.setAttrs({
                     x: text.x(),
                     y: text.y(),
@@ -91,7 +88,7 @@ const CommentElement = ({
             const text = textRef.current;
             const transformer = transformerRef.current;
             const activeAnchor = transformer.getActiveAnchor();
-            const transformedComment = resizeAnchors.includes(activeAnchor)
+            const transformedComment = constants.resizeAnchors.includes(activeAnchor)
                 ? {
                       // corner = rescaling
                       ...comment,
@@ -162,6 +159,7 @@ const CommentElement = ({
         if (isSelected) {
             editComment(textRef, rectRef, transformerRef, comment);
         }
+        // eslint-disable-next-line
     }, []);
 
     return (
