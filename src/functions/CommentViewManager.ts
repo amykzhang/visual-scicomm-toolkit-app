@@ -4,7 +4,7 @@ import { APP_VIEW } from "../utils/enums";
 import color from "../styles/color";
 import Konva from "konva";
 import { v4 as uuid } from "uuid";
-import constants from "../styles/constants";
+import constants from "../utils/constants";
 
 const initialCommentProps = {
     width: constants.comment.totalWidth,
@@ -23,6 +23,7 @@ export const CommentViewManager = (
         backgroundColor: color.canvasBackground,
     });
     const [selectedComment, setSelectedComment] = useState<string | null>(null);
+    const [isEditing, setIsEditing] = useState<boolean>(false);
 
     function addComment(
         x: number,
@@ -67,26 +68,36 @@ export const CommentViewManager = (
         };
     };
 
-    // when not clicking on a comment, deselect selected comment or if nothing is selected add new comment
+    // handle stage click in comment mode
+    // 1) check for click on any are not a 'comment'
+    // 2) if isEditing is true, just blurred off a textarea, do nothing
+    // 3) if isEditing is false, add a comment
     function handleCommentViewClickOff(e: Konva.KonvaEventObject<MouseEvent>) {
         if (e.target.getAttrs().type !== "comment") {
-            if (selectedComment !== null) setSelectedComment(null);
-            else handleAddComment(comments, setComments, stageRef)(e);
+            if (isEditing) {
+                setIsEditing(false);
+                setSelectedComment(null);
+            } else {
+                setIsEditing(false);
+                handleAddComment(comments, setComments, stageRef)(e);
+            }
         }
     }
 
-    function editComment(
+    const editComment = (
         textRef: React.RefObject<Konva.Text | null>,
         rectRef: React.RefObject<Konva.Rect | null>,
         transformerRef: React.RefObject<Konva.Transformer | null>,
         comment: CommentProp
-    ) {
+    ) => {
         if (
             textRef.current !== null &&
             stageRef.current !== null &&
             rectRef.current !== null &&
             transformerRef.current !== null
         ) {
+            setIsEditing(true);
+
             const textNode = textRef.current;
             const rectNode = rectRef.current;
             const tr = transformerRef.current;
@@ -156,7 +167,7 @@ export const CommentViewManager = (
                 px += 2 + Math.round(textNode.fontSize() / 20);
             }
 
-            const transform = "translateY(-" + px + "px)";
+            const transform = `translateY(-${px}px)`;
             textarea.style.transform = transform;
 
             // reset height
@@ -182,6 +193,7 @@ export const CommentViewManager = (
 
             const removeTextarea = () => {
                 textarea.removeEventListener("click", handleBlur);
+                textarea.removeEventListener("input", handleResize);
                 window.removeEventListener("wheel", handleWheel);
                 textarea.remove();
 
@@ -194,6 +206,12 @@ export const CommentViewManager = (
                 e.stopPropagation();
                 const newText = textarea.value;
 
+                if (newText === "") {
+                    removeComment(comment.id, comments, setComments);
+                    removeTextarea();
+                    return;
+                }
+
                 handleResize();
 
                 textNode.setAttrs({
@@ -204,7 +222,6 @@ export const CommentViewManager = (
                     width: width / scale,
                     height: height / scale,
                 });
-                removeTextarea();
 
                 if (textRef.current !== null) {
                     const text = textRef.current;
@@ -223,6 +240,7 @@ export const CommentViewManager = (
                     });
                     setComments(newComments);
                 }
+                removeTextarea();
             };
 
             const handleWheel = (e: WheelEvent) => {
@@ -251,14 +269,13 @@ export const CommentViewManager = (
                     textNode.text(textarea.value);
                     textarea.blur();
                 }
-                // setTextareaWidth(textarea.scrollWidth);
             });
 
             textarea.addEventListener("input", handleResize);
             textarea.addEventListener("blur", handleBlur);
             window.addEventListener("wheel", handleWheel);
         }
-    }
+    };
 
     return {
         commentViewState,
