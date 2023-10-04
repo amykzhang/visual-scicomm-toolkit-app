@@ -73,6 +73,8 @@ const TextElement = ({
             document.body.appendChild(textarea);
 
             const scale = stage.scaleX() * text.scale;
+            let width: number = 0;
+            let height: number = 0;
 
             // apply many styles to match text on canvas as close as possible
             // remember that text rendering on canvas and on the textarea can be different
@@ -81,12 +83,12 @@ const TextElement = ({
             textarea.style.position = "absolute";
             textarea.style.top = areaPosition.y + "px";
             textarea.style.left = areaPosition.x + "px";
-            textarea.style.width = textNode.width() * scale + "px";
-            textarea.style.height = textNode.height() * scale + "px";
+            textarea.style.width = width + "px";
+            textarea.style.height = height + "px";
             textarea.style.fontSize = textNode.fontSize() * scale + "px";
             textarea.style.border = "1px solid " + transformerNode.borderStroke();
-            textarea.style.padding = textNode.padding() * scale + "px";
-            textarea.style.margin = "0";
+            textarea.style.padding = "0";
+            textarea.style.margin = "-10px -1px";
             textarea.style.overflow = "hidden";
             textarea.style.outline = "none";
             textarea.style.resize = "none";
@@ -95,8 +97,8 @@ const TextElement = ({
             textarea.style.transformOrigin = "left top";
             textarea.style.textAlign = textNode.align();
             textarea.style.color = textNode.fill();
-            textarea.style.zIndex = "600";
-            let transform = "";
+            textarea.style.zIndex = "100";
+            textarea.wrap = "off";
 
             let px = 0;
             // also we need to slightly move textarea on firefox
@@ -106,60 +108,59 @@ const TextElement = ({
                 px += 2 + Math.round(textNode.fontSize() / 20);
             }
 
-            transform += "translateY(-" + px + "px)";
+            const transform = "translateY(-" + px + "px)";
             textarea.style.transform = transform;
 
-            // reset height
-            // after browsers resized it we can set actual value
-            textarea.style.height = textarea.scrollHeight + 3 + "px";
+            width = textarea.scrollWidth + 1 * scale;
+            height = textarea.scrollHeight;
+            textarea.style.width = width + "px";
+            textarea.style.height = height + "px";
+
             textarea.focus();
 
-            const setTextareaWidth = (newWidth: number) => {
-                // some extra fixes on different browsers
-                var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-                var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
-                if (isSafari || isFirefox) {
-                    newWidth = Math.ceil(newWidth);
-                }
-                var isEdge = /Edge/.test(navigator.userAgent);
-                if (isEdge) {
-                    newWidth += 1;
-                }
-                textarea.style.width = newWidth + "px";
-            };
+            // const setTextareaWidth = (newWidth: number) => {
+            //     // some extra fixes on different browsers
+            //     var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            //     var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
+            //     if (isSafari || isFirefox) {
+            //         newWidth = Math.ceil(newWidth);
+            //     }
+            //     var isEdge = /Edge/.test(navigator.userAgent);
+            //     if (isEdge) {
+            //         newWidth += 1;
+            //     }
+            //     textarea.style.width = newWidth + "px";
 
             const removeTextarea = () => {
-                if (textarea.parentNode !== null) {
-                    textarea.removeEventListener("click", handleBlur);
-                    window.removeEventListener("wheel", handleWheel);
+                textarea.removeEventListener("keypress", handleKeyPress);
+                textarea.removeEventListener("click", handleBlur);
+                textarea.removeEventListener("input", handleResize);
+                window.removeEventListener("wheel", handleWheel);
+                textarea.remove();
 
-                    textarea.remove();
-                    textNode.show();
-                    transformerNode.show();
-                    // transformerNode.forceUpdate();
-                }
+                textNode.show();
+                transformerNode.show();
             };
 
-            textarea.addEventListener("keydown", (e) => {
-                if (e.key === "Escape") {
-                    textNode.text(textarea.value);
-                    textarea.blur();
+            const handleBlur = (e: FocusEvent) => {
+                e.stopPropagation();
+                const newText = textarea.value;
+
+                if (newText === "") {
+                    // removeComment(comment.id, comments, setComments);
+                    removeTextarea();
+                    return;
                 }
 
-                const scale = textNode.getAbsoluteScale().x;
-                setTextareaWidth(textNode.width() * scale);
-                textarea.style.height = textarea.scrollHeight + "px";
-            });
-
-            const handleBlur = (e: FocusEvent) => {
                 textNode.setAttrs({
-                    width: textarea.scrollWidth / scale,
-                    height: textarea.scrollHeight / scale,
+                    width: width / scale,
+                    height: height / scale,
                 });
                 handleChange({
-                    text: textarea.value,
-                    width: textarea.scrollWidth / scale,
-                    height: textarea.scrollHeight / scale,
+                    text: newText,
+                    width: textNode.width(),
+                    height: textNode.height(),
+                    scale: textNode.scaleX(),
                 });
                 removeTextarea();
             };
@@ -168,6 +169,26 @@ const TextElement = ({
                 textarea.blur();
             };
 
+            const handleResize = () => {
+                textarea.style.width = "0";
+                textarea.style.height = "0";
+
+                width = textarea.scrollWidth + 1 * scale;
+                height = textarea.scrollHeight;
+
+                textarea.style.width = width + "px";
+                textarea.style.height = height + "px";
+            };
+
+            const handleKeyPress = (e: KeyboardEvent) => {
+                if (e.key === "Escape") {
+                    e.preventDefault();
+                    textarea.blur();
+                }
+            };
+
+            textarea.addEventListener("keypress", handleKeyPress);
+            textarea.addEventListener("input", handleResize);
             textarea.addEventListener("blur", handleBlur);
             window.addEventListener("wheel", handleWheel);
         }
@@ -207,7 +228,7 @@ const TextElement = ({
             const transformerNode = transformerRef.current;
 
             const activeAnchor = transformerNode.getActiveAnchor();
-            const transformedComment = constants.resizeAnchors.includes(activeAnchor)
+            const transformedText = constants.resizeAnchors.includes(activeAnchor)
                 ? {
                       // corner drag = rescaling
                       ...text,
@@ -227,7 +248,7 @@ const TextElement = ({
                       rotation: textNode.rotation(),
                   };
 
-            handleChange(transformedComment);
+            handleChange(transformedText);
         }
     }
 
@@ -293,9 +314,7 @@ const TextElement = ({
                 fill={text.fill}
                 draggable={draggable}
                 onClick={handleClick}
-                onMouseDown={() => {
-                    updateResetGroup();
-                }}
+                onMouseDown={updateResetGroup}
                 onDragStart={(e) => {
                     setDragSelected(true);
                     setTransformFlag(false);

@@ -84,6 +84,8 @@ export const CommentViewManager = (
         }
     }
 
+    // Similar to TextElement.enterEditTextMode()
+    // Hides konva element, creates a textarea, and updates konva elements on blur
     const editComment = (
         textRef: React.RefObject<Konva.Text | null>,
         rectRef: React.RefObject<Konva.Rect | null>,
@@ -156,7 +158,6 @@ export const CommentViewManager = (
                 rectNode.shadowOffsetY() * scale
             }px ${rectNode.shadowBlur() * scale}px 0px rgba(0,0,0,${rectNode.shadowOpacity()})`;
             textarea.style.zIndex = "100";
-
             textarea.wrap = "off";
 
             let px = 0;
@@ -224,23 +225,22 @@ export const CommentViewManager = (
                     height: height / scale,
                 });
 
-                if (textRef.current !== null) {
-                    const text = textRef.current;
-                    const newComments = comments.map((comment_i) => {
-                        if (comment.id === comment_i.id) {
-                            return {
-                                ...comment_i,
-                                text: newText,
-                                width: text.width(),
-                                height: text.height(),
-                                scale: text.scaleX(),
-                            };
-                        } else {
-                            return comment_i;
-                        }
-                    });
-                    setComments(newComments);
-                }
+                // update Comment props
+                const newComments = comments.map((comment_i) => {
+                    if (comment.id === comment_i.id) {
+                        return {
+                            ...comment_i,
+                            text: newText,
+                            width: textNode.width(),
+                            height: textNode.height(),
+                            scale: textNode.scaleX(),
+                        };
+                    } else {
+                        return comment_i;
+                    }
+                });
+                setComments(newComments);
+
                 removeTextarea();
             };
 
@@ -259,7 +259,7 @@ export const CommentViewManager = (
                     ) +
                         2) *
                     scale;
-                height = textarea.scrollHeight + 4 * scale;
+                height = textarea.scrollHeight + 4;
 
                 textarea.style.width = width + "px";
                 textarea.style.height = height + "px";
