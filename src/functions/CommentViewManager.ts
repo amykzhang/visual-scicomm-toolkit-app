@@ -43,6 +43,14 @@ export const CommentViewManager = (
         return id;
     }
 
+    function removeComment(
+        id: string,
+        comments: CommentProp[],
+        setComments: React.Dispatch<React.SetStateAction<CommentProp[]>>
+    ) {
+        setComments(comments.filter((comment) => comment.id !== id));
+    }
+
     const handleAddComment = (
         comments: CommentProp[],
         setComments: React.Dispatch<React.SetStateAction<CommentProp[]>>,
@@ -133,6 +141,9 @@ export const CommentViewManager = (
             textarea.style.transformOrigin = "left top";
             textarea.style.textAlign = textNode.align();
             textarea.style.color = textNode.fill();
+            textarea.style.boxShadow = `${rectNode.shadowOffsetX() * scale}px ${
+                rectNode.shadowOffsetY() * scale
+            }px ${rectNode.shadowBlur() * scale}px 0px rgba(0,0,0,${rectNode.shadowOpacity()})`;
             textarea.style.zIndex = "100";
 
             textarea.wrap = "off";
@@ -149,23 +160,25 @@ export const CommentViewManager = (
             textarea.style.transform = transform;
 
             // reset height
+            textarea.style.height = "0";
             // after browsers resized it we can set actual value
-            textarea.style.height = textarea.scrollHeight + 3 + "px";
+            height = textarea.scrollHeight + 4 * scale;
+            textarea.style.height = height + "px";
             textarea.focus();
 
-            const setTextareaWidth = (newWidth: number) => {
-                // some extra fixes on different browsers
-                var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-                var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
-                if (isSafari || isFirefox) {
-                    newWidth = Math.ceil(newWidth);
-                }
-                var isEdge = /Edge/.test(navigator.userAgent);
-                if (isEdge) {
-                    newWidth += 1;
-                }
-                textarea.style.width = newWidth + "px";
-            };
+            // const setTextareaWidth = (newWidth: number) => {
+            //     // some extra fixes on different browsers
+            //     var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            //     var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
+            //     if (isSafari || isFirefox) {
+            //         newWidth = Math.ceil(newWidth);
+            //     }
+            //     var isEdge = /Edge/.test(navigator.userAgent);
+            //     if (isEdge) {
+            //         newWidth += 1;
+            //     }
+            //     textarea.style.width = newWidth + "px";
+            // };
 
             const removeTextarea = () => {
                 textarea.removeEventListener("click", handleBlur);
@@ -182,9 +195,6 @@ export const CommentViewManager = (
                 const newText = textarea.value;
 
                 handleResize();
-
-                width += 2 * scale;
-                height += 3 * scale;
 
                 textNode.setAttrs({
                     width: width / scale,
@@ -223,11 +233,15 @@ export const CommentViewManager = (
                 textarea.style.width = "0";
                 textarea.style.height = "0";
 
-                width = Math.max(
-                    constants.comment.totalWidth * scale,
-                    textarea.scrollWidth + constants.comment.padding * scale
-                );
-                height = textarea.scrollHeight;
+                width =
+                    (Math.max(
+                        constants.comment.totalWidth,
+                        textarea.scrollWidth / scale + constants.comment.padding
+                    ) +
+                        2) *
+                    scale;
+                height = textarea.scrollHeight + 4 * scale;
+
                 textarea.style.width = width + "px";
                 textarea.style.height = height + "px";
             };
@@ -253,5 +267,6 @@ export const CommentViewManager = (
         setSelectedComment,
         handleCommentViewClickOff,
         editComment,
+        removeComment,
     };
 };
