@@ -7,8 +7,8 @@ import { v4 as uuid } from "uuid";
 import constants from "../styles/constants";
 
 const initialCommentProps = {
-    width: 200,
-    height: 55,
+    width: constants.comment.totalWidth,
+    height: constants.comment.totalHeight,
     scale: 1,
     text: "",
 };
@@ -150,7 +150,7 @@ export const CommentViewManager = (
             textarea.style.height = textarea.scrollHeight + 3 + "px";
             textarea.focus();
 
-            const setTextareaWidth = (newWidth: number) => {
+            const setTextareaDimensions = (newWidth: number) => {
                 // some extra fixes on different browsers
                 var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
                 var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
@@ -162,6 +162,8 @@ export const CommentViewManager = (
                     newWidth += 1;
                 }
                 textarea.style.width = newWidth + "px";
+
+                textarea.style.height = textarea.scrollHeight + "px";
             };
 
             const removeTextarea = () => {
@@ -216,8 +218,7 @@ export const CommentViewManager = (
                     textNode.text(textarea.value);
                     textarea.blur();
                 }
-                setTextareaWidth(textNode.width() * scale);
-                textarea.style.height = textarea.scrollHeight + "px";
+                setTextareaDimensions(textarea.scrollWidth);
             });
 
             textarea.addEventListener("blur", handleBlur);

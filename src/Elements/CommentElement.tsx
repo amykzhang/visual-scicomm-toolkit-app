@@ -226,7 +226,10 @@ const CommentElement = ({
                         // limit resize so box can't be negative
                         if (stageRef.current !== null) {
                             const scale = stageRef.current.scaleX();
-                            if (newBox.width < 55 * scale || newBox.height < 55 * scale) {
+                            if (
+                                newBox.width < constants.comment.totalWidth * scale ||
+                                newBox.height < constants.comment.totalHeight * scale
+                            ) {
                                 return oldBox;
                             }
                             return newBox;
