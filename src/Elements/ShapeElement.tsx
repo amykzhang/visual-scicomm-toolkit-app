@@ -96,7 +96,6 @@ const ShapeElement = ({
                         const rotation = node.rotation();
 
                         handleChange({
-                            ...shape,
                             x: node.x(),
                             y: node.y(),
                             // set minimal value

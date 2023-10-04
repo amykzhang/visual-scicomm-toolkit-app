@@ -94,7 +94,6 @@ const ImageElement = ({
                         node.scaleY(1);
 
                         handleChange({
-                            ...image,
                             x: node.x(),
                             y: node.y(),
                             // set minimal value
