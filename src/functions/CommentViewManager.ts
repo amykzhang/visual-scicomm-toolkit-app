@@ -104,6 +104,8 @@ export const CommentViewManager = (
 
             const scale = stage.scaleX() * comment.scale;
             const cornerRadius = constants.comment.cornerRadius;
+            let width: number = textNode.width() * scale;
+            let height: number = 0;
 
             // apply many styles to match text on canvas as close as possible
             // remember that text rendering on canvas and on the textarea can be different
@@ -112,13 +114,13 @@ export const CommentViewManager = (
             textarea.style.position = "absolute";
             textarea.style.top = areaPosition.y + "px";
             textarea.style.left = areaPosition.x + "px";
-            textarea.style.width = textNode.width() * scale + "px";
-            textarea.style.height = 0 + "px";
+            textarea.style.width = width + "px";
+            textarea.style.height = height + "px";
             textarea.style.fontSize = textNode.fontSize() * scale + "px";
             textarea.style.border = "none";
             textarea.style.padding = `${(textNode.padding() - 1.3) * scale}px ${
                 textNode.padding() * scale
-            }px`;
+            }px `;
             textarea.style.overflow = "hidden";
             textarea.style.background = constants.comment.background;
             textarea.style.borderRadius = `${cornerRadius * scale}px ${cornerRadius * scale}px ${
@@ -132,7 +134,8 @@ export const CommentViewManager = (
             textarea.style.textAlign = textNode.align();
             textarea.style.color = textNode.fill();
             textarea.style.zIndex = "100";
-            let transform = "";
+
+            textarea.wrap = "off";
 
             let px = 0;
             // also we need to slightly move textarea on firefox
@@ -142,7 +145,7 @@ export const CommentViewManager = (
                 px += 2 + Math.round(textNode.fontSize() / 20);
             }
 
-            transform += "translateY(-" + px + "px)";
+            const transform = "translateY(-" + px + "px)";
             textarea.style.transform = transform;
 
             // reset height
@@ -150,7 +153,7 @@ export const CommentViewManager = (
             textarea.style.height = textarea.scrollHeight + 3 + "px";
             textarea.focus();
 
-            const setTextareaDimensions = (newWidth: number) => {
+            const setTextareaWidth = (newWidth: number) => {
                 // some extra fixes on different browsers
                 var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
                 var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
@@ -162,8 +165,6 @@ export const CommentViewManager = (
                     newWidth += 1;
                 }
                 textarea.style.width = newWidth + "px";
-
-                textarea.style.height = textarea.scrollHeight + "px";
             };
 
             const removeTextarea = () => {
@@ -180,13 +181,18 @@ export const CommentViewManager = (
                 e.stopPropagation();
                 const newText = textarea.value;
 
+                handleResize();
+
+                width += 2 * scale;
+                height += 3 * scale;
+
                 textNode.setAttrs({
-                    width: textarea.scrollWidth / scale,
-                    height: textarea.scrollHeight / scale,
+                    width: width / scale,
+                    height: height / scale,
                 });
                 rectNode.setAttrs({
-                    width: textarea.scrollWidth / scale,
-                    height: textarea.scrollHeight / scale,
+                    width: width / scale,
+                    height: height / scale,
                 });
                 removeTextarea();
 
@@ -213,14 +219,28 @@ export const CommentViewManager = (
                 textarea.blur();
             };
 
+            const handleResize = () => {
+                textarea.style.width = "0";
+                textarea.style.height = "0";
+
+                width = Math.max(
+                    constants.comment.totalWidth * scale,
+                    textarea.scrollWidth + constants.comment.padding * scale
+                );
+                height = textarea.scrollHeight;
+                textarea.style.width = width + "px";
+                textarea.style.height = height + "px";
+            };
+
             textarea.addEventListener("keydown", (e) => {
                 if (e.key === "Escape") {
                     textNode.text(textarea.value);
                     textarea.blur();
                 }
-                setTextareaDimensions(textarea.scrollWidth);
+                // setTextareaWidth(textarea.scrollWidth);
             });
 
+            textarea.addEventListener("input", handleResize);
             textarea.addEventListener("blur", handleBlur);
             window.addEventListener("wheel", handleWheel);
         }
