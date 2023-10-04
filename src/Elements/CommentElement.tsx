@@ -168,7 +168,7 @@ const CommentElement = ({
                     document.body.style.cursor = "default";
                 }}
                 onMouseLeave={() => {
-                    document.body.style.cursor = "crosshair";
+                    document.body.style.cursor = "pointer";
                 }}
             >
                 <Rect
