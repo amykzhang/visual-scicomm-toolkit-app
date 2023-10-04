@@ -74,10 +74,15 @@ export const TextViewManager = (
     // 2) if isEditing is true, just blurred off a textarea, do nothing
     // 3) if isEditing is false, add a textbox
     function handleTextClick(e: Konva.KonvaEventObject<MouseEvent>) {
+        console.log(1);
         if (e.target.getAttrs().type !== "text") {
+            console.log(2);
             if (isEditing) {
+                console.log(3);
                 setIsEditing(false);
+                selectionRef.current = [];
             } else {
+                console.log(4);
                 setIsEditing(false);
                 handleAddTextBox(elements, setElements, stageRef)(e);
             }
@@ -97,6 +102,8 @@ export const TextViewManager = (
             transformerRef.current !== null &&
             stageRef.current !== null
         ) {
+            setIsEditing(true);
+
             const textNode = textRef.current;
             const transformerNode = transformerRef.current;
             const stage = stageRef.current;
