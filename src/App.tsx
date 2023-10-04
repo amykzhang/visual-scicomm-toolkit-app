@@ -335,12 +335,17 @@ export default function App() {
         } else return <></>;
     }
 
-    function handleClickOff(e: Konva.KonvaEventObject<MouseEvent>) {
+    // Handle click off stage for all views
+    function handleCanvasClick(e: Konva.KonvaEventObject<MouseEvent>) {
         if (view === APP_VIEW.select) {
             selectionRef.current = [];
-        } else if (view === APP_VIEW.text) {
+        }
+        if (view === APP_VIEW.text) {
             selectionRef.current = [];
             handleTextClick(e);
+        }
+        if (view === APP_VIEW.comment) {
+            handleCommentViewClickOff(e);
         }
     }
 
@@ -437,16 +442,9 @@ export default function App() {
                 width={window.innerWidth}
                 height={window.innerHeight}
                 onWheel={handleWheel}
+                // handle unfocus/click on stage
                 onClick={(e) => {
-                    // handle unfocus/click on stage
-                    if (view === APP_VIEW.comment) {
-                        handleCommentViewClickOff(e);
-                    } else {
-                        // handle all different view modes
-                        if (e.target === stageRef.current) {
-                            handleClickOff(e);
-                        }
-                    }
+                    if (e.target === stageRef.current) handleCanvasClick(e);
                 }}
                 onMouseDown={(e) => {
                     if (view === APP_VIEW.select && stageRef.current !== null) {
@@ -506,7 +504,8 @@ export default function App() {
                     <ExportArea
                         exportAreaRef={exportAreaRef}
                         {...activity.canvas_size}
-                        onClick={(e) => handleClickOff(e)}
+                        // handle unfocus/click on stage (for export area since it is a rect element technically)
+                        onClick={handleCanvasClick}
                     />
                     {isSelectionMode && view === APP_VIEW.select && (
                         <SelectionRect
