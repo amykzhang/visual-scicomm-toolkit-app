@@ -1,6 +1,6 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Text, Transformer } from "react-konva";
-import { TextProp } from "../utils/interfaces";
+import { TextProp, editTextProp } from "../utils/interfaces";
 import Konva from "konva";
 import constants from "../utils/constants";
 
@@ -8,29 +8,23 @@ interface TextElementProp {
     text: TextProp;
     draggable: boolean;
     selectionRef: React.MutableRefObject<string[]>;
-    stageRef: React.MutableRefObject<Konva.Stage | null>;
     transformFlag: boolean;
+    isJustCreated: boolean;
     setTransformFlag: React.Dispatch<React.SetStateAction<boolean>>;
     handleChange: (attributes: any) => void;
     handleSelect: () => void;
     handleDragStart: (e: Konva.KonvaEventObject<DragEvent>) => void;
     handleDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => void;
     updateResetGroup: () => void;
-    editText: (
-        text: TextProp,
-        handleChange: (attributes: any) => void,
-        textRef: React.RefObject<Konva.Text>,
-        transformerRef: React.RefObject<Konva.Transformer>,
-        stageRef: React.RefObject<Konva.Stage>
-    ) => void;
+    editText: editTextProp;
 }
 
 const TextElement = ({
     text,
     draggable,
     selectionRef,
-    stageRef,
     transformFlag,
+    isJustCreated,
     setTransformFlag,
     handleChange,
     handleSelect,
@@ -42,7 +36,6 @@ const TextElement = ({
     const isSelected = selectionRef.current.includes(text.id);
     // When the element is dragged selected but not selected yet (to show transformer when dragging and globalflag is disabled)
     const [dragSelected, setDragSelected] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
 
     // If transformFlag is disabled from App, no transformer will be shown unless the specific element is drag selected
     // Otherwise, show if it is selected or drag selected
@@ -54,8 +47,7 @@ const TextElement = ({
     // Behaviour: If the element is selected, next click enters edit text mode
     function handleClick(e: Konva.KonvaEventObject<MouseEvent>) {
         if (isSelected) {
-            editText(text, handleChange, textRef, transformerRef, stageRef);
-            setIsEditing(true);
+            editText(text, handleChange, textRef, transformerRef);
         } else {
             handleSelect();
         }
@@ -107,18 +99,6 @@ const TextElement = ({
         }
     }
 
-    const handleKeyPress = useCallback(
-        (e: KeyboardEvent) => {
-            if (e.key === "Enter") {
-                if (isSelected) {
-                    editText(text, handleChange, textRef, transformerRef, stageRef);
-                    setIsEditing(true);
-                }
-            }
-        },
-        [isSelected, editText, setIsEditing, text, handleChange, textRef, transformerRef, stageRef]
-    );
-
     useEffect(() => {
         // Show transformer when the text is selected or dragged
         if (showTransform) {
@@ -131,24 +111,14 @@ const TextElement = ({
         }
     }, [showTransform]);
 
-    // Selected ID key press listeners
+    // Enter edit mode when first added
     useEffect(() => {
-        if (isEditing) {
-            window.removeEventListener("keyup", handleKeyPress);
-        } else {
-            window.addEventListener("keyup", handleKeyPress);
+        if (isJustCreated) {
+            console.log("side effect editText");
+            editText(text, handleChange, textRef, transformerRef);
         }
-
-        return () => {
-            window.removeEventListener("keyup", handleKeyPress);
-        };
-    }, [handleKeyPress, isEditing]);
-
-    // useEffect(() => {
-    //     if (isEditing) {
-    //         editText();
-    //     }
-    // }, [isEditing]);
+        // eslint-disable-next-line
+    }, []);
 
     return (
         <Fragment>

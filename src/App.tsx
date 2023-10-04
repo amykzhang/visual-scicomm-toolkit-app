@@ -161,12 +161,13 @@ export default function App() {
         editComment,
     } = CommentViewManager(setView, comments, setComments, stageRef);
 
-    const { toggleTextMode, handleTextClick, editText } = TextViewManager(
+    const { toggleTextMode, handleTextClick, editText, justCreated } = TextViewManager(
         view,
         setView,
         elements,
         setElements,
-        stageRef
+        stageRef,
+        selectionRef
     );
 
     // Key Presses
@@ -316,7 +317,6 @@ export default function App() {
                     key={i}
                     text={text}
                     selectionRef={selectionRef}
-                    stageRef={stageRef}
                     draggable={draggable}
                     handleChange={(attributes: any) => {
                         setElements([
@@ -335,6 +335,7 @@ export default function App() {
                     setTransformFlag={setTransformFlag}
                     updateResetGroup={updateResetGroup}
                     editText={editText}
+                    isJustCreated={justCreated === text.id}
                 />
             );
         } else return <></>;

@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect } from "react";
 import { Group, Rect, Text, Transformer } from "react-konva";
-import { CommentProp } from "../utils/interfaces";
+import { CommentProp, editCommentProp } from "../utils/interfaces";
 import Konva from "konva";
 import constants from "../utils/constants";
 import color from "../styles/color";
@@ -13,12 +13,7 @@ interface CommentElementProp {
     isSelected: boolean;
     stageRef: React.MutableRefObject<Konva.Stage | null>;
     handleSelect: () => void;
-    editComment: (
-        textRef: React.RefObject<Konva.Text | null>,
-        rectRef: React.RefObject<Konva.Rect | null>,
-        transformerRef: React.RefObject<Konva.Transformer | null>,
-        comment: CommentProp
-    ) => void;
+    editComment: editCommentProp;
 }
 
 const CommentElement = ({
@@ -154,13 +149,14 @@ const CommentElement = ({
         }
     }, [isSelected]);
 
-    // Enter edit Comment mode when first added
-    useEffect(() => {
-        if (isSelected) {
-            editComment(textRef, rectRef, transformerRef, comment);
-        }
-        // eslint-disable-next-line
-    }, []);
+    // // Enter edit Comment mode when first added
+    // useEffect(() => {
+    //     console.log("useEffect");
+    //     if (isSelected) {
+    //         editComment(textRef, rectRef, transformerRef, comment);
+    //     }
+    //     // eslint-disable-next-line
+    // }, []);
 
     return (
         <Fragment>
@@ -225,8 +221,8 @@ const CommentElement = ({
                         if (stageRef.current !== null) {
                             const scale = stageRef.current.scaleX();
                             if (
-                                newBox.width < constants.comment.totalWidth * scale ||
-                                newBox.height < constants.comment.totalHeight * scale
+                                newBox.width < constants.comment.minWidth * scale ||
+                                newBox.height < constants.comment.minHeight * scale
                             ) {
                                 return oldBox;
                             }

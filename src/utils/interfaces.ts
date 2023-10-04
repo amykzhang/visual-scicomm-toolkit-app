@@ -1,3 +1,4 @@
+import Konva from "konva";
 import { APP_VIEW } from "./enums";
 
 export interface CommentStateProp {
@@ -73,3 +74,17 @@ export interface SelectionBoundsProp {
     width: number;
     height: number;
 }
+
+export type editTextProp = (
+    text: TextProp,
+    handleChange: (attributes: any) => void,
+    textRef: React.RefObject<Konva.Text>,
+    transformerRef: React.RefObject<Konva.Transformer>
+) => void;
+
+export type editCommentProp = (
+    textRef: React.RefObject<Konva.Text | null>,
+    rectRef: React.RefObject<Konva.Rect | null>,
+    transformerRef: React.RefObject<Konva.Transformer | null>,
+    comment: CommentProp
+) => void;

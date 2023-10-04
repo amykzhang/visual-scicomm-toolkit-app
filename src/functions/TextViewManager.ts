@@ -2,15 +2,20 @@ import { APP_VIEW } from "../utils/enums";
 import Konva from "konva";
 import { v4 as uuid } from "uuid";
 import { ElementProp, TextProp } from "../utils/interfaces";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import constants from "../utils/constants";
 
 export const TextViewManager = (
     view: APP_VIEW,
     setView: (view: APP_VIEW) => void,
     elements: ElementProp[],
     setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>,
-    stageRef: React.RefObject<Konva.Stage>
+    stageRef: React.RefObject<Konva.Stage>,
+    selectionRef: React.MutableRefObject<string[]>
 ) => {
+    const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [justCreated, setJustCreated] = useState<string | null>(null);
+
     function enterTextMode() {
         setView(APP_VIEW.text);
     }
@@ -38,18 +43,10 @@ export const TextViewManager = (
                 type: "text",
                 x: x,
                 y: y,
-                width: 100,
-                height: 20,
-                rotation: 0,
-                text: "hello world",
-                fontSize: 20,
-                fontFamily: "Arial",
-                fontStyle: "normal",
-                fill: "#000000",
-                align: "left",
-                scale: 1,
+                ...constants.textbox.initialTextBox,
             } as TextProp,
         ]);
+        return id;
     }
 
     const handleAddTextBox = (
@@ -58,20 +55,32 @@ export const TextViewManager = (
         stageRef: React.RefObject<Konva.Stage>
     ) => {
         return (e: Konva.KonvaEventObject<MouseEvent>) => {
-            // if clicked anywhere other than a comment
+            // if clicked anywhere other than a textbox
             if (stageRef.current !== null && e.target.getAttrs().type !== "text") {
                 const stage = stageRef.current;
                 const x = (e.evt.clientX - stage.x()) / stage.scaleX();
                 const y = (e.evt.clientY - stage.y()) / stage.scaleX();
-                addTextBox(x, y, elements, setElements);
+                const id = addTextBox(x, y, elements, setElements);
+
+                // set justCreated for side effect to enter edit mode
+                setJustCreated(id);
+                selectionRef.current = [id];
             }
         };
     };
 
-    // when not clicking on a textbox, deselect selected comment or if nothing is selected add new comment
+    // handle stage click in text mode
+    // 1) check for click on any are not a 'text'
+    // 2) if isEditing is true, just blurred off a textarea, do nothing
+    // 3) if isEditing is false, add a textbox
     function handleTextClick(e: Konva.KonvaEventObject<MouseEvent>) {
         if (e.target.getAttrs().type !== "text") {
-            handleAddTextBox(elements, setElements, stageRef)(e);
+            if (isEditing) {
+                setIsEditing(false);
+            } else {
+                setIsEditing(false);
+                handleAddTextBox(elements, setElements, stageRef)(e);
+            }
         }
     }
 
@@ -81,8 +90,7 @@ export const TextViewManager = (
         text: TextProp,
         handleChange: (attributes: any) => void,
         textRef: React.RefObject<Konva.Text>,
-        transformerRef: React.RefObject<Konva.Transformer>,
-        stageRef: React.RefObject<Konva.Stage>
+        transformerRef: React.RefObject<Konva.Transformer>
     ) => {
         if (
             textRef.current !== null &&
@@ -185,7 +193,7 @@ export const TextViewManager = (
                 const newText = textarea.value;
 
                 if (newText === "") {
-                    // removeComment(comment.id, comments, setComments);
+                    // removeComment(textbox.id, comments, setComments);
                     removeTextarea();
                     return;
                 }
@@ -201,6 +209,10 @@ export const TextViewManager = (
                     scale: textNode.scaleX(),
                 });
                 removeTextarea();
+
+                // reset selection and justCreated for next textbox
+                setJustCreated(null);
+                selectionRef.current = [];
             };
 
             const handleWheel = (e: WheelEvent) => {
@@ -244,5 +256,6 @@ export const TextViewManager = (
         toggleTextMode,
         handleTextClick,
         editText,
+        justCreated,
     };
 };

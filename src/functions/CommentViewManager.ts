@@ -6,13 +6,6 @@ import Konva from "konva";
 import { v4 as uuid } from "uuid";
 import constants from "../utils/constants";
 
-const initialCommentProps = {
-    width: constants.comment.totalWidth,
-    height: constants.comment.totalHeight,
-    scale: 1,
-    text: "",
-};
-
 export const CommentViewManager = (
     setView: (view: APP_VIEW) => void,
     comments: CommentProp[],
@@ -37,8 +30,8 @@ export const CommentViewManager = (
             {
                 id: id,
                 x: x,
-                y: y - initialCommentProps.height,
-                ...initialCommentProps,
+                y: y - constants.comment.initialComment.height,
+                ...constants.comment.initialComment,
             },
         ]);
         return id;
@@ -254,7 +247,7 @@ export const CommentViewManager = (
 
                 width =
                     (Math.max(
-                        constants.comment.totalWidth,
+                        constants.comment.minWidth,
                         textarea.scrollWidth / scale + constants.comment.padding
                     ) +
                         2) *
