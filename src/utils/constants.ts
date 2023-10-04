@@ -15,8 +15,10 @@ const comment = {
 };
 
 const textbox = {
+    minWidth: 5,
+    minHeight: 20,
     initialTextBox: {
-        width: 100,
+        width: 5,
         height: 20,
         rotation: 0,
         text: "",

@@ -157,8 +157,8 @@ export const TextViewManager = (
             const transform = "translateY(-" + px + "px)";
             textarea.style.transform = transform;
 
-            width = textarea.scrollWidth + 1 * scale;
-            height = textarea.scrollHeight;
+            width = Math.max(textarea.scrollWidth + 1 * scale, constants.textbox.minWidth * scale);
+            height = Math.max(textarea.scrollHeight, constants.textbox.minHeight * scale);
             textarea.style.width = width + "px";
             textarea.style.height = height + "px";
 
@@ -193,7 +193,10 @@ export const TextViewManager = (
                 const newText = textarea.value;
 
                 if (newText === "") {
-                    // removeComment(textbox.id, comments, setComments);
+                    // removeComment
+                    const newElements = elements.filter((element) => element.id !== text.id);
+                    setElements(newElements);
+
                     removeTextarea();
                     return;
                 }
@@ -223,8 +226,11 @@ export const TextViewManager = (
                 textarea.style.width = "0";
                 textarea.style.height = "0";
 
-                width = textarea.scrollWidth + 1 * scale;
-                height = textarea.scrollHeight;
+                width = Math.max(
+                    textarea.scrollWidth + 1 * scale,
+                    constants.textbox.minWidth * scale
+                );
+                height = Math.max(textarea.scrollHeight, constants.textbox.minHeight * scale);
 
                 textarea.style.width = width + "px";
                 textarea.style.height = height + "px";
