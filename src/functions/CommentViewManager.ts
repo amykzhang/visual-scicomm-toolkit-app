@@ -113,12 +113,12 @@ export const CommentViewManager = (
             textarea.style.top = areaPosition.y + "px";
             textarea.style.left = areaPosition.x + "px";
             textarea.style.width = textNode.width() * scale + "px";
-            textarea.style.height = textNode.height() * scale + "px";
+            textarea.style.height = 0 + "px";
             textarea.style.fontSize = textNode.fontSize() * scale + "px";
             textarea.style.border = "none";
             textarea.style.padding = `${(textNode.padding() - 1.3) * scale}px ${
                 textNode.padding() * scale
-            }px ${textNode.padding() * scale}px ${textNode.padding() * scale}px`;
+            }px`;
             textarea.style.overflow = "hidden";
             textarea.style.background = constants.comment.background;
             textarea.style.borderRadius = `${cornerRadius * scale}px ${cornerRadius * scale}px ${
@@ -131,7 +131,7 @@ export const CommentViewManager = (
             textarea.style.transformOrigin = "left top";
             textarea.style.textAlign = textNode.align();
             textarea.style.color = textNode.fill();
-            textarea.style.zIndex = "600";
+            textarea.style.zIndex = "100";
             let transform = "";
 
             let px = 0;
