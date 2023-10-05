@@ -8,7 +8,7 @@ import {
     StageViewManager,
     TextViewManager,
     handleDragEnd,
-    handleDragStart,
+    // handleDragStart,
 } from "./functions";
 import { CommentViewManager } from "./functions";
 import { APP_VIEW } from "./utils/enums";
@@ -41,18 +41,21 @@ import color from "./styles/color";
 
 const activity = activity_visual_strategies;
 
-// interface HistoryProp {
-//     canvas: CanvasStateProp;
-//     selection: string[];
-// }
+const initialCanvasState = persistance.retrieveCanvasState();
+const initialUiState = persistance.retrieveUiState();
 
-// let history: HistoryProp[] = [
-//     {
-//         canvas: persistance.retrieveCanvasState(),
-//         selection: [],
-//     },
-// ];
-// let historyStep = 0;
+interface HistoryProp {
+    canvas: CanvasStateProp;
+    selection: string[];
+}
+
+let history: HistoryProp[] = [
+    {
+        canvas: initialCanvasState,
+        selection: [],
+    },
+];
+let historyStep = 0;
 
 export default function App() {
     const groupRef = useRef<Konva.Group>(null);
@@ -62,7 +65,7 @@ export default function App() {
     const { shiftKey, metaKey } = KeyPressManager();
 
     // App State (stage position, zoom, view, panels)
-    const [uiState, setUiState] = useState<UiStateProp>(persistance.retrieveUiState());
+    const [uiState, setUiState] = useState<UiStateProp>(initialUiState);
 
     const view = uiState.view;
     const setView = useCallback(
@@ -85,13 +88,12 @@ export default function App() {
         StageViewManager(activity.canvas_size);
 
     // --- CANVAS STATE ---
-    const canvasState = persistance.retrieveCanvasState();
 
-    const [elements, setElements] = useState<ElementProp[]>(canvasState.elements);
-    const [comments, setComments] = useState<CommentProp[]>(canvasState.comments);
+    const [elements, setElements] = useState<ElementProp[]>(history[0].canvas.elements);
+    const [comments, setComments] = useState<CommentProp[]>(history[0].canvas.comments);
 
     // Group Selection
-    const selectionRef = useRef<string[]>([]);
+    const selectionRef = useRef<string[]>(history[0].selection);
 
     // Drag Select
     const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -133,23 +135,31 @@ export default function App() {
 
     // --- HISTORY ---
 
-    // const handleUndo = () => {
-    //     if (historyStep === 0) {
-    //         return;
-    //     }
-    //     historyStep -= 1;
-    //     const previous = history[historyStep];
-    //     // setCurrentElements(previous);
-    // };
+    const handleUndo = () => {
+        if (historyStep === 0) {
+            return;
+        }
 
-    // const handleRedo = () => {
-    //     if (historyStep === history.length - 1) {
-    //         return;
-    //     }
-    //     historyStep += 1;
-    //     const next = history[historyStep];
-    //     // setCurrentElements(next);
-    // };
+        console.log("handleUndo");
+
+        historyStep -= 1;
+        const previous = history[historyStep];
+        setElements(previous.canvas.elements);
+        selectionRef.current = previous.selection;
+    };
+
+    const handleRedo = () => {
+        if (historyStep === history.length - 1) {
+            return;
+        }
+
+        console.log("handleRedo");
+
+        historyStep += 1;
+        const next = history[historyStep];
+        setElements(next.canvas.elements);
+        selectionRef.current = next.selection;
+    };
 
     // Key Presses
     const handleKeyPress = useCallback(
@@ -180,6 +190,10 @@ export default function App() {
                             if (!metaKey) {
                                 setView(APP_VIEW.text);
                             }
+                            break;
+                        case "=":
+                            console.log(history);
+                            console.log(historyStep);
                             break;
                         default:
                             break;
@@ -227,12 +241,9 @@ export default function App() {
                                 setSelectedComment(null);
                             }
                             break;
-                        case "=":
-                            break;
                         default:
                             break;
                     }
-                    // SELECT VIEW
                 }
             }
         },
@@ -272,7 +283,7 @@ export default function App() {
                         ]);
                     }}
                     handleSelect={() => handleSelect(image.id)}
-                    handleDragStart={handleDragStart(elements, setElements)}
+                    // handleDragStart={handleDragStart(elements, setElements)}
                     handleDragEnd={handleDragEnd(elements, setElements)}
                     transformFlag={transformFlag}
                     setTransformFlag={setTransformFlag}
@@ -295,7 +306,7 @@ export default function App() {
                         ]);
                     }}
                     handleSelect={() => handleSelect(shape.id)}
-                    handleDragStart={handleDragStart(elements, setElements)}
+                    // handleDragStart={handleDragStart(elements, setElements)}
                     handleDragEnd={handleDragEnd(elements, setElements)}
                     transformFlag={transformFlag}
                     setTransformFlag={setTransformFlag}
@@ -322,7 +333,7 @@ export default function App() {
                         setView(APP_VIEW.select);
                         handleSelect(text.id);
                     }}
-                    handleDragStart={handleDragStart(elements, setElements)}
+                    // handleDragStart={handleDragStart(elements, setElements)}
                     handleDragEnd={handleDragEnd(elements, setElements)}
                     transformFlag={transformFlag}
                     setTransformFlag={setTransformFlag}
@@ -370,6 +381,29 @@ export default function App() {
         persistance.persistUiState(uiState);
     }, [uiState]);
 
+    // Save history
+    useEffect(() => {
+        // cap history at 5
+        // if (history.length > 100) {
+        //     history = history.slice(history.length - 100);
+        //     historyStep = 100;
+        // }
+        console.log(historyStep, elements);
+        // remove all future history
+        history = history.slice(0, historyStep + 1);
+        // add new history
+        history.push({
+            canvas: {
+                elements: elements,
+                comments: comments,
+            },
+            selection: selectionRef.current,
+        });
+        // increment history step
+        historyStep += 1;
+    }, [elements]);
+
+    // Handle key presses
     useEffect(() => {
         document.addEventListener("keydown", handleKeyPress);
 
@@ -432,7 +466,12 @@ export default function App() {
             <PanelsContainer>
                 <TopZone>
                     <TitlePanel name={activity.name} />
-                    <ToolbarPanel view={view} setView={setView} />
+                    <ToolbarPanel
+                        view={view}
+                        setView={setView}
+                        handleUndo={handleUndo}
+                        handleRedo={handleRedo}
+                    />
                     <ExitCommentView view={view} setView={setView} />
                     <ExportPanel activity={activity} startExportProcess={startExportProcess} />
                 </TopZone>
