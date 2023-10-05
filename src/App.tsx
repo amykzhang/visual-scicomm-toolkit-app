@@ -159,30 +159,26 @@ export default function App() {
         setSelectedComment,
         handleCommentViewClickOff,
         editComment,
-    } = CommentViewManager(setView, comments, setComments, stageRef);
+        isEditingComment,
+    } = CommentViewManager(comments, setComments, stageRef);
 
-    const { toggleTextMode, handleTextClick, editText, isEditing, justCreated } = TextViewManager(
-        view,
-        setView,
-        elements,
-        setElements,
-        stageRef,
-        selectionRef
-    );
+    const { toggleTextMode, handleTextClick, editText, isEditingText, justCreated } =
+        TextViewManager(view, setView, elements, setElements, stageRef, selectionRef);
 
     // Key Presses
     const handleKeyPress = useCallback(
         (e: KeyboardEvent) => {
             if (selectionRef.current !== null) {
                 // Then account for specific views
-                // COMMENT VIEW
+                // SELECT VIEW
                 if (view === APP_VIEW.select) {
+                    if (isEditingText) {
+                        return;
+                    }
                     switch (e.key) {
                         case "a":
                             if (metaKey) {
-                                if (!isEditing) {
-                                    selectionRef.current = elements.map((element) => element.id);
-                                }
+                                selectionRef.current = elements.map((element) => element.id);
                             }
                             break;
                         case "Delete":
@@ -230,7 +226,11 @@ export default function App() {
                         default:
                             break;
                     }
+                    // COMMENT VIEW
                 } else if (view === APP_VIEW.comment) {
+                    if (isEditingComment) {
+                        return;
+                    }
                     switch (e.key) {
                         case "Delete":
                         case "Backspace":
@@ -242,7 +242,6 @@ export default function App() {
                             }
                             break;
                         case "=":
-                            console.log(comments);
                             break;
                         default:
                             break;
@@ -252,14 +251,16 @@ export default function App() {
             }
         },
         [
-            comments,
-            deleteSelected,
             elements,
+            comments,
             metaKey,
             selectedComment,
+            view,
+            isEditingText,
+            isEditingComment,
+            deleteSelected,
             setSelectedComment,
             setView,
-            view,
         ]
     );
 

@@ -149,14 +149,13 @@ const CommentElement = ({
         }
     }, [isSelected]);
 
-    // // Enter edit Comment mode when first added
-    // useEffect(() => {
-    //     console.log("useEffect");
-    //     if (isSelected) {
-    //         editComment(textRef, rectRef, transformerRef, comment);
-    //     }
-    //     // eslint-disable-next-line
-    // }, []);
+    // Enter edit Comment mode when first added
+    useEffect(() => {
+        if (isSelected) {
+            editComment(textRef, rectRef, transformerRef, comment);
+        }
+        // eslint-disable-next-line
+    }, []);
 
     return (
         <Fragment>
