@@ -196,12 +196,12 @@ export const CommentViewManager = (
             };
 
             const handleBlur = (e: FocusEvent) => {
-                e.stopPropagation();
                 const newText = textarea.value;
 
                 if (newText === "") {
                     removeComment(comment.id, comments, setComments);
                     removeTextarea();
+                    setIsEditing(false);
                     return;
                 }
 
@@ -233,6 +233,7 @@ export const CommentViewManager = (
                 setComments(newComments);
 
                 removeTextarea();
+                setIsEditing(false);
             };
 
             const handleWheel = (e: WheelEvent) => {
