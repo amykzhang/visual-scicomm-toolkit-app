@@ -41,36 +41,6 @@ import color from "./styles/color";
 
 const activity = activity_visual_strategies;
 
-const retrieveElements = () => {
-    const saved = persistance.retrieveCanvasState();
-
-    if (saved !== undefined) {
-        return saved.elements;
-    } else return [];
-};
-
-const retrieveComments = () => {
-    const saved = persistance.retrieveCanvasState();
-
-    if (saved !== undefined && saved.comments !== undefined) {
-        return saved.comments;
-    } else {
-        return [];
-    }
-};
-
-// const retrieveCanvasState = () => {
-//     const saved = persistance.retrieveCanvasState();
-
-//     if (saved !== undefined) {
-//         return saved;
-//     } else
-//         return {
-//             elements: [],
-//             comments: [],
-//         };
-// };
-
 // interface HistoryProp {
 //     canvas: CanvasStateProp;
 //     selection: string[];
@@ -78,7 +48,7 @@ const retrieveComments = () => {
 
 // let history: HistoryProp[] = [
 //     {
-//         canvas: retrieveCanvasState(),
+//         canvas: persistance.retrieveCanvasState(),
 //         selection: [],
 //     },
 // ];
@@ -92,18 +62,7 @@ export default function App() {
     const { shiftKey, metaKey } = KeyPressManager();
 
     // App State (stage position, zoom, view, panels)
-    const [uiState, setUiState] = useState<UiStateProp>(() => {
-        const saved = persistance.retrieveUiState();
-
-        if (saved !== undefined) {
-            return saved;
-        } else
-            return {
-                isLeftPanelOpen: true,
-                isRightPanelOpen: true,
-                view: APP_VIEW.select,
-            };
-    });
+    const [uiState, setUiState] = useState<UiStateProp>(persistance.retrieveUiState());
 
     const view = uiState.view;
     const setView = useCallback(
@@ -126,9 +85,10 @@ export default function App() {
         StageViewManager(activity.canvas_size);
 
     // --- CANVAS STATE ---
+    const canvasState = persistance.retrieveCanvasState();
 
-    const [elements, setElements] = useState<ElementProp[]>(retrieveElements);
-    const [comments, setComments] = useState<CommentProp[]>(retrieveComments);
+    const [elements, setElements] = useState<ElementProp[]>(canvasState.elements);
+    const [comments, setComments] = useState<CommentProp[]>(canvasState.comments);
 
     // Group Selection
     const selectionRef = useRef<string[]>([]);
