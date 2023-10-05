@@ -23,6 +23,7 @@ import { ExportArea } from "./components/ExportArea";
 import { ExitCommentViewButton } from "./components/Components";
 import activity_visual_strategies from "./activity/activity";
 import {
+    CanvasStateProp,
     CommentProp,
     ElementProp,
     ImageProp,
@@ -39,6 +40,49 @@ import { SelectionRect } from "./components/SelectionRect";
 import color from "./styles/color";
 
 const activity = activity_visual_strategies;
+
+const retrieveElements = () => {
+    const saved = persistance.retrieveCanvasState();
+
+    if (saved !== undefined) {
+        return saved.elements;
+    } else return [];
+};
+
+const retrieveComments = () => {
+    const saved = persistance.retrieveCanvasState();
+
+    if (saved !== undefined && saved.comments !== undefined) {
+        return saved.comments;
+    } else {
+        return [];
+    }
+};
+
+// const retrieveCanvasState = () => {
+//     const saved = persistance.retrieveCanvasState();
+
+//     if (saved !== undefined) {
+//         return saved;
+//     } else
+//         return {
+//             elements: [],
+//             comments: [],
+//         };
+// };
+
+// interface HistoryProp {
+//     canvas: CanvasStateProp;
+//     selection: string[];
+// }
+
+// let history: HistoryProp[] = [
+//     {
+//         canvas: retrieveCanvasState(),
+//         selection: [],
+//     },
+// ];
+// let historyStep = 0;
 
 export default function App() {
     const groupRef = useRef<Konva.Group>(null);
@@ -62,7 +106,6 @@ export default function App() {
     });
 
     const view = uiState.view;
-
     const setView = useCallback(
         (view: APP_VIEW) => {
             setUiState({ ...uiState, view: view });
@@ -78,37 +121,14 @@ export default function App() {
         draggable: view === APP_VIEW.pan,
     };
 
-    // Elements
-    const [elements, setElements] = useState<ElementProp[]>(() => {
-        const saved = persistance.retrieveCanvasState();
+    // Stage View
+    const { stageRef, handleWheel, zoomLevel, zoomIn, zoomOut, zoomFit, toggleFullscreen } =
+        StageViewManager(activity.canvas_size);
 
-        if (saved !== undefined) {
-            return saved.elements;
-        } else return [];
-    });
+    // --- CANVAS STATE ---
 
-    // // History
-    // const [currentElements, setCurrentElements] = useState<ElementProp[]>(elements);
-    // let history: ElementProp[][] = [];
-    // let historyStep = 0;
-
-    // const handleUndo = () => {
-    //     if (historyStep === 0) {
-    //         return;
-    //     }
-    //     historyStep -= 1;
-    //     const previous = history[historyStep];
-    //     setCurrentElements(previous);
-    // };
-
-    // const handleRedo = () => {
-    //     if (historyStep === history.length - 1) {
-    //         return;
-    //     }
-    //     historyStep += 1;
-    //     const next = history[historyStep];
-    //     setCurrentElements(next);
-    // };
+    const [elements, setElements] = useState<ElementProp[]>(retrieveElements);
+    const [comments, setComments] = useState<CommentProp[]>(retrieveComments);
 
     // Group Selection
     const selectionRef = useRef<string[]>([]);
@@ -122,23 +142,10 @@ export default function App() {
         height: 0,
     });
 
-    // "Global" transform flag (for isolating drag selecting elements)
+    // App wide transform flag (for isolating drag selecting elements)
     const [transformFlag, setTransformFlag] = useState(true);
 
-    // comments
-    const [comments, setComments] = useState<CommentProp[]>(() => {
-        const saved = persistance.retrieveCanvasState();
-
-        if (saved !== undefined && saved.comments !== undefined) {
-            return saved.comments;
-        } else {
-            return [];
-        }
-    });
-
-    // Stage View
-    const { stageRef, handleWheel, zoomLevel, zoomIn, zoomOut, zoomFit, toggleFullscreen } =
-        StageViewManager(activity.canvas_size);
+    // --- MANAGERS FOR VIEWS ---
 
     // Selection
     const { handleSelect, deleteSelected, updateResetGroup } = SelectionManager(
@@ -151,7 +158,6 @@ export default function App() {
         groupRef
     );
 
-    // Comment View
     const {
         commentViewState,
         setCommentViewState,
@@ -164,6 +170,26 @@ export default function App() {
 
     const { toggleTextMode, handleTextClick, editText, isEditingText, justCreated } =
         TextViewManager(view, setView, elements, setElements, stageRef, selectionRef);
+
+    // --- HISTORY ---
+
+    // const handleUndo = () => {
+    //     if (historyStep === 0) {
+    //         return;
+    //     }
+    //     historyStep -= 1;
+    //     const previous = history[historyStep];
+    //     // setCurrentElements(previous);
+    // };
+
+    // const handleRedo = () => {
+    //     if (historyStep === history.length - 1) {
+    //         return;
+    //     }
+    //     historyStep += 1;
+    //     const next = history[historyStep];
+    //     // setCurrentElements(next);
+    // };
 
     // Key Presses
     const handleKeyPress = useCallback(
@@ -263,9 +289,6 @@ export default function App() {
             setView,
         ]
     );
-
-    // Export
-    const startExportProcess = ExportManager(activity, stageRef, setTransformFlag);
 
     // Given an elementProp, return a ReactElement representing the type of element
     function elementToReactElement(
@@ -373,6 +396,9 @@ export default function App() {
                 break;
         }
     }
+
+    // Export
+    const startExportProcess = ExportManager(activity, stageRef, setTransformFlag);
 
     // Save canvas state
     useEffect(() => {
