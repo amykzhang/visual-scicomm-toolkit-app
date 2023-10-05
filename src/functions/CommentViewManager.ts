@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { CommentProp, CommentStateProp } from "../utils/interfaces";
-import { APP_VIEW } from "../utils/enums";
 import color from "../styles/color";
 import Konva from "konva";
 import { v4 as uuid } from "uuid";
 import constants from "../utils/constants";
 
 export const CommentViewManager = (
-    setView: (view: APP_VIEW) => void,
     comments: CommentProp[],
     setComments: React.Dispatch<React.SetStateAction<CommentProp[]>>,
     stageRef: React.RefObject<Konva.Stage>
@@ -16,7 +14,7 @@ export const CommentViewManager = (
         backgroundColor: color.canvasBackground,
     });
     const [selectedComment, setSelectedComment] = useState<string | null>(null);
-    const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [isEditingComment, setIsEditing] = useState<boolean>(false);
 
     function addComment(
         x: number,
@@ -63,11 +61,11 @@ export const CommentViewManager = (
 
     // handle stage click in comment mode
     // 1) check for click on any are not a 'comment'
-    // 2) if isEditing is true, just blurred off a textarea, do nothing
-    // 3) if isEditing is false, add a comment
+    // 2) if isEditingComment is true, just blurred off a textarea, do nothing
+    // 3) if isEditingComment is false, add a comment
     function handleCommentViewClickOff(e: Konva.KonvaEventObject<MouseEvent>) {
         if (e.target.getAttrs().type !== "comment") {
-            if (isEditing) {
+            if (isEditingComment) {
                 setIsEditing(false);
                 setSelectedComment(null);
             } else {
@@ -186,7 +184,7 @@ export const CommentViewManager = (
             // };
 
             const removeTextarea = () => {
-                textarea.removeEventListener("keypress", handleKeyPress);
+                textarea.removeEventListener("keydown", handleKeyPress);
                 textarea.removeEventListener("click", handleBlur);
                 textarea.removeEventListener("input", handleResize);
                 window.removeEventListener("wheel", handleWheel);
@@ -198,12 +196,12 @@ export const CommentViewManager = (
             };
 
             const handleBlur = (e: FocusEvent) => {
-                e.stopPropagation();
                 const newText = textarea.value;
 
                 if (newText === "") {
                     removeComment(comment.id, comments, setComments);
                     removeTextarea();
+                    setIsEditing(false);
                     return;
                 }
 
@@ -235,6 +233,7 @@ export const CommentViewManager = (
                 setComments(newComments);
 
                 removeTextarea();
+                setIsEditing(false);
             };
 
             const handleWheel = (e: WheelEvent) => {
@@ -260,12 +259,11 @@ export const CommentViewManager = (
 
             const handleKeyPress = (e: KeyboardEvent) => {
                 if (e.key === "Escape") {
-                    e.preventDefault();
                     textarea.blur();
                 }
             };
 
-            textarea.addEventListener("keypress", handleKeyPress);
+            textarea.addEventListener("keydown", handleKeyPress);
             textarea.addEventListener("input", handleResize);
             textarea.addEventListener("blur", handleBlur);
             window.addEventListener("wheel", handleWheel);
@@ -280,5 +278,6 @@ export const CommentViewManager = (
         handleCommentViewClickOff,
         editComment,
         removeComment,
+        isEditingComment,
     };
 };

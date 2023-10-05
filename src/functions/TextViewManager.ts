@@ -13,7 +13,7 @@ export const TextViewManager = (
     stageRef: React.RefObject<Konva.Stage>,
     selectionRef: React.MutableRefObject<string[]>
 ) => {
-    const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [isEditingText, setIsEditing] = useState<boolean>(false);
     const [justCreated, setJustCreated] = useState<string | null>(null);
 
     function enterTextMode() {
@@ -71,12 +71,13 @@ export const TextViewManager = (
 
     // handle stage click in text mode
     // 1) check for click on any are not a 'text'
-    // 2) if isEditing is true, just blurred off a textarea, do nothing
-    // 3) if isEditing is false, add a textbox
+    // 2) if isEditingText is true, just blurred off a textarea, do nothing
+    // 3) if isEditingText is false, add a textbox
     function handleTextClick(e: Konva.KonvaEventObject<MouseEvent>) {
         if (e.target.getAttrs().type !== "text") {
-            if (isEditing) {
+            if (isEditingText) {
                 setIsEditing(false);
+                selectionRef.current = [];
             } else {
                 setIsEditing(false);
                 handleAddTextBox(elements, setElements, stageRef)(e);
@@ -97,6 +98,8 @@ export const TextViewManager = (
             transformerRef.current !== null &&
             stageRef.current !== null
         ) {
+            setIsEditing(true);
+
             const textNode = textRef.current;
             const transformerNode = transformerRef.current;
             const stage = stageRef.current;
@@ -216,6 +219,7 @@ export const TextViewManager = (
                 // reset selection and justCreated for next textbox
                 setJustCreated(null);
                 selectionRef.current = [];
+                setIsEditing(false);
             };
 
             const handleWheel = (e: WheelEvent) => {
@@ -238,12 +242,12 @@ export const TextViewManager = (
 
             const handleKeyPress = (e: KeyboardEvent) => {
                 if (e.key === "Escape") {
-                    e.preventDefault();
                     textarea.blur();
+                    setView(APP_VIEW.select);
                 }
             };
 
-            textarea.addEventListener("keypress", handleKeyPress);
+            textarea.addEventListener("keydown", handleKeyPress);
             textarea.addEventListener("input", handleResize);
             textarea.addEventListener("blur", handleBlur);
             window.addEventListener("wheel", handleWheel);
@@ -262,6 +266,7 @@ export const TextViewManager = (
         toggleTextMode,
         handleTextClick,
         editText,
+        isEditingText,
         justCreated,
     };
 };
