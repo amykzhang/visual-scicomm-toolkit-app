@@ -10,7 +10,7 @@ interface ImageElementProp {
     setTransformFlag: React.Dispatch<React.SetStateAction<boolean>>;
     handleChange: (attributes: any) => void;
     handleSelect: () => void;
-    handleDragStart: (e: Konva.KonvaEventObject<DragEvent>) => void;
+    // handleDragStart: (e: Konva.KonvaEventObject<DragEvent>) => void;
     handleDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => void;
     selectionRef: React.MutableRefObject<string[]>;
     updateResetGroup: () => void;
@@ -23,7 +23,7 @@ const ImageElement = ({
     setTransformFlag,
     handleChange,
     handleSelect,
-    handleDragStart,
+    // handleDragStart,
     handleDragEnd,
     selectionRef,
     updateResetGroup,
@@ -64,13 +64,13 @@ const ImageElement = ({
                 ref={imageRef}
                 draggable={draggable}
                 onClick={handleSelect}
-                onMouseDown={() => {
-                    updateResetGroup();
-                }}
+                // onMouseDown={() => {
+                //     updateResetGroup(); //CULPRIT GODDAMIT
+                // }}
                 onDragStart={(e) => {
                     setDragSelected(true);
                     setTransformFlag(false);
-                    handleDragStart(e);
+                    // handleDragStart(e);
                 }}
                 onDragEnd={(e) => {
                     handleDragEnd(e);

@@ -1,11 +1,11 @@
 import Konva from "konva";
 
-export const handleDragStart = (
-    elements: any[],
-    setElements: React.Dispatch<React.SetStateAction<any>>
-) => {
-    return (e: Konva.KonvaEventObject<DragEvent>) => {};
-};
+// export const handleDragStart = (
+//     elements: any[],
+//     setElements: React.Dispatch<React.SetStateAction<any>>
+// ) => {
+//     return (e: Konva.KonvaEventObject<DragEvent>) => {};
+// };
 
 export const handleDragEnd = (
     elements: any[],

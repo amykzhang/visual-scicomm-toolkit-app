@@ -10,7 +10,7 @@ interface ShapeElementProp {
     setTransformFlag: React.Dispatch<React.SetStateAction<boolean>>;
     handleChange: (attributes: any) => void;
     handleSelect: () => void;
-    handleDragStart: (e: Konva.KonvaEventObject<DragEvent>) => void;
+    // handleDragStart: (e: Konva.KonvaEventObject<DragEvent>) => void;
     handleDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => void;
     selectionRef: React.MutableRefObject<string[]>;
     updateResetGroup: () => void;
@@ -23,7 +23,7 @@ const ShapeElement = ({
     setTransformFlag,
     handleChange,
     handleSelect,
-    handleDragStart,
+    // handleDragStart,
     handleDragEnd,
     selectionRef,
     updateResetGroup,
@@ -70,13 +70,13 @@ const ShapeElement = ({
                 ref={shapeRef as any}
                 draggable={draggable}
                 onClick={handleSelect}
-                onMouseDown={() => {
-                    updateResetGroup();
-                }}
+                // onMouseDown={() => {
+                //     updateResetGroup();
+                // }}
                 onDragStart={(e) => {
                     setDragSelected(true);
                     setTransformFlag(false);
-                    handleDragStart(e);
+                    // handleDragStart(e);
                 }}
                 onDragEnd={(e) => {
                     handleDragEnd(e);
