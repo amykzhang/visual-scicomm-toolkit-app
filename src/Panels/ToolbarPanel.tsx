@@ -16,9 +16,16 @@ const ToolbarPanelContainer = styled(CenterBar)`
 interface ToolbarPanelProps {
     view: APP_VIEW;
     setView: (view: APP_VIEW) => void;
+    handleUndo: () => void;
+    handleRedo: () => void;
 }
 
-export const ToolbarPanel: React.FC<ToolbarPanelProps> = ({ view, setView }) => {
+export const ToolbarPanel: React.FC<ToolbarPanelProps> = ({
+    view,
+    setView,
+    handleRedo,
+    handleUndo,
+}) => {
     return (
         <ToolbarPanelContainer>
             <SquareButton
@@ -35,14 +42,10 @@ export const ToolbarPanel: React.FC<ToolbarPanelProps> = ({ view, setView }) => 
             </SquareButton>
             <CommentTool view={view} setView={setView}></CommentTool>
             <Divider />
-            <SquareButton
-            // onClick={() => app.undo()}
-            >
+            <SquareButton onClick={handleUndo}>
                 <UndoIcon />
             </SquareButton>
-            <SquareButton
-            // onClick={() => app.redo()}
-            >
+            <SquareButton onClick={handleRedo}>
                 <RedoIcon />
             </SquareButton>
         </ToolbarPanelContainer>

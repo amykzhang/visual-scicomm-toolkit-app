@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import Konva from "konva";
-import { persistance } from "./persistance";
+import { persistance } from "../utils/persistance";
 
 const zoomScale = 1.1;
 const zoomConstants = [
@@ -10,7 +10,7 @@ const zoomConstants = [
 export const StageViewManager = (canvas_size: { width: number; height: number }) => {
     const [zoomLevel, setZoomLevel] = useState(() => {
         const saved = persistance.retrieveStageState();
-        if (saved !== undefined) {
+        if (saved !== null) {
             const { scaleX } = saved;
             return Math.floor(scaleX * 100);
         } else {
@@ -168,7 +168,7 @@ export const StageViewManager = (canvas_size: { width: number; height: number })
     useEffect(() => {
         const saved = persistance.retrieveStageState();
 
-        if (saved !== undefined) {
+        if (saved !== null) {
             const { stagePosition, scaleX } = saved;
             if (stageRef.current !== null) {
                 const stage = stageRef.current;

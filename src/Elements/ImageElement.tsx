@@ -10,10 +10,8 @@ interface ImageElementProp {
     setTransformFlag: React.Dispatch<React.SetStateAction<boolean>>;
     handleChange: (attributes: any) => void;
     handleSelect: () => void;
-    handleDragStart: (e: Konva.KonvaEventObject<DragEvent>) => void;
     handleDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => void;
     selectionRef: React.MutableRefObject<string[]>;
-    updateResetGroup: () => void;
 }
 
 const ImageElement = ({
@@ -23,10 +21,8 @@ const ImageElement = ({
     setTransformFlag,
     handleChange,
     handleSelect,
-    handleDragStart,
     handleDragEnd,
     selectionRef,
-    updateResetGroup,
 }: ImageElementProp) => {
     const isSelected = selectionRef.current.includes(image.id);
     // When the element is dragged selected but not selected yet (to show transformer when dragging and globalflag is disabled)
@@ -64,13 +60,9 @@ const ImageElement = ({
                 ref={imageRef}
                 draggable={draggable}
                 onClick={handleSelect}
-                onMouseDown={() => {
-                    updateResetGroup();
-                }}
                 onDragStart={(e) => {
                     setDragSelected(true);
                     setTransformFlag(false);
-                    handleDragStart(e);
                 }}
                 onDragEnd={(e) => {
                     handleDragEnd(e);

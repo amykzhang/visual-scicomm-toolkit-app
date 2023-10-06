@@ -102,17 +102,25 @@ October 3:
 
 October 4:
 
--   text box : transfer comment fixes to text (height adjustments, delete, edit...) (1h)
--   freehand draw (https://konvajs.org/docs/sandbox/Free_Drawing.html) (2h)
--   Undo/redo stack (https://konvajs.org/docs/react/Undo-Redo.html) (2h)
--   contextmenu for copy paste change color etc. (3h)
+-   text box : transfer comment fixes to text (height adjustments, delete, edit... )✅
 
 October 5:
 
+-   freehand draw (https://konvajs.org/docs/sandbox/Free_Drawing.html) (2h)
+-   Undo/redo stack (https://konvajs.org/docs/react/Undo-Redo.html) (2h)✅
+-   contextmenu for copy paste change color etc. (3h)
 -   Add shortcuts for commands (1h)
+-   tooltips !
 -   Add support for chrome, safari, firefox, edge (2h)
 -   Landing Page (look into it) (1h)
--   Production and staging servers (1h)
+
+Production and staging servers: t
+document code, how to deploy, how to run, how to test
+
+nice-to-haves:
+
+-   elements: shift locks onto rails while dragging
+-   shapes: shift to lock dimensions while resizing, lock onto dimensions
 
 October 6:: testing
 

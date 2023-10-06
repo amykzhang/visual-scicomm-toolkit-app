@@ -3,12 +3,10 @@ import { Stage, Layer, Group } from "react-konva";
 import { PanelsContainer } from "./styles/containers";
 import {
     ExportManager,
-    KeyPressManager,
     SelectionManager,
     StageViewManager,
     TextViewManager,
     handleDragEnd,
-    handleDragStart,
 } from "./functions";
 import { CommentViewManager } from "./functions";
 import { APP_VIEW } from "./utils/enums";
@@ -23,6 +21,7 @@ import { ExportArea } from "./components/ExportArea";
 import { ExitCommentViewButton } from "./components/Components";
 import activity_visual_strategies from "./activity/activity";
 import {
+    CanvasStateProp,
     CommentProp,
     ElementProp,
     ImageProp,
@@ -31,7 +30,7 @@ import {
     TextProp,
     UiStateProp,
 } from "./utils/interfaces";
-import { persistance } from "./functions";
+import { persistance } from "./utils/persistance";
 import { ImageElement, CommentElement, ShapeElement, TextElement } from "./Elements";
 import { ExportPanel } from "./Panels";
 import Konva from "konva";
@@ -40,29 +39,33 @@ import color from "./styles/color";
 
 const activity = activity_visual_strategies;
 
+const initialCanvasState = persistance.retrieveCanvasState();
+const initialUiState = persistance.retrieveUiState();
+
+interface HistoryProp {
+    canvas: CanvasStateProp;
+    selection: string[];
+}
+
+let history: HistoryProp[] = [
+    {
+        canvas: initialCanvasState,
+        selection: [],
+    },
+];
+let historyStep = 0;
+
 export default function App() {
     const groupRef = useRef<Konva.Group>(null);
     const exportAreaRef = useRef<Konva.Rect>(null);
     const selectionRectRef = useRef<Konva.Rect>(null);
 
-    const { shiftKey, metaKey } = KeyPressManager();
+    const [shiftKey, setShiftKey] = useState(false);
 
     // App State (stage position, zoom, view, panels)
-    const [uiState, setUiState] = useState<UiStateProp>(() => {
-        const saved = persistance.retrieveUiState();
-
-        if (saved !== undefined) {
-            return saved;
-        } else
-            return {
-                isLeftPanelOpen: true,
-                isRightPanelOpen: true,
-                view: APP_VIEW.select,
-            };
-    });
+    const [uiState, setUiState] = useState<UiStateProp>(initialUiState);
 
     const view = uiState.view;
-
     const setView = useCallback(
         (view: APP_VIEW) => {
             setUiState({ ...uiState, view: view });
@@ -78,40 +81,17 @@ export default function App() {
         draggable: view === APP_VIEW.pan,
     };
 
-    // Elements
-    const [elements, setElements] = useState<ElementProp[]>(() => {
-        const saved = persistance.retrieveCanvasState();
+    // Stage View
+    const { stageRef, handleWheel, zoomLevel, zoomIn, zoomOut, zoomFit, toggleFullscreen } =
+        StageViewManager(activity.canvas_size);
 
-        if (saved !== undefined) {
-            return saved.elements;
-        } else return [];
-    });
+    // --- CANVAS STATE ---
 
-    // // History
-    // const [currentElements, setCurrentElements] = useState<ElementProp[]>(elements);
-    // let history: ElementProp[][] = [];
-    // let historyStep = 0;
-
-    // const handleUndo = () => {
-    //     if (historyStep === 0) {
-    //         return;
-    //     }
-    //     historyStep -= 1;
-    //     const previous = history[historyStep];
-    //     setCurrentElements(previous);
-    // };
-
-    // const handleRedo = () => {
-    //     if (historyStep === history.length - 1) {
-    //         return;
-    //     }
-    //     historyStep += 1;
-    //     const next = history[historyStep];
-    //     setCurrentElements(next);
-    // };
+    const [elements, setElements] = useState<ElementProp[]>(history[0].canvas.elements);
+    const [comments, setComments] = useState<CommentProp[]>(history[0].canvas.comments);
 
     // Group Selection
-    const selectionRef = useRef<string[]>([]);
+    const selectionRef = useRef<string[]>(history[0].selection);
 
     // Drag Select
     const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -122,23 +102,10 @@ export default function App() {
         height: 0,
     });
 
-    // "Global" transform flag (for isolating drag selecting elements)
+    // App wide transform flag (for isolating drag selecting elements)
     const [transformFlag, setTransformFlag] = useState(true);
 
-    // comments
-    const [comments, setComments] = useState<CommentProp[]>(() => {
-        const saved = persistance.retrieveCanvasState();
-
-        if (saved !== undefined && saved.comments !== undefined) {
-            return saved.comments;
-        } else {
-            return [];
-        }
-    });
-
-    // Stage View
-    const { stageRef, handleWheel, zoomLevel, zoomIn, zoomOut, zoomFit, toggleFullscreen } =
-        StageViewManager(activity.canvas_size);
+    // --- MANAGERS FOR VIEWS ---
 
     // Selection
     const { handleSelect, deleteSelected, updateResetGroup } = SelectionManager(
@@ -151,7 +118,6 @@ export default function App() {
         groupRef
     );
 
-    // Comment View
     const {
         commentViewState,
         setCommentViewState,
@@ -165,11 +131,12 @@ export default function App() {
     const { toggleTextMode, handleTextClick, editText, isEditingText, justCreated } =
         TextViewManager(view, setView, elements, setElements, stageRef, selectionRef);
 
-    // Key Presses
-    const handleKeyPress = useCallback(
+    // -- KEY PRESSES --
+    const handleKeyDown = useCallback(
         (e: KeyboardEvent) => {
+            if (e.key === "Shift") setShiftKey(true);
+
             if (selectionRef.current !== null) {
-                // Then account for specific views
                 // SELECT VIEW
                 if (view === APP_VIEW.select) {
                     if (isEditingText) {
@@ -177,21 +144,23 @@ export default function App() {
                     }
                     switch (e.key) {
                         case "a":
-                            if (metaKey) {
+                            if (e.metaKey) {
                                 selectionRef.current = elements.map((element) => element.id);
-                            }
-                            break;
-                        case "Delete":
-                        case "Backspace":
-                            if (!metaKey && selectionRef.current.length > 0) {
-                                deleteSelected();
+                                setElements(elements.slice()); // force update (TODO: FIX HACK)
                             }
                             break;
                         case "Escape":
                             selectionRef.current = [];
+                            setElements(elements.slice());
+                            break;
+                        case "Delete":
+                        case "Backspace":
+                            if (!e.metaKey && selectionRef.current.length > 0) {
+                                deleteSelected();
+                            }
                             break;
                         case "t":
-                            if (!metaKey) {
+                            if (e.metaKey) {
                                 setView(APP_VIEW.text);
                             }
                             break;
@@ -241,19 +210,15 @@ export default function App() {
                                 setSelectedComment(null);
                             }
                             break;
-                        case "=":
-                            break;
                         default:
                             break;
                     }
-                    // SELECT VIEW
                 }
             }
         },
         [
             elements,
             comments,
-            metaKey,
             selectedComment,
             view,
             isEditingText,
@@ -261,11 +226,13 @@ export default function App() {
             deleteSelected,
             setSelectedComment,
             setView,
+            selectionRef,
         ]
     );
 
-    // Export
-    const startExportProcess = ExportManager(activity, stageRef, setTransformFlag);
+    const handleKeyUp = useCallback((e: KeyboardEvent) => {
+        if (e.key === "Shift") setShiftKey(false);
+    }, []);
 
     // Given an elementProp, return a ReactElement representing the type of element
     function elementToReactElement(
@@ -289,12 +256,10 @@ export default function App() {
                         ]);
                     }}
                     handleSelect={() => handleSelect(image.id)}
-                    handleDragStart={handleDragStart(elements, setElements)}
                     handleDragEnd={handleDragEnd(elements, setElements)}
                     transformFlag={transformFlag}
                     setTransformFlag={setTransformFlag}
                     selectionRef={selectionRef}
-                    updateResetGroup={updateResetGroup}
                 />
             );
         } else if (element.type === "shape") {
@@ -312,12 +277,10 @@ export default function App() {
                         ]);
                     }}
                     handleSelect={() => handleSelect(shape.id)}
-                    handleDragStart={handleDragStart(elements, setElements)}
                     handleDragEnd={handleDragEnd(elements, setElements)}
                     transformFlag={transformFlag}
                     setTransformFlag={setTransformFlag}
                     selectionRef={selectionRef}
-                    updateResetGroup={updateResetGroup}
                 />
             );
         } else if (element.type === "text") {
@@ -339,11 +302,9 @@ export default function App() {
                         setView(APP_VIEW.select);
                         handleSelect(text.id);
                     }}
-                    handleDragStart={handleDragStart(elements, setElements)}
                     handleDragEnd={handleDragEnd(elements, setElements)}
                     transformFlag={transformFlag}
                     setTransformFlag={setTransformFlag}
-                    updateResetGroup={updateResetGroup}
                     editText={editText}
                     isJustCreated={justCreated === text.id}
                 />
@@ -356,6 +317,7 @@ export default function App() {
         switch (view) {
             case APP_VIEW.select:
                 selectionRef.current = [];
+                setElements(elements.slice());
                 break;
             case APP_VIEW.pan:
                 // do something for pan view
@@ -374,6 +336,29 @@ export default function App() {
         }
     }
 
+    // --- HISTORY ---
+
+    const handleUndo = () => {
+        if (historyStep > 0) {
+            historyStep -= 1;
+            setElements(history[historyStep].canvas.elements);
+            setComments(history[historyStep].canvas.comments);
+            selectionRef.current = history[historyStep].selection;
+        }
+    };
+
+    const handleRedo = () => {
+        if (historyStep < history.length - 1) {
+            historyStep += 1;
+            setElements(history[historyStep].canvas.elements);
+            setComments(history[historyStep].canvas.comments);
+            selectionRef.current = history[historyStep].selection;
+        }
+    };
+
+    // Export
+    const startExportProcess = ExportManager(activity, stageRef, setTransformFlag);
+
     // Save canvas state
     useEffect(() => {
         persistance.persistCanvasState(elements, comments);
@@ -385,12 +370,27 @@ export default function App() {
     }, [uiState]);
 
     useEffect(() => {
-        document.addEventListener("keydown", handleKeyPress);
+        const newState = {
+            canvas: { elements, comments },
+            selection: selectionRef.current,
+        };
+
+        if (JSON.stringify(newState) !== JSON.stringify(history[historyStep])) {
+            history = [...history.slice(0, historyStep + 1), newState];
+            historyStep += 1;
+        }
+    }, [elements, comments, selectionRef]);
+
+    // Handle key presses
+    useEffect(() => {
+        window.addEventListener("keydown", handleKeyDown);
+        window.addEventListener("keyup", handleKeyUp);
 
         return () => {
-            document.removeEventListener("keydown", handleKeyPress);
+            window.removeEventListener("keydown", handleKeyDown);
+            window.removeEventListener("keyup", handleKeyUp);
         };
-    }, [handleKeyPress]);
+    }, [handleKeyDown, handleKeyUp]);
 
     // For Comment View
     useEffect(() => {
@@ -446,7 +446,12 @@ export default function App() {
             <PanelsContainer>
                 <TopZone>
                     <TitlePanel name={activity.name} />
-                    <ToolbarPanel view={view} setView={setView} />
+                    <ToolbarPanel
+                        view={view}
+                        setView={setView}
+                        handleUndo={handleUndo}
+                        handleRedo={handleRedo}
+                    />
                     <ExitCommentView view={view} setView={setView} />
                     <ExportPanel activity={activity} startExportProcess={startExportProcess} />
                 </TopZone>
