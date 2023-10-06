@@ -1,11 +1,11 @@
-import { APP_VIEW } from "../utils/enums";
+import { APP_VIEW } from "./enums";
 import {
     ElementProp,
     UiStateProp,
     StageStateProp,
     CanvasStateProp,
     CommentProp,
-} from "../utils/interfaces";
+} from "./interfaces";
 
 const LOCALSTORAGE_CANVAS_STATE_KEY = "visual-toolkit-canvas";
 const LOCALSTORAGE_UI_STATE_KEY = "visual-toolkit-ui";
