@@ -85,9 +85,6 @@ export default function App() {
     const { stageRef, handleWheel, zoomLevel, zoomIn, zoomOut, zoomFit, toggleFullscreen } =
         StageViewManager(activity.canvas_size);
 
-    // History
-    const [undoRedo, setUndoRedo] = useState<"" | "undo" | "redo">("");
-
     // --- CANVAS STATE ---
 
     const [elements, setElements] = useState<ElementProp[]>(history[0].canvas.elements);
@@ -134,20 +131,6 @@ export default function App() {
     const { toggleTextMode, handleTextClick, editText, isEditingText, justCreated } =
         TextViewManager(view, setView, elements, setElements, stageRef, selectionRef);
 
-    // --- HISTORY ---
-
-    const handleUndo = () => {
-        if (historyStep > 0) {
-            setUndoRedo("undo");
-        }
-    };
-
-    const handleRedo = () => {
-        if (historyStep < history.length - 1) {
-            setUndoRedo("redo");
-        }
-    };
-
     // -- KEY PRESSES --
     const handleKeyDown = useCallback(
         (e: KeyboardEvent) => {
@@ -182,7 +165,7 @@ export default function App() {
                             }
                             break;
                         case "7":
-                            console.log(historyStep, undoRedo);
+                            console.log(historyStep);
                             console.log(history);
                             break;
                         default:
@@ -248,7 +231,6 @@ export default function App() {
             setSelectedComment,
             setView,
             selectionRef,
-            undoRedo,
         ]
     );
 
@@ -339,6 +321,7 @@ export default function App() {
         switch (view) {
             case APP_VIEW.select:
                 selectionRef.current = [];
+                setElements(elements.slice());
                 break;
             case APP_VIEW.pan:
                 // do something for pan view
@@ -356,6 +339,26 @@ export default function App() {
                 break;
         }
     }
+
+    // --- HISTORY ---
+
+    const handleUndo = () => {
+        if (historyStep > 0) {
+            historyStep -= 1;
+            setElements(history[historyStep].canvas.elements);
+            setComments(history[historyStep].canvas.comments);
+            selectionRef.current = history[historyStep].selection;
+        }
+    };
+
+    const handleRedo = () => {
+        if (historyStep < history.length - 1) {
+            historyStep += 1;
+            setElements(history[historyStep].canvas.elements);
+            setComments(history[historyStep].canvas.comments);
+            selectionRef.current = history[historyStep].selection;
+        }
+    };
 
     // Export
     const startExportProcess = ExportManager(activity, stageRef, setTransformFlag);
@@ -381,22 +384,6 @@ export default function App() {
             historyStep += 1;
         }
     }, [elements, comments, selectionRef]);
-
-    useEffect(() => {
-        if (undoRedo === "undo") {
-            historyStep -= 1;
-            setElements(history[historyStep].canvas.elements);
-            setComments(history[historyStep].canvas.comments);
-            selectionRef.current = history[historyStep].selection;
-            setUndoRedo("");
-        } else if (undoRedo === "redo") {
-            historyStep += 1;
-            setElements(history[historyStep].canvas.elements);
-            setComments(history[historyStep].canvas.comments);
-            selectionRef.current = history[historyStep].selection;
-            setUndoRedo("");
-        }
-    }, [undoRedo]);
 
     // Handle key presses
     useEffect(() => {
