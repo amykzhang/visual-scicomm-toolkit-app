@@ -164,10 +164,6 @@ export default function App() {
                                 setView(APP_VIEW.text);
                             }
                             break;
-                        case "7":
-                            console.log(historyStep);
-                            console.log(history);
-                            break;
                         default:
                             break;
                     }
