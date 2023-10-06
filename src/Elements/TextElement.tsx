@@ -13,9 +13,7 @@ interface TextElementProp {
     setTransformFlag: React.Dispatch<React.SetStateAction<boolean>>;
     handleChange: (attributes: any) => void;
     handleSelect: () => void;
-    // handleDragStart: (e: Konva.KonvaEventObject<DragEvent>) => void;
     handleDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => void;
-    updateResetGroup: () => void;
     editText: editTextProp;
 }
 
@@ -28,9 +26,7 @@ const TextElement = ({
     setTransformFlag,
     handleChange,
     handleSelect,
-    // handleDragStart,
     handleDragEnd,
-    updateResetGroup,
     editText,
 }: TextElementProp) => {
     const isSelected = selectionRef.current.includes(text.id);
@@ -139,11 +135,9 @@ const TextElement = ({
                 fill={text.fill}
                 draggable={draggable}
                 onClick={handleClick}
-                // onMouseDown={updateResetGroup}
                 onDragStart={(e) => {
                     setDragSelected(true);
                     setTransformFlag(false);
-                    // handleDragStart(e);
                 }}
                 onDragEnd={(e) => {
                     handleDragEnd(e);

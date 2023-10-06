@@ -3,12 +3,10 @@ import { Stage, Layer, Group } from "react-konva";
 import { PanelsContainer } from "./styles/containers";
 import {
     ExportManager,
-    KeyPressManager,
     SelectionManager,
     StageViewManager,
     TextViewManager,
     handleDragEnd,
-    // handleDragStart,
 } from "./functions";
 import { CommentViewManager } from "./functions";
 import { APP_VIEW } from "./utils/enums";
@@ -32,7 +30,7 @@ import {
     TextProp,
     UiStateProp,
 } from "./utils/interfaces";
-import { persistance } from "./functions";
+import { persistance } from "./utils/persistance";
 import { ImageElement, CommentElement, ShapeElement, TextElement } from "./Elements";
 import { ExportPanel } from "./Panels";
 import Konva from "konva";
@@ -62,7 +60,7 @@ export default function App() {
     const exportAreaRef = useRef<Konva.Rect>(null);
     const selectionRectRef = useRef<Konva.Rect>(null);
 
-    const { shiftKey, metaKey } = KeyPressManager();
+    const [shiftKey, setShiftKey] = useState(false);
 
     // App State (stage position, zoom, view, panels)
     const [uiState, setUiState] = useState<UiStateProp>(initialUiState);
@@ -86,6 +84,9 @@ export default function App() {
     // Stage View
     const { stageRef, handleWheel, zoomLevel, zoomIn, zoomOut, zoomFit, toggleFullscreen } =
         StageViewManager(activity.canvas_size);
+
+    // History
+    const [undoRedo, setUndoRedo] = useState<"" | "undo" | "redo">("");
 
     // --- CANVAS STATE ---
 
@@ -136,36 +137,23 @@ export default function App() {
     // --- HISTORY ---
 
     const handleUndo = () => {
-        if (historyStep === 0) {
-            return;
+        if (historyStep > 0) {
+            setUndoRedo("undo");
         }
-
-        console.log("handleUndo");
-
-        historyStep -= 1;
-        const previous = history[historyStep];
-        setElements(previous.canvas.elements);
-        selectionRef.current = previous.selection;
     };
 
     const handleRedo = () => {
-        if (historyStep === history.length - 1) {
-            return;
+        if (historyStep < history.length - 1) {
+            setUndoRedo("redo");
         }
-
-        console.log("handleRedo");
-
-        historyStep += 1;
-        const next = history[historyStep];
-        setElements(next.canvas.elements);
-        selectionRef.current = next.selection;
     };
 
-    // Key Presses
-    const handleKeyPress = useCallback(
+    // -- KEY PRESSES --
+    const handleKeyDown = useCallback(
         (e: KeyboardEvent) => {
+            if (e.key === "Shift") setShiftKey(true);
+
             if (selectionRef.current !== null) {
-                // Then account for specific views
                 // SELECT VIEW
                 if (view === APP_VIEW.select) {
                     if (isEditingText) {
@@ -173,27 +161,29 @@ export default function App() {
                     }
                     switch (e.key) {
                         case "a":
-                            if (metaKey) {
+                            if (e.metaKey) {
                                 selectionRef.current = elements.map((element) => element.id);
-                            }
-                            break;
-                        case "Delete":
-                        case "Backspace":
-                            if (!metaKey && selectionRef.current.length > 0) {
-                                deleteSelected();
+                                setElements(elements.slice()); // force update (TODO: FIX HACK)
                             }
                             break;
                         case "Escape":
                             selectionRef.current = [];
+                            setElements(elements.slice());
+                            break;
+                        case "Delete":
+                        case "Backspace":
+                            if (!e.metaKey && selectionRef.current.length > 0) {
+                                deleteSelected();
+                            }
                             break;
                         case "t":
-                            if (!metaKey) {
+                            if (e.metaKey) {
                                 setView(APP_VIEW.text);
                             }
                             break;
-                        case "=":
+                        case "7":
+                            console.log(historyStep, undoRedo);
                             console.log(history);
-                            console.log(historyStep);
                             break;
                         default:
                             break;
@@ -250,7 +240,6 @@ export default function App() {
         [
             elements,
             comments,
-            metaKey,
             selectedComment,
             view,
             isEditingText,
@@ -258,8 +247,14 @@ export default function App() {
             deleteSelected,
             setSelectedComment,
             setView,
+            selectionRef,
+            undoRedo,
         ]
     );
+
+    const handleKeyUp = useCallback((e: KeyboardEvent) => {
+        if (e.key === "Shift") setShiftKey(false);
+    }, []);
 
     // Given an elementProp, return a ReactElement representing the type of element
     function elementToReactElement(
@@ -283,12 +278,10 @@ export default function App() {
                         ]);
                     }}
                     handleSelect={() => handleSelect(image.id)}
-                    // handleDragStart={handleDragStart(elements, setElements)}
                     handleDragEnd={handleDragEnd(elements, setElements)}
                     transformFlag={transformFlag}
                     setTransformFlag={setTransformFlag}
                     selectionRef={selectionRef}
-                    updateResetGroup={updateResetGroup}
                 />
             );
         } else if (element.type === "shape") {
@@ -306,12 +299,10 @@ export default function App() {
                         ]);
                     }}
                     handleSelect={() => handleSelect(shape.id)}
-                    // handleDragStart={handleDragStart(elements, setElements)}
                     handleDragEnd={handleDragEnd(elements, setElements)}
                     transformFlag={transformFlag}
                     setTransformFlag={setTransformFlag}
                     selectionRef={selectionRef}
-                    updateResetGroup={updateResetGroup}
                 />
             );
         } else if (element.type === "text") {
@@ -333,11 +324,9 @@ export default function App() {
                         setView(APP_VIEW.select);
                         handleSelect(text.id);
                     }}
-                    // handleDragStart={handleDragStart(elements, setElements)}
                     handleDragEnd={handleDragEnd(elements, setElements)}
                     transformFlag={transformFlag}
                     setTransformFlag={setTransformFlag}
-                    updateResetGroup={updateResetGroup}
                     editText={editText}
                     isJustCreated={justCreated === text.id}
                 />
@@ -381,36 +370,44 @@ export default function App() {
         persistance.persistUiState(uiState);
     }, [uiState]);
 
-    // Save history
     useEffect(() => {
-        // cap history at 5
-        // if (history.length > 100) {
-        //     history = history.slice(history.length - 100);
-        //     historyStep = 100;
-        // }
-        console.log(historyStep, elements);
-        // remove all future history
-        history = history.slice(0, historyStep + 1);
-        // add new history
-        history.push({
-            canvas: {
-                elements: elements,
-                comments: comments,
-            },
+        const newState = {
+            canvas: { elements, comments },
             selection: selectionRef.current,
-        });
-        // increment history step
-        historyStep += 1;
-    }, [elements]);
+        };
+
+        if (JSON.stringify(newState) !== JSON.stringify(history[historyStep])) {
+            history = [...history.slice(0, historyStep + 1), newState];
+            historyStep += 1;
+        }
+    }, [elements, comments, selectionRef]);
+
+    useEffect(() => {
+        if (undoRedo === "undo") {
+            historyStep -= 1;
+            setElements(history[historyStep].canvas.elements);
+            setComments(history[historyStep].canvas.comments);
+            selectionRef.current = history[historyStep].selection;
+            setUndoRedo("");
+        } else if (undoRedo === "redo") {
+            historyStep += 1;
+            setElements(history[historyStep].canvas.elements);
+            setComments(history[historyStep].canvas.comments);
+            selectionRef.current = history[historyStep].selection;
+            setUndoRedo("");
+        }
+    }, [undoRedo]);
 
     // Handle key presses
     useEffect(() => {
-        document.addEventListener("keydown", handleKeyPress);
+        window.addEventListener("keydown", handleKeyDown);
+        window.addEventListener("keyup", handleKeyUp);
 
         return () => {
-            document.removeEventListener("keydown", handleKeyPress);
+            window.removeEventListener("keydown", handleKeyDown);
+            window.removeEventListener("keyup", handleKeyUp);
         };
-    }, [handleKeyPress]);
+    }, [handleKeyDown, handleKeyUp]);
 
     // For Comment View
     useEffect(() => {

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import Konva from "konva";
-import { persistance } from "./persistance";
+import { persistance } from "../utils/persistance";
 
 const zoomScale = 1.1;
 const zoomConstants = [
