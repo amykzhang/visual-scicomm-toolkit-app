@@ -336,6 +336,68 @@ export default function App() {
         }
     }
 
+    const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
+        if (stageRef.current === null) return;
+        const stage = stageRef.current;
+
+        if (view === APP_VIEW.select) {
+            // Only start bounding box drag select if user clicks on stage or export area
+            if (e.target === stage || e.target === exportAreaRef.current) {
+                setIsSelectionMode(true);
+
+                const pointerPosition = stage.getPointerPosition();
+                if (pointerPosition !== null) {
+                    const x = (pointerPosition.x - stage.x()) / stage.scaleX();
+                    const y = (pointerPosition.y - stage.y()) / stage.scaleX();
+                    setSelectionBounds({
+                        x,
+                        y,
+                        width: 0,
+                        height: 0,
+                    });
+                }
+            }
+        }
+        if (view === APP_VIEW.draw) {
+            console.log("draw mousedown");
+        }
+    };
+
+    const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
+        if (stageRef.current === null) return;
+        const stage = stageRef.current;
+
+        if (view === APP_VIEW.select && isSelectionMode) {
+            const pointerPosition = stage.getPointerPosition();
+
+            if (pointerPosition !== null) {
+                const x = (pointerPosition.x - stage.x()) / stage.scaleX();
+                const y = (pointerPosition.y - stage.y()) / stage.scaleX();
+                const width = x - selectionBounds.x;
+                const height = y - selectionBounds.y;
+                setSelectionBounds({
+                    ...selectionBounds,
+                    width,
+                    height,
+                });
+            }
+        }
+        if (view === APP_VIEW.draw) {
+            console.log("draw mousemove");
+        }
+    };
+
+    const handleMouseUp = (e: Konva.KonvaEventObject<MouseEvent>) => {
+        if (view === APP_VIEW.select && isSelectionMode) {
+            setIsSelectionMode(false);
+            // Get Elements within bounds
+            selectionRef.current = getElementsWithinBounds(selectionBounds, elements);
+        }
+        if (view === APP_VIEW.draw) {
+            console.log("draw mouseup");
+        }
+    };
+
     // --- HISTORY ---
 
     const handleUndo = () => {
@@ -498,54 +560,9 @@ export default function App() {
                 onClick={(e) => {
                     if (e.target === stageRef.current) handleCanvasClick(e);
                 }}
-                onMouseDown={(e) => {
-                    if (view === APP_VIEW.select && stageRef.current !== null) {
-                        const stage = stageRef.current;
-
-                        // Only start bounding box drag select if user clicks on stage or export area
-                        if (e.target === stage || e.target === exportAreaRef.current) {
-                            setIsSelectionMode(true);
-
-                            const pointerPosition = stage.getPointerPosition();
-                            if (pointerPosition !== null) {
-                                const x = (pointerPosition.x - stage.x()) / stage.scaleX();
-                                const y = (pointerPosition.y - stage.y()) / stage.scaleX();
-                                setSelectionBounds({
-                                    x,
-                                    y,
-                                    width: 0,
-                                    height: 0,
-                                });
-                            }
-                        }
-                    }
-                }}
-                onMouseMove={(e) => {
-                    if (isSelectionMode && stageRef.current !== null) {
-                        const stage = stageRef.current;
-                        const pointerPosition = stage.getPointerPosition();
-
-                        if (pointerPosition !== null) {
-                            const x = (pointerPosition.x - stage.x()) / stage.scaleX();
-                            const y = (pointerPosition.y - stage.y()) / stage.scaleX();
-                            const width = x - selectionBounds.x;
-                            const height = y - selectionBounds.y;
-                            setSelectionBounds({
-                                ...selectionBounds,
-                                width,
-                                height,
-                            });
-                        }
-                    }
-                }}
-                onMouseUp={(e) => {
-                    if (isSelectionMode && view === APP_VIEW.select) {
-                        setIsSelectionMode(false);
-
-                        // Get Elements within bounds
-                        selectionRef.current = getElementsWithinBounds(selectionBounds, elements);
-                    }
-                }}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
                 onContextMenu={(e) => {
                     e.evt.preventDefault();
                 }}
