@@ -11,7 +11,8 @@ export const TextViewManager = (
     elements: ElementProp[],
     setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>,
     stageRef: React.RefObject<Konva.Stage>,
-    selectionRef: React.MutableRefObject<string[]>
+    groupSelection: string[],
+    setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>
 ) => {
     const [isEditingText, setIsEditing] = useState<boolean>(false);
     const [justCreated, setJustCreated] = useState<string | null>(null);
@@ -64,7 +65,7 @@ export const TextViewManager = (
 
                 // set justCreated for side effect to enter edit mode
                 setJustCreated(id);
-                selectionRef.current = [id];
+                setGroupSelection([id]);
             }
         };
     };
@@ -77,7 +78,7 @@ export const TextViewManager = (
         if (e.target.getAttrs().type !== "text") {
             if (isEditingText) {
                 setIsEditing(false);
-                selectionRef.current = [];
+                setGroupSelection([]);
             } else {
                 setIsEditing(false);
                 handleAddTextBox(elements, setElements, stageRef)(e);
@@ -218,7 +219,7 @@ export const TextViewManager = (
 
                 // reset selection and justCreated for next textbox
                 setJustCreated(null);
-                selectionRef.current = [];
+                setGroupSelection([]);
                 setIsEditing(false);
             };
 

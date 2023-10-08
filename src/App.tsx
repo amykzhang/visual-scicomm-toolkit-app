@@ -71,7 +71,7 @@ export default function App() {
         (view: APP_VIEW) => {
             setUiState({ ...uiState, view: view });
             if (view !== APP_VIEW.select) {
-                selectionRef.current = [];
+                setGroupSelection([]);
             }
         },
         [uiState]
@@ -92,7 +92,7 @@ export default function App() {
     const [comments, setComments] = useState<CommentProp[]>(history[0].canvas.comments);
 
     // Group Selection
-    const selectionRef = useRef<string[]>(history[0].selection);
+    const [groupSelection, setGroupSelection] = useState<string[]>(history[0].selection);
 
     // Drag Select
     const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -115,13 +115,12 @@ export default function App() {
         view,
         setView,
         shiftKey,
-        selectionRef,
+        groupSelection,
+        setGroupSelection,
         groupRef
     );
 
     const {
-        commentViewState,
-        setCommentViewState,
         selectedComment,
         setSelectedComment,
         handleCommentViewClickOff,
@@ -130,14 +129,22 @@ export default function App() {
     } = CommentViewManager(comments, setComments, stageRef);
 
     const { toggleTextMode, handleTextClick, editText, isEditingText, justCreated } =
-        TextViewManager(view, setView, elements, setElements, stageRef, selectionRef);
+        TextViewManager(
+            view,
+            setView,
+            elements,
+            setElements,
+            stageRef,
+            groupSelection,
+            setGroupSelection
+        );
 
     // -- KEY PRESSES --
     const handleKeyDown = useCallback(
         (e: KeyboardEvent) => {
             if (e.key === "Shift") setShiftKey(true);
 
-            if (selectionRef.current !== null) {
+            if (groupSelection !== null) {
                 // SELECT VIEW
                 if (view === APP_VIEW.select) {
                     if (isEditingText) {
@@ -146,20 +153,21 @@ export default function App() {
                     switch (e.key) {
                         case "a":
                             if (e.metaKey) {
-                                selectionRef.current = elements.map((element) => element.id);
+                                setGroupSelection(elements.map((element) => element.id));
                                 setElements(elements.slice()); // force update (TODO: FIX HACK)
                             }
                             break;
                         case "Escape":
-                            selectionRef.current = [];
+                            setGroupSelection([]);
                             setElements(elements.slice());
                             break;
                         case "Delete":
                         case "Backspace":
-                            if (!e.metaKey && selectionRef.current.length > 0) {
+                            if (!e.metaKey) {
                                 deleteSelected();
                             }
                             break;
+                        // TODO: remove shortcut
                         case "t":
                             if (e.metaKey) {
                                 setView(APP_VIEW.text);
@@ -175,9 +183,11 @@ export default function App() {
                         case "Escape":
                             setView(APP_VIEW.select);
                             break;
+                        // TODO: remove shortcut
                         case "t":
                             setView(APP_VIEW.text);
                             break;
+                        // TODO: remove shortcut
                         case "v":
                             setView(APP_VIEW.select);
                             break;
@@ -190,6 +200,7 @@ export default function App() {
                         case "Escape":
                             setView(APP_VIEW.select);
                             break;
+                        // TODO: remove shortcut
                         case "v":
                             setView(APP_VIEW.select);
                             break;
@@ -227,7 +238,7 @@ export default function App() {
             deleteSelected,
             setSelectedComment,
             setView,
-            selectionRef,
+            groupSelection,
         ]
     );
 
@@ -260,7 +271,8 @@ export default function App() {
                     handleDragEnd={handleDragEnd(elements, setElements)}
                     transformFlag={transformFlag}
                     setTransformFlag={setTransformFlag}
-                    selectionRef={selectionRef}
+                    groupSelection={groupSelection}
+                    setGroupSelection={setGroupSelection}
                 />
             );
         } else if (element.type === "shape") {
@@ -281,7 +293,8 @@ export default function App() {
                     handleDragEnd={handleDragEnd(elements, setElements)}
                     transformFlag={transformFlag}
                     setTransformFlag={setTransformFlag}
-                    selectionRef={selectionRef}
+                    groupSelection={groupSelection}
+                    setGroupSelection={setGroupSelection}
                 />
             );
         } else if (element.type === "text") {
@@ -290,7 +303,8 @@ export default function App() {
                 <TextElement
                     key={i}
                     text={text}
-                    selectionRef={selectionRef}
+                    groupSelection={groupSelection}
+                    setGroupSelection={setGroupSelection}
                     draggable={draggable}
                     handleChange={(attributes: any) => {
                         setElements([
@@ -317,7 +331,7 @@ export default function App() {
     function handleCanvasClick(e: Konva.KonvaEventObject<MouseEvent>) {
         switch (view) {
             case APP_VIEW.select:
-                selectionRef.current = [];
+                setGroupSelection([]);
                 setElements(elements.slice());
                 break;
             case APP_VIEW.pan:
@@ -392,7 +406,7 @@ export default function App() {
         if (view === APP_VIEW.select && isSelectionMode) {
             setIsSelectionMode(false);
             // Get Elements within bounds
-            selectionRef.current = getElementsWithinBounds(selectionBounds, elements);
+            setGroupSelection(getElementsWithinBounds(selectionBounds, elements));
         }
         if (view === APP_VIEW.draw) {
             console.log("draw mouseup");
@@ -406,7 +420,7 @@ export default function App() {
             historyStep -= 1;
             setElements(history[historyStep].canvas.elements);
             setComments(history[historyStep].canvas.comments);
-            selectionRef.current = history[historyStep].selection;
+            setGroupSelection(history[historyStep].selection);
         }
     };
 
@@ -415,7 +429,7 @@ export default function App() {
             historyStep += 1;
             setElements(history[historyStep].canvas.elements);
             setComments(history[historyStep].canvas.comments);
-            selectionRef.current = history[historyStep].selection;
+            setGroupSelection(history[historyStep].selection);
         }
     };
 
@@ -435,14 +449,14 @@ export default function App() {
     useEffect(() => {
         const newState = {
             canvas: { elements, comments },
-            selection: selectionRef.current,
+            selection: groupSelection,
         };
 
         if (JSON.stringify(newState) !== JSON.stringify(history[historyStep])) {
             history = [...history.slice(0, historyStep + 1), newState];
             historyStep += 1;
         }
-    }, [elements, comments, selectionRef]);
+    }, [elements, comments, groupSelection]);
 
     // Handle key presses
     useEffect(() => {
@@ -455,30 +469,17 @@ export default function App() {
         };
     }, [handleKeyDown, handleKeyUp]);
 
-    // For Comment View
+    // side effect views
     useEffect(() => {
-        if (stageRef.current !== null) {
-            const stage = stageRef.current;
-            const container = stage.getContent();
-            container.style.backgroundColor = commentViewState.backgroundColor;
+        if (stageRef.current === null) return;
+        const stage = stageRef.current;
 
-            // update comment selection
-            setSelectedComment(null);
-        }
-    }, [commentViewState, stageRef, setSelectedComment]);
-
-    // side effect comment view background
-    useEffect(() => {
         if (view === APP_VIEW.comment) {
-            setCommentViewState({
-                backgroundColor: color.commentViewBackground,
-            });
+            stage.getContent().style.backgroundColor = color.commentViewBackground;
         } else {
-            setCommentViewState({
-                backgroundColor: color.canvasBackground,
-            });
+            stage.getContent().style.backgroundColor = color.canvasBackground;
         }
-    }, [view, setView, setCommentViewState]);
+    }, [view, setView, stageRef]);
 
     // side effect for cursor
     useEffect(() => {
@@ -589,7 +590,7 @@ export default function App() {
                 </Layer>
                 <Layer id="elements-layer">
                     {elements
-                        .filter((element) => !selectionRef.current.includes(element.id))
+                        .filter((element) => !groupSelection.includes(element.id))
                         .map((element, i) => elementToReactElement(element, i, false))}
                     <Group
                         draggable
@@ -598,7 +599,7 @@ export default function App() {
                             updateResetGroup();
                         }}
                     >
-                        {selectionRef.current.map((id) => {
+                        {groupSelection.map((id) => {
                             const idx = elements.findIndex((element) => element.id === id);
                             return idx !== -1
                                 ? elementToReactElement(elements[idx], idx, true)

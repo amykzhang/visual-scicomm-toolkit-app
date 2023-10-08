@@ -11,7 +11,8 @@ interface ShapeElementProp {
     handleChange: (attributes: any) => void;
     handleSelect: () => void;
     handleDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => void;
-    selectionRef: React.MutableRefObject<string[]>;
+    groupSelection: string[];
+    setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const ShapeElement = ({
@@ -22,10 +23,10 @@ const ShapeElement = ({
     handleChange,
     handleSelect,
     handleDragEnd,
-    selectionRef,
-}: // updateResetGroup,
-ShapeElementProp) => {
-    const isSelected = selectionRef.current.includes(shape.id);
+    groupSelection,
+    setGroupSelection,
+}: ShapeElementProp) => {
+    const isSelected = groupSelection.includes(shape.id);
     // When the element is dragged selected but not selected yet (to show transformer when dragging and globalflag is disabled)
     const [dragSelected, setDragSelected] = useState(false);
 
@@ -73,7 +74,7 @@ ShapeElementProp) => {
                 }}
                 onDragEnd={(e) => {
                     handleDragEnd(e);
-                    selectionRef.current = [shape.id];
+                    setGroupSelection([shape.id]);
                     setTransformFlag(true);
                     setDragSelected(false);
                 }}

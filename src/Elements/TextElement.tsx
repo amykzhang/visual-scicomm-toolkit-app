@@ -7,7 +7,8 @@ import constants from "../utils/constants";
 interface TextElementProp {
     text: TextProp;
     draggable: boolean;
-    selectionRef: React.MutableRefObject<string[]>;
+    groupSelection: string[];
+    setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>;
     transformFlag: boolean;
     isJustCreated: boolean;
     setTransformFlag: React.Dispatch<React.SetStateAction<boolean>>;
@@ -20,7 +21,8 @@ interface TextElementProp {
 const TextElement = ({
     text,
     draggable,
-    selectionRef,
+    groupSelection,
+    setGroupSelection,
     transformFlag,
     isJustCreated,
     setTransformFlag,
@@ -29,7 +31,7 @@ const TextElement = ({
     handleDragEnd,
     editText,
 }: TextElementProp) => {
-    const isSelected = selectionRef.current.includes(text.id);
+    const isSelected = groupSelection.includes(text.id);
     // When the element is dragged selected but not selected yet (to show transformer when dragging and globalflag is disabled)
     const [dragSelected, setDragSelected] = useState(false);
 
@@ -141,7 +143,7 @@ const TextElement = ({
                 }}
                 onDragEnd={(e) => {
                     handleDragEnd(e);
-                    selectionRef.current = [text.id];
+                    setGroupSelection([text.id]);
                     setTransformFlag(true);
                     setDragSelected(false);
                 }}

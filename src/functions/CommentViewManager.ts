@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { CommentProp, CommentStateProp } from "../utils/interfaces";
-import color from "../styles/color";
+import { CommentProp } from "../utils/interfaces";
 import Konva from "konva";
 import { v4 as uuid } from "uuid";
 import constants from "../utils/constants";
@@ -10,9 +9,6 @@ export const CommentViewManager = (
     setComments: React.Dispatch<React.SetStateAction<CommentProp[]>>,
     stageRef: React.RefObject<Konva.Stage>
 ) => {
-    const [commentViewState, setCommentViewState] = useState<CommentStateProp>({
-        backgroundColor: color.canvasBackground,
-    });
     const [selectedComment, setSelectedComment] = useState<string | null>(null);
     const [isEditingComment, setIsEditing] = useState<boolean>(false);
 
@@ -271,8 +267,6 @@ export const CommentViewManager = (
     };
 
     return {
-        commentViewState,
-        setCommentViewState,
         selectedComment,
         setSelectedComment,
         handleCommentViewClickOff,
