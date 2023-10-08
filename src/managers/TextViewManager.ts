@@ -11,7 +11,6 @@ export const TextViewManager = (
     elements: ElementProp[],
     setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>,
     stageRef: React.RefObject<Konva.Stage>,
-    groupSelection: string[],
     setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>
 ) => {
     const [isEditingText, setIsEditing] = useState<boolean>(false);

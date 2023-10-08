@@ -121,15 +121,7 @@ export default function App() {
     } = CommentViewManager(comments, setComments, stageRef);
 
     const { toggleTextMode, handleTextClick, editText, isEditingText, justCreated } =
-        TextViewManager(
-            view,
-            setView,
-            elements,
-            setElements,
-            stageRef,
-            groupSelection,
-            setGroupSelection
-        );
+        TextViewManager(view, setView, elements, setElements, stageRef, setGroupSelection);
 
     const {
         isSelectionMode,
