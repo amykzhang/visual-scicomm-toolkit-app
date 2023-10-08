@@ -102,6 +102,7 @@ export default function App() {
         width: 0,
         height: 0,
     });
+    const [elementsWithinBounds, setElementsWithinBounds] = useState<string[]>([]);
 
     // App wide transform flag (for isolating drag selecting elements)
     const [transformFlag, setTransformFlag] = useState(true);
@@ -359,7 +360,6 @@ export default function App() {
             // Only start bounding box drag select if user clicks on stage or export area
             if (e.target === stage || e.target === exportAreaRef.current) {
                 setIsSelectionMode(true);
-
                 const pointerPosition = stage.getPointerPosition();
                 if (pointerPosition !== null) {
                     const x = (pointerPosition.x - stage.x()) / stage.scaleX();
@@ -372,8 +372,7 @@ export default function App() {
                     });
                 }
             }
-        }
-        if (view === APP_VIEW.draw) {
+        } else if (view === APP_VIEW.draw) {
             console.log("draw mousedown");
         }
     };
@@ -384,34 +383,37 @@ export default function App() {
 
         if (view === APP_VIEW.select && isSelectionMode) {
             const pointerPosition = stage.getPointerPosition();
-
             if (pointerPosition !== null) {
                 const x = (pointerPosition.x - stage.x()) / stage.scaleX();
                 const y = (pointerPosition.y - stage.y()) / stage.scaleX();
                 const width = x - selectionBounds.x;
                 const height = y - selectionBounds.y;
+
                 setSelectionBounds({
                     ...selectionBounds,
                     width,
                     height,
                 });
             }
-        }
-        if (view === APP_VIEW.draw) {
+        } else if (view === APP_VIEW.draw) {
             console.log("draw mousemove");
         }
     };
 
     const handleMouseUp = (e: Konva.KonvaEventObject<MouseEvent>) => {
         if (view === APP_VIEW.select && isSelectionMode) {
+            setElementsWithinBounds(getElementsWithinBounds(selectionBounds, elements));
             setIsSelectionMode(false);
-            // Get Elements within bounds
-            setGroupSelection(getElementsWithinBounds(selectionBounds, elements));
         }
         if (view === APP_VIEW.draw) {
             console.log("draw mouseup");
         }
     };
+
+    // Group Selection
+    useEffect(() => {
+        setGroupSelection(elementsWithinBounds);
+    }, [elementsWithinBounds]);
 
     // --- HISTORY ---
 
