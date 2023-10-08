@@ -6,16 +6,18 @@ import {
     SelectionManager,
     StageViewManager,
     TextViewManager,
-    getElementsWithinBounds,
-    handleDragEnd,
-} from "./functions";
-import { CommentViewManager } from "./functions";
+    CommentViewManager,
+    DragSelectManager,
+} from "./managers";
+import {
+    TitlePanel,
+    ToolbarPanel,
+    ActivityPanel,
+    ZoomPanel,
+    ElementsPanel,
+    ExportPanel,
+} from "./Panels";
 import { APP_VIEW } from "./utils/enums";
-import { ElementsPanel } from "./Panels/ElementsPanel";
-import { ToolbarPanel } from "./Panels/ToolbarPanel";
-import { ActivityPanel } from "./Panels/ActivityPanel";
-import { ZoomPanel } from "./Panels/ZoomPanel";
-import { TitlePanel } from "./Panels/TitlePanel";
 import { BottomZone, TopZone } from "./styles/containers";
 import typography from "./styles/typography";
 import { ExportArea } from "./components/ExportArea";
@@ -26,14 +28,13 @@ import {
     CommentProp,
     ElementProp,
     ImageProp,
-    SelectionBoundsProp,
     ShapeProp,
     TextProp,
     UiStateProp,
 } from "./utils/interfaces";
+import { handleDragEnd } from "./utils/dragging";
 import { persistance } from "./utils/persistance";
 import { ImageElement, CommentElement, ShapeElement, TextElement } from "./Elements";
-import { ExportPanel } from "./Panels";
 import Konva from "konva";
 import { SelectionRect } from "./components/SelectionRect";
 import color from "./styles/color";
@@ -94,16 +95,6 @@ export default function App() {
     // Group Selection
     const [groupSelection, setGroupSelection] = useState<string[]>(history[0].selection);
 
-    // Drag Select
-    const [isSelectionMode, setIsSelectionMode] = useState(false);
-    const [selectionBounds, setSelectionBounds] = useState<SelectionBoundsProp>({
-        x: 0,
-        y: 0,
-        width: 0,
-        height: 0,
-    });
-    const [elementsWithinBounds, setElementsWithinBounds] = useState<string[]>([]);
-
     // App wide transform flag (for isolating drag selecting elements)
     const [transformFlag, setTransformFlag] = useState(true);
 
@@ -139,6 +130,15 @@ export default function App() {
             groupSelection,
             setGroupSelection
         );
+
+    const {
+        isSelectionMode,
+        selectionBounds,
+        elementsWithinBounds,
+        handleDragSelectMouseDown,
+        handleDragSelectMouseMove,
+        handleDragSelectMouseUp,
+    } = DragSelectManager(stageRef, elements);
 
     // -- KEY PRESSES --
     const handleKeyDown = useCallback(
@@ -359,18 +359,7 @@ export default function App() {
         if (view === APP_VIEW.select) {
             // Only start bounding box drag select if user clicks on stage or export area
             if (e.target === stage || e.target === exportAreaRef.current) {
-                setIsSelectionMode(true);
-                const pointerPosition = stage.getPointerPosition();
-                if (pointerPosition !== null) {
-                    const x = (pointerPosition.x - stage.x()) / stage.scaleX();
-                    const y = (pointerPosition.y - stage.y()) / stage.scaleX();
-                    setSelectionBounds({
-                        x,
-                        y,
-                        width: 0,
-                        height: 0,
-                    });
-                }
+                handleDragSelectMouseDown(e);
             }
         } else if (view === APP_VIEW.draw) {
             console.log("draw mousedown");
@@ -378,23 +367,8 @@ export default function App() {
     };
 
     const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
-        if (stageRef.current === null) return;
-        const stage = stageRef.current;
-
         if (view === APP_VIEW.select && isSelectionMode) {
-            const pointerPosition = stage.getPointerPosition();
-            if (pointerPosition !== null) {
-                const x = (pointerPosition.x - stage.x()) / stage.scaleX();
-                const y = (pointerPosition.y - stage.y()) / stage.scaleX();
-                const width = x - selectionBounds.x;
-                const height = y - selectionBounds.y;
-
-                setSelectionBounds({
-                    ...selectionBounds,
-                    width,
-                    height,
-                });
-            }
+            handleDragSelectMouseMove(e);
         } else if (view === APP_VIEW.draw) {
             console.log("draw mousemove");
         }
@@ -402,8 +376,7 @@ export default function App() {
 
     const handleMouseUp = (e: Konva.KonvaEventObject<MouseEvent>) => {
         if (view === APP_VIEW.select && isSelectionMode) {
-            setElementsWithinBounds(getElementsWithinBounds(selectionBounds, elements));
-            setIsSelectionMode(false);
+            handleDragSelectMouseUp(e);
         }
         if (view === APP_VIEW.draw) {
             console.log("draw mouseup");
