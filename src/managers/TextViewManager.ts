@@ -17,17 +17,9 @@ export const TextViewManager = (
     const [isEditingText, setIsEditing] = useState<boolean>(false);
     const [justCreated, setJustCreated] = useState<string | null>(null);
 
-    function enterTextMode() {
-        setView(APP_VIEW.text);
-    }
-
-    function exitTextMode() {
-        setView(APP_VIEW.select);
-    }
-
     function toggleTextMode() {
-        if (view === APP_VIEW.text) exitTextMode();
-        else enterTextMode();
+        if (view === APP_VIEW.text) setView(APP_VIEW.select);
+        else setView(APP_VIEW.text);
     }
 
     function addTextBox(
