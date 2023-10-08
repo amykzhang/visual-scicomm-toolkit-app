@@ -5,3 +5,4 @@ export { KeyPressManager } from "./KeyPressManager";
 export { ExportManager } from "./ExportManager";
 export { SelectionManager } from "./SelectionManager";
 export { TextViewManager } from "./TextViewManager";
+export { getElementsWithinBounds } from "./dragSelect";
