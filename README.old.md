@@ -104,13 +104,19 @@ October 4:
 
 -   text box : transfer comment fixes to text (height adjustments, delete, edit... )✅
 
-October 5:
+October 6 (friday):
 
--   freehand draw (https://konvajs.org/docs/sandbox/Free_Drawing.html) (2h)
 -   Undo/redo stack (https://konvajs.org/docs/react/Undo-Redo.html) (2h)✅
+
+October 8 (sunday):
+
+-   freehand draw (https://konvajs.org/docs/sandbox/Free_Drawing.html) (2h)\
 -   contextmenu for copy paste change color etc. (3h)
--   Add shortcuts for commands (1h)
 -   tooltips !
+
+October 9 (monday):
+
+-   Add shortcuts for commands (1h)
 -   Add support for chrome, safari, firefox, edge (2h)
 -   Landing Page (look into it) (1h)
 

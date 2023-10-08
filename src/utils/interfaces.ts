@@ -1,10 +1,6 @@
 import Konva from "konva";
 import { APP_VIEW } from "./enums";
 
-export interface CommentStateProp {
-    backgroundColor: string;
-}
-
 export interface CanvasStateProp {
     elements: ElementProp[];
     comments: CommentProp[];

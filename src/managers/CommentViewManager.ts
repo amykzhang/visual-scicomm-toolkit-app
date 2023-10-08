@@ -1,112 +1,101 @@
-import { APP_VIEW } from "../utils/enums";
+import { useState } from "react";
+import { CommentProp } from "../utils/interfaces";
 import Konva from "konva";
 import { v4 as uuid } from "uuid";
-import { ElementProp, TextProp } from "../utils/interfaces";
-import { useEffect, useState } from "react";
 import constants from "../utils/constants";
 
-export const TextViewManager = (
-    view: APP_VIEW,
-    setView: (view: APP_VIEW) => void,
-    elements: ElementProp[],
-    setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>,
-    stageRef: React.RefObject<Konva.Stage>,
-    selectionRef: React.MutableRefObject<string[]>
+export const CommentViewManager = (
+    comments: CommentProp[],
+    setComments: React.Dispatch<React.SetStateAction<CommentProp[]>>,
+    stageRef: React.RefObject<Konva.Stage>
 ) => {
-    const [isEditingText, setIsEditing] = useState<boolean>(false);
-    const [justCreated, setJustCreated] = useState<string | null>(null);
+    const [selectedComment, setSelectedComment] = useState<string | null>(null);
+    const [isEditingComment, setIsEditing] = useState<boolean>(false);
 
-    function enterTextMode() {
-        setView(APP_VIEW.text);
-    }
-
-    function exitTextMode() {
-        setView(APP_VIEW.select);
-    }
-
-    function toggleTextMode() {
-        if (view === APP_VIEW.text) exitTextMode();
-        else enterTextMode();
-    }
-
-    function addTextBox(
+    function addComment(
         x: number,
         y: number,
-        elements: ElementProp[],
-        setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>
+        comments: CommentProp[],
+        setComments: React.Dispatch<React.SetStateAction<CommentProp[]>>
     ) {
         const id = uuid();
-        setElements([
-            ...elements,
+        setComments([
+            ...comments,
             {
                 id: id,
-                type: "text",
                 x: x,
-                y: y,
-                ...constants.textbox.initialTextBox,
-            } as TextProp,
+                y: y - constants.comment.initialComment.height,
+                ...constants.comment.initialComment,
+            },
         ]);
         return id;
     }
 
-    const handleAddTextBox = (
-        elements: ElementProp[],
-        setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>,
+    function removeComment(
+        id: string,
+        comments: CommentProp[],
+        setComments: React.Dispatch<React.SetStateAction<CommentProp[]>>
+    ) {
+        setComments(comments.filter((comment) => comment.id !== id));
+    }
+
+    const handleAddComment = (
+        comments: CommentProp[],
+        setComments: React.Dispatch<React.SetStateAction<CommentProp[]>>,
         stageRef: React.RefObject<Konva.Stage>
     ) => {
         return (e: Konva.KonvaEventObject<MouseEvent>) => {
-            // if clicked anywhere other than a textbox
-            if (stageRef.current !== null && e.target.getAttrs().type !== "text") {
+            if (stageRef.current !== null) {
                 const stage = stageRef.current;
                 const x = (e.evt.clientX - stage.x()) / stage.scaleX();
                 const y = (e.evt.clientY - stage.y()) / stage.scaleX();
-                const id = addTextBox(x, y, elements, setElements);
-
-                // set justCreated for side effect to enter edit mode
-                setJustCreated(id);
-                selectionRef.current = [id];
+                const id = addComment(x, y, comments, setComments);
+                setSelectedComment(id);
             }
         };
     };
 
-    // handle stage click in text mode
-    // 1) check for click on any are not a 'text'
-    // 2) if isEditingText is true, just blurred off a textarea, do nothing
-    // 3) if isEditingText is false, add a textbox
-    function handleTextClick(e: Konva.KonvaEventObject<MouseEvent>) {
-        if (e.target.getAttrs().type !== "text") {
-            if (isEditingText) {
+    // handle stage click in comment mode
+    // 1) check for click on any are not a 'comment'
+    // 2) if isEditingComment is true, just blurred off a textarea, do nothing
+    // 3) if isEditingComment is false, add a comment
+    function handleCommentViewClickOff(e: Konva.KonvaEventObject<MouseEvent>) {
+        if (e.target.getAttrs().type !== "comment") {
+            if (isEditingComment) {
                 setIsEditing(false);
-                selectionRef.current = [];
+                setSelectedComment(null);
             } else {
                 setIsEditing(false);
-                handleAddTextBox(elements, setElements, stageRef)(e);
+                handleAddComment(comments, setComments, stageRef)(e);
             }
         }
     }
 
-    // Similar to CommentViewManager.editComment()
+    // Similar to TextElement.enterEditTextMode()
     // Hides konva element, creates a textarea, and updates konva elements on blur
-    const editText = (
-        text: TextProp,
-        handleChange: (attributes: any) => void,
-        textRef: React.RefObject<Konva.Text>,
-        transformerRef: React.RefObject<Konva.Transformer>
+    const editComment = (
+        textRef: React.RefObject<Konva.Text | null>,
+        rectRef: React.RefObject<Konva.Rect | null>,
+        transformerRef: React.RefObject<Konva.Transformer | null>,
+        comment: CommentProp
     ) => {
         if (
             textRef.current !== null &&
-            transformerRef.current !== null &&
-            stageRef.current !== null
+            stageRef.current !== null &&
+            rectRef.current !== null &&
+            transformerRef.current !== null
         ) {
             setIsEditing(true);
 
             const textNode = textRef.current;
-            const transformerNode = transformerRef.current;
+            const rectNode = rectRef.current;
+            const tr = transformerRef.current;
             const stage = stageRef.current;
 
             // hide text node and transformer:
             textNode.hide();
-            transformerNode.hide();
+            rectNode.hide();
+            tr.hide();
 
             // first find position of text node relative to the stage:
             const textPosition = textNode.absolutePosition();
@@ -121,8 +110,9 @@ export const TextViewManager = (
             const textarea = document.createElement("textarea");
             document.body.appendChild(textarea);
 
-            const scale = stage.scaleX() * text.scale;
-            let width: number = 0;
+            const scale = stage.scaleX() * comment.scale;
+            const cornerRadius = constants.comment.cornerRadius;
+            let width: number = textNode.width() * scale;
             let height: number = 0;
 
             // apply many styles to match text on canvas as close as possible
@@ -135,10 +125,15 @@ export const TextViewManager = (
             textarea.style.width = width + "px";
             textarea.style.height = height + "px";
             textarea.style.fontSize = textNode.fontSize() * scale + "px";
-            textarea.style.border = "1px solid " + transformerNode.borderStroke();
-            textarea.style.padding = "0";
-            textarea.style.margin = "-10px -1px";
+            textarea.style.border = "none";
+            textarea.style.padding = `${(textNode.padding() - 1.3) * scale}px ${
+                textNode.padding() * scale
+            }px `;
             textarea.style.overflow = "hidden";
+            textarea.style.background = constants.comment.background;
+            textarea.style.borderRadius = `${cornerRadius * scale}px ${cornerRadius * scale}px ${
+                cornerRadius * scale
+            }px 0`;
             textarea.style.outline = "none";
             textarea.style.resize = "none";
             textarea.style.lineHeight = textNode.lineHeight() * 20 * scale + "px";
@@ -146,6 +141,9 @@ export const TextViewManager = (
             textarea.style.transformOrigin = "left top";
             textarea.style.textAlign = textNode.align();
             textarea.style.color = textNode.fill();
+            textarea.style.boxShadow = `${rectNode.shadowOffsetX() * scale}px ${
+                rectNode.shadowOffsetY() * scale
+            }px ${rectNode.shadowBlur() * scale}px 0px rgba(0,0,0,${rectNode.shadowOpacity()})`;
             textarea.style.zIndex = "100";
             textarea.wrap = "off";
 
@@ -157,14 +155,14 @@ export const TextViewManager = (
                 px += 2 + Math.round(textNode.fontSize() / 20);
             }
 
-            const transform = "translateY(-" + px + "px)";
+            const transform = `translateY(-${px}px)`;
             textarea.style.transform = transform;
 
-            width = Math.max(textarea.scrollWidth + 1 * scale, constants.textbox.minWidth * scale);
-            height = Math.max(textarea.scrollHeight, constants.textbox.minHeight * scale);
-            textarea.style.width = width + "px";
+            // reset height
+            textarea.style.height = "0";
+            // after browsers resized it we can set actual value
+            height = textarea.scrollHeight + 4 * scale;
             textarea.style.height = height + "px";
-
             textarea.focus();
 
             // const setTextareaWidth = (newWidth: number) => {
@@ -179,46 +177,58 @@ export const TextViewManager = (
             //         newWidth += 1;
             //     }
             //     textarea.style.width = newWidth + "px";
+            // };
 
             const removeTextarea = () => {
-                textarea.removeEventListener("keypress", handleKeyPress);
+                textarea.removeEventListener("keydown", handleKeyPress);
                 textarea.removeEventListener("click", handleBlur);
                 textarea.removeEventListener("input", handleResize);
                 window.removeEventListener("wheel", handleWheel);
                 textarea.remove();
 
                 textNode.show();
-                transformerNode.show();
+                rectNode.show();
+                tr.show();
             };
 
             const handleBlur = (e: FocusEvent) => {
-                e.stopPropagation();
                 const newText = textarea.value;
 
                 if (newText === "") {
-                    // removeComment
-                    const newElements = elements.filter((element) => element.id !== text.id);
-                    setElements(newElements);
-
+                    removeComment(comment.id, comments, setComments);
                     removeTextarea();
+                    setIsEditing(false);
                     return;
                 }
+
+                handleResize();
 
                 textNode.setAttrs({
                     width: width / scale,
                     height: height / scale,
                 });
-                handleChange({
-                    text: newText,
-                    width: textNode.width(),
-                    height: textNode.height(),
-                    scale: textNode.scaleX(),
+                rectNode.setAttrs({
+                    width: width / scale,
+                    height: height / scale,
                 });
-                removeTextarea();
 
-                // reset selection and justCreated for next textbox
-                setJustCreated(null);
-                selectionRef.current = [];
+                // update Comment props
+                const newComments = comments.map((comment_i) => {
+                    if (comment.id === comment_i.id) {
+                        return {
+                            ...comment_i,
+                            text: newText,
+                            width: textNode.width(),
+                            height: textNode.height(),
+                            scale: textNode.scaleX(),
+                        };
+                    } else {
+                        return comment_i;
+                    }
+                });
+                setComments(newComments);
+
+                removeTextarea();
                 setIsEditing(false);
             };
 
@@ -230,11 +240,14 @@ export const TextViewManager = (
                 textarea.style.width = "0";
                 textarea.style.height = "0";
 
-                width = Math.max(
-                    textarea.scrollWidth + 1 * scale,
-                    constants.textbox.minWidth * scale
-                );
-                height = Math.max(textarea.scrollHeight, constants.textbox.minHeight * scale);
+                width =
+                    (Math.max(
+                        constants.comment.minWidth,
+                        textarea.scrollWidth / scale + constants.comment.padding
+                    ) +
+                        2) *
+                    scale;
+                height = textarea.scrollHeight + 4;
 
                 textarea.style.width = width + "px";
                 textarea.style.height = height + "px";
@@ -243,7 +256,6 @@ export const TextViewManager = (
             const handleKeyPress = (e: KeyboardEvent) => {
                 if (e.key === "Escape") {
                     textarea.blur();
-                    setView(APP_VIEW.select);
                 }
             };
 
@@ -254,19 +266,12 @@ export const TextViewManager = (
         }
     };
 
-    useEffect(() => {
-        if (view === APP_VIEW.text) {
-            document.body.style.cursor = "crosshair";
-        } else {
-            document.body.style.cursor = "default";
-        }
-    }, [view]);
-
     return {
-        toggleTextMode,
-        handleTextClick,
-        editText,
-        isEditingText,
-        justCreated,
+        selectedComment,
+        setSelectedComment,
+        handleCommentViewClickOff,
+        editComment,
+        removeComment,
+        isEditingComment,
     };
 };

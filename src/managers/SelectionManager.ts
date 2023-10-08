@@ -9,15 +9,16 @@ export const SelectionManager = (
     view: APP_VIEW,
     setView_: (view: APP_VIEW) => void,
     shiftKey: boolean,
-    selectionRef: React.MutableRefObject<string[]>,
+    groupSelection: string[],
+    setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>,
     groupRef: React.MutableRefObject<Konva.Group | null>
 ) => {
     // Selection mode: true when dragging selection rectangle
     const toggleSelectedId = (id: string) => {
-        if (selectionRef.current.includes(id)) {
-            selectionRef.current = selectionRef.current.filter((selectedId) => selectedId !== id);
+        if (groupSelection.includes(id)) {
+            setGroupSelection(groupSelection.filter((selectedId) => selectedId !== id));
         } else {
-            selectionRef.current = [...selectionRef.current, id];
+            setGroupSelection([...groupSelection, id]);
         }
     };
 
@@ -26,17 +27,17 @@ export const SelectionManager = (
             if (shiftKey) {
                 toggleSelectedId(id);
             } else {
-                if (selectionRef.current.length === 1 && selectionRef.current.includes(id)) {
-                    selectionRef.current = [];
+                if (groupSelection.length === 1 && groupSelection.includes(id)) {
+                    setGroupSelection([]);
                 } else {
-                    selectionRef.current = [id];
+                    setGroupSelection([id]);
                 }
             }
             updateResetGroup();
         }
         if (view === APP_VIEW.text) {
             setView_(APP_VIEW.select);
-            selectionRef.current = [id];
+            setGroupSelection([id]);
         }
     };
 
@@ -46,7 +47,7 @@ export const SelectionManager = (
             const group = groupRef.current;
 
             const newElements = elements.map((element) => {
-                if (selectionRef.current.includes(element.id)) {
+                if (groupSelection.includes(element.id)) {
                     return {
                         ...element,
                         x: element.x + group.x(),
@@ -63,10 +64,10 @@ export const SelectionManager = (
     };
 
     const deleteSelected = useCallback(() => {
-        const newImages = elements.filter((element) => !selectionRef.current.includes(element.id));
+        const newImages = elements.filter((element) => !groupSelection.includes(element.id));
         setElements(newImages);
-        selectionRef.current = [];
-    }, [elements, setElements, selectionRef]);
+        setGroupSelection([]);
+    }, [elements, setElements, groupSelection, setGroupSelection]);
 
     return {
         handleSelect,
