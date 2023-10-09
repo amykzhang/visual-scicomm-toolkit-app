@@ -8,6 +8,7 @@ import {
     TextViewManager,
     CommentViewManager,
     DragSelectManager,
+    DrawViewManager,
 } from "./managers";
 import {
     TitlePanel,
@@ -131,6 +132,9 @@ export default function App() {
         handleDragSelectMouseMove,
         handleDragSelectMouseUp,
     } = DragSelectManager(stageRef, elements);
+
+    const { handleDrawMouseDown, handleDrawMouseMove, handleDrawMouseUp, toggleDrawMode } =
+        DrawViewManager(view, setView);
 
     // -- KEY PRESSES --
     const handleKeyDown = useCallback(
@@ -345,16 +349,16 @@ export default function App() {
     }
 
     const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
-        if (stageRef.current === null) return;
-        const stage = stageRef.current;
-
         if (view === APP_VIEW.select) {
+            if (stageRef.current === null) return;
+            const stage = stageRef.current;
+
             // Only start bounding box drag select if user clicks on stage or export area
             if (e.target === stage || e.target === exportAreaRef.current) {
                 handleDragSelectMouseDown(e);
             }
         } else if (view === APP_VIEW.draw) {
-            console.log("draw mousedown");
+            handleDrawMouseDown(e);
         }
     };
 
@@ -362,7 +366,7 @@ export default function App() {
         if (view === APP_VIEW.select && isSelectionMode) {
             handleDragSelectMouseMove(e);
         } else if (view === APP_VIEW.draw) {
-            console.log("draw mousemove");
+            handleDrawMouseMove(e);
         }
     };
 
@@ -371,7 +375,7 @@ export default function App() {
             handleDragSelectMouseUp(e);
         }
         if (view === APP_VIEW.draw) {
-            console.log("draw mouseup");
+            handleDrawMouseUp(e);
         }
     };
 
@@ -497,6 +501,7 @@ export default function App() {
                     }}
                 />
                 <ElementsPanel
+                    view={view}
                     activity={activity}
                     elements={elements}
                     setElements={setElements}
@@ -509,7 +514,7 @@ export default function App() {
                         });
                     }}
                     toggleTextMode={toggleTextMode}
-                    view={view}
+                    toggleDrawMode={toggleDrawMode}
                 />
                 <BottomZone>
                     <ZoomPanel
