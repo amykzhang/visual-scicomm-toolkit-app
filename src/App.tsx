@@ -29,6 +29,7 @@ import {
     CommentProp,
     ElementProp,
     ImageProp,
+    LineProp,
     ShapeProp,
     TextProp,
     UiStateProp,
@@ -39,6 +40,7 @@ import { ImageElement, CommentElement, ShapeElement, TextElement } from "./Eleme
 import Konva from "konva";
 import { SelectionRect } from "./components/SelectionRect";
 import color from "./styles/color";
+import LineElement from "./Elements/LineElement";
 
 const activity = activity_visual_strategies;
 
@@ -134,7 +136,7 @@ export default function App() {
     } = DragSelectManager(stageRef, elements);
 
     const { handleDrawMouseDown, handleDrawMouseMove, handleDrawMouseUp, toggleDrawMode } =
-        DrawViewManager(view, setView);
+        DrawViewManager(view, setView, setElements, stageRef);
 
     // -- KEY PRESSES --
     const handleKeyDown = useCallback(
@@ -200,6 +202,17 @@ export default function App() {
                         // TODO: remove shortcut
                         case "v":
                             setView(APP_VIEW.select);
+                            break;
+                        default:
+                            break;
+                    }
+                } else if (view === APP_VIEW.draw) {
+                    switch (e.key) {
+                        case "Escape":
+                            setView(APP_VIEW.select);
+                            break;
+                        case "=":
+                            console.log(elements);
                             break;
                         default:
                             break;
@@ -319,6 +332,28 @@ export default function App() {
                     setTransformFlag={setTransformFlag}
                     editText={editText}
                     isJustCreated={justCreated === text.id}
+                />
+            );
+        } else if (element.type === "line") {
+            const line = element as LineProp;
+            return (
+                <LineElement
+                    key={i}
+                    line={line}
+                    draggable={draggable}
+                    handleChange={(attributes: any) => {
+                        setElements([
+                            ...elements.slice(0, i),
+                            { ...line, ...attributes },
+                            ...elements.slice(i + 1),
+                        ]);
+                    }}
+                    handleSelect={() => handleSelect(line.id)}
+                    handleDragEnd={handleDragEnd(elements, setElements)}
+                    transformFlag={transformFlag}
+                    setTransformFlag={setTransformFlag}
+                    groupSelection={groupSelection}
+                    setGroupSelection={setGroupSelection}
                 />
             );
         } else return <></>;

@@ -112,16 +112,20 @@ October 7 (saturday):
 
 -   Fix drag select issues (1h)✅
 
-October 8 (sunday):
+October 10 (tuesday):
+afternoon:
 
 -   freehand draw (3h) 🚧
     -   DrawViewManager ✔️
-    -   FreeformLineElement
+    -   LineElement
     -   handleDrawMouseDown, handleDrawMouseMove, handleDrawMouseUp ✔️
+
+night:
+
 -   contextmenu for copy paste change color etc. (3h)
 -   tooltips (3h)
 
-October 9 (monday):
+October 11 (wednesday):
 
 -   Add shortcuts for commands (3h)
 -   Add support for chrome, safari, firefox, edge (4h)
@@ -129,6 +133,10 @@ October 9 (monday):
 
 Production and staging servers:
 document code, how to deploy, how to run, how to test
+
+little things:
+
+-   pan: closed hand on mousedown, open hand on mouseup
 
 nice-to-haves:
 
