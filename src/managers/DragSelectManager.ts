@@ -72,7 +72,7 @@ export const DragSelectManager = (
             height: Math.abs(selectionBounds.height),
         };
 
-        const newSelection = elements
+        return elements
             .filter(
                 (element) =>
                     element.x > actualBounds.x &&
@@ -81,7 +81,6 @@ export const DragSelectManager = (
                     element.y + element.height < actualBounds.y + actualBounds.height
             )
             .map((element) => element.id);
-        return newSelection;
     }
 
     return {

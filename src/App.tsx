@@ -105,7 +105,6 @@ export default function App() {
 
     // Selection
     const { handleSelect, deleteSelected, updateResetGroup } = SelectionManager(
-        elements,
         setElements,
         view,
         setView,
@@ -121,10 +120,10 @@ export default function App() {
         handleCommentViewClickOff,
         editComment,
         isEditingComment,
-    } = CommentViewManager(comments, setComments, stageRef);
+    } = CommentViewManager(setComments, stageRef);
 
     const { toggleTextMode, handleTextClick, editText, isEditingText, justCreated } =
-        TextViewManager(view, setView, elements, setElements, stageRef, setGroupSelection);
+        TextViewManager(view, setView, setElements, stageRef, setGroupSelection);
 
     const {
         isSelectionMode,
