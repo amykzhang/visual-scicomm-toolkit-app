@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { ElementProp } from "../utils/interfaces";
 import { APP_VIEW } from "../utils/enums";
 import Konva from "konva";
+import { off } from "process";
 
 export const SelectionManager = (
     setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>,
@@ -44,13 +45,15 @@ export const SelectionManager = (
     const updateResetGroup = () => {
         if (groupRef.current !== null) {
             const group = groupRef.current;
+            const offsetX = group.x();
+            const offsetY = group.y();
             setElements((elements) =>
                 elements.map((element) => {
                     if (groupSelection.includes(element.id)) {
                         return {
                             ...element,
-                            x: element.x + group.x(),
-                            y: element.y + group.y(),
+                            x: element.x + offsetX,
+                            y: element.y + offsetY,
                         };
                     } else {
                         return element;
