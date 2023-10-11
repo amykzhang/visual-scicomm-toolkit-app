@@ -49,22 +49,6 @@ const LineElement = ({
         }
     }, [showTransform]);
 
-    // update width/height everytime the line is manipulated
-    useEffect(() => {
-        if (lineRef.current !== null) {
-            const node = lineRef.current;
-            handleChange({
-                x: node.x(),
-                y: node.y(),
-                width: node.width(),
-                height: node.height(),
-                scaleX: node.scaleX(),
-                scaleY: node.scaleY(),
-                rotation: node.rotation(),
-            });
-        }
-    }, [line.points]);
-
     return (
         <Fragment>
             <Line
@@ -132,6 +116,7 @@ const LineElement = ({
             {showTransform && (
                 <Transformer
                     ref={transformerRef}
+                    keepRatio={false}
                     rotationSnaps={[0, 45, 90, 135, 180, 225, 270, 315]}
                     boundBoxFunc={(oldBox, newBox) => {
                         // limit resize

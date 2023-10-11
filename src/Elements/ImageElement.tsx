@@ -104,6 +104,7 @@ const ImageElement = ({
             {showTransform && (
                 <Transformer
                     ref={transformerRef}
+                    keepRatio={false}
                     rotationSnaps={[0, 45, 90, 135, 180, 225, 270, 315]}
                     boundBoxFunc={(oldBox, newBox) => {
                         // limit resize
