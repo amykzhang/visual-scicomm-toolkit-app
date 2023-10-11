@@ -59,6 +59,8 @@ export interface LineProp extends BaseProp {
     tension: number;
     stroke: string;
     strokeWidth: number;
+    scaleX: number;
+    scaleY: number;
 }
 
 export interface CommentProp {
