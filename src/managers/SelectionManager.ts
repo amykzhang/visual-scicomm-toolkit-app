@@ -2,7 +2,6 @@ import { useCallback } from "react";
 import { ElementProp } from "../utils/interfaces";
 import { APP_VIEW } from "../utils/enums";
 import Konva from "konva";
-import { off } from "process";
 
 export const SelectionManager = (
     setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>,
