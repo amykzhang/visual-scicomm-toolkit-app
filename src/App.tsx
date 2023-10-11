@@ -171,6 +171,9 @@ export default function App() {
                                 setView(APP_VIEW.text);
                             }
                             break;
+                        case "=":
+                            console.log(elements);
+                            break;
                         default:
                             break;
                     }
@@ -605,10 +608,10 @@ export default function App() {
                             updateResetGroup();
                         }}
                     >
-                        {groupSelection.map((id) => {
+                        {groupSelection.map((id, i) => {
                             const idx = elements.findIndex((element) => element.id === id);
                             return idx !== -1
-                                ? elementToReactElement(elements[idx], idx, true)
+                                ? elementToReactElement(elements[idx], i, true)
                                 : null;
                         })}
                     </Group>

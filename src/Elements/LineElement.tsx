@@ -49,6 +49,22 @@ const LineElement = ({
         }
     }, [showTransform]);
 
+    // update width/height everytime the line is manipulated
+    useEffect(() => {
+        if (lineRef.current !== null) {
+            const node = lineRef.current;
+            handleChange({
+                x: node.x(),
+                y: node.y(),
+                width: node.width(),
+                height: node.height(),
+                scaleX: node.scaleX(),
+                scaleY: node.scaleY(),
+                rotation: node.rotation(),
+            });
+        }
+    }, [line.points]);
+
     return (
         <Fragment>
             <Line
@@ -66,6 +82,21 @@ const LineElement = ({
                     setTransformFlag(true);
                     setDragSelected(false);
                 }}
+                onTransform={(e) => {
+                    if (lineRef.current !== null) {
+                        const node = lineRef.current;
+                        const scaleX = node.scaleX();
+                        const scaleY = node.scaleY();
+                        const scaledPoints = node.points().map((point, i) => {
+                            if (i % 2 === 0) return point * scaleX;
+                            else return point * scaleY;
+                        });
+
+                        node.scaleX(1);
+                        node.scaleY(1);
+                        node.points(scaledPoints);
+                    }
+                }}
                 onTransformEnd={() => {
                     // transformer is changing scale of the node
                     // and NOT its width or height
@@ -76,15 +107,20 @@ const LineElement = ({
                         const scaleX = node.scaleX();
                         const scaleY = node.scaleY();
                         const rotation = node.rotation();
+                        const scaledPoints = node.points().map((point, i) => {
+                            if (i % 2 === 0) return point * scaleX;
+                            else return point * scaleY;
+                        });
+
+                        node.scaleX(1);
+                        node.scaleY(1);
 
                         handleChange({
                             x: node.x(),
                             y: node.y(),
-                            // set minimal value
-                            width: Math.max(5, node.width()),
-                            height: Math.max(5, node.height()),
-                            scaleX: scaleX,
-                            scaleY: scaleY,
+                            width: node.width(),
+                            height: node.height(),
+                            points: scaledPoints,
                             rotation: rotation,
                         });
                     }

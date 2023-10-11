@@ -52,7 +52,7 @@ export const DrawViewManager = (
             const stage = stageRef.current;
             const x = (e.evt.clientX - stage.x()) / stage.scaleX();
             const y = (e.evt.clientY - stage.y()) / stage.scaleX();
-            const points = [0, 0, 100, 0, 100, 100, 200, 0, 200, 200];
+            const points = normalizeLine([0, 0, 100, 0, 100, 100, 200, 0, 200, 200]);
             addLine(x, y, points);
         }
     };
@@ -69,3 +69,13 @@ export const DrawViewManager = (
         toggleDrawMode,
     };
 };
+
+function normalizeLine(points: number[]) {
+    const offsetX = points[0];
+    const offsetY = points[1];
+    const newPoints = points.map((point, index) => {
+        if (index % 2 === 0) return point - offsetX;
+        else return point - offsetY;
+    });
+    return newPoints;
+}
