@@ -7,11 +7,12 @@ const zoomConstants = [
     2, 3, 6, 13, 25, 50, 100, 200, 300, 400, 800, 1600, 3200, 6400, 12800, 25600,
 ];
 
+const stageState = persistance.retrieveStageState();
+
 export const StageViewManager = (canvas_size: { width: number; height: number }) => {
     const [zoomLevel, setZoomLevel] = useState(() => {
-        const saved = persistance.retrieveStageState();
-        if (saved !== null) {
-            const { scaleX } = saved;
+        if (stageState !== null) {
+            const { scaleX } = stageState;
             return Math.floor(scaleX * 100);
         } else {
             return 100;
@@ -166,10 +167,8 @@ export const StageViewManager = (canvas_size: { width: number; height: number })
 
     // Load persisted stage state on initial load
     useEffect(() => {
-        const saved = persistance.retrieveStageState();
-
-        if (saved !== null) {
-            const { stagePosition, scaleX } = saved;
+        if (stageState !== null) {
+            const { stagePosition, scaleX } = stageState;
             if (stageRef.current !== null) {
                 const stage = stageRef.current;
                 stage.position(stagePosition);
