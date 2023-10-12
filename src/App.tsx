@@ -455,7 +455,14 @@ export default function App() {
         persistance.persistUiState(uiState);
     }, [uiState]);
 
+    // Save history
     useEffect(() => {
+        // Save only last  actions
+        if (history.length > 200) {
+            history = history.slice(1);
+            historyStep -= 1;
+        }
+
         const newState = {
             canvas: { elements, comments },
             selection: groupSelection,
