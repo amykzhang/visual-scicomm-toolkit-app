@@ -28,6 +28,8 @@ interface BaseProp {
     y: number;
     width: number;
     height: number;
+    scaleX: number;
+    scaleY: number;
     rotation: number;
 }
 
@@ -40,8 +42,6 @@ export interface ShapeProp extends BaseProp {
     stroke: string;
     strokeWidth: number;
     shape: string;
-    scaleX: number;
-    scaleY: number;
 }
 
 export interface TextProp extends BaseProp {
@@ -51,7 +51,6 @@ export interface TextProp extends BaseProp {
     fontStyle: string;
     fill: string;
     align: "left" | "center" | "right";
-    scale: number;
 }
 
 export interface LineProp extends BaseProp {
@@ -59,8 +58,6 @@ export interface LineProp extends BaseProp {
     tension: number;
     stroke: string;
     strokeWidth: number;
-    scaleX: number;
-    scaleY: number;
 }
 
 export interface CommentProp {

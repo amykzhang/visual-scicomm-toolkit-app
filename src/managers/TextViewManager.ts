@@ -96,7 +96,7 @@ export const TextViewManager = (
             const textarea = document.createElement("textarea");
             document.body.appendChild(textarea);
 
-            const scale = stage.scaleX() * text.scale;
+            const scale = stage.scaleX() * text.scaleX;
             let width: number = 0;
             let height: number = 0;
 

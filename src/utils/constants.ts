@@ -27,7 +27,8 @@ const textbox = {
         fontStyle: "normal",
         fill: "#000000",
         align: "left",
-        scale: 1,
+        scaleX: 1,
+        scaleY: 1,
     },
 };
 

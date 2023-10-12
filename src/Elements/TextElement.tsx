@@ -60,10 +60,10 @@ const TextElement = ({
             const activeAnchor = transformerNode.getActiveAnchor();
             if (!constants.resizeAnchors.includes(activeAnchor)) {
                 textNode.setAttrs({
-                    width: (textNode.width() * textNode.scaleX()) / text.scale,
-                    height: (textNode.height() * textNode.scaleY()) / text.scale,
-                    scaleX: text.scale,
-                    scaleY: text.scale,
+                    width: (textNode.width() * textNode.scaleX()) / text.scaleX,
+                    height: (textNode.height() * textNode.scaleY()) / text.scaleX,
+                    scaleX: text.scaleX,
+                    scaleY: text.scaleX,
                 });
             }
         }
@@ -129,8 +129,8 @@ const TextElement = ({
                 width={text.width}
                 height={text.height}
                 rotation={text.rotation}
-                scaleX={text.scale}
-                scaleY={text.scale}
+                scaleX={text.scaleX}
+                scaleY={text.scaleX}
                 fontSize={text.fontSize}
                 fontFamily={text.fontFamily}
                 fontStyle={text.fontStyle}
