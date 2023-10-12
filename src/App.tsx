@@ -258,27 +258,21 @@ export default function App() {
     }, []);
 
     // Given an elementProp, return a ReactElement representing the type of element
-    function elementToReactElement(
-        element: ElementProp,
-        i: number,
-        group: boolean
-    ): React.ReactElement {
-        if (i === -1) return <></>;
-
+    function elementToReactElement(element: ElementProp, group: boolean): React.ReactElement {
         const draggable = view === APP_VIEW.select && !group;
         if (element.type === "image") {
             const image = element as ImageProp;
             return (
                 <ImageElement
-                    key={i}
+                    key={image.id}
                     image={image}
                     draggable={draggable}
                     handleChange={(attributes: any) => {
-                        setElements([
-                            ...elements.slice(0, i),
-                            { ...image, ...attributes },
-                            ...elements.slice(i + 1),
-                        ]);
+                        setElements((elements) =>
+                            elements.map((element) =>
+                                element.id === image.id ? { ...image, ...attributes } : element
+                            )
+                        );
                     }}
                     handleSelect={() => handleSelect(image.id)}
                     handleDragEnd={handleDragEnd(elements, setElements)}
@@ -292,15 +286,15 @@ export default function App() {
             const shape = element as ShapeProp;
             return (
                 <ShapeElement
-                    key={i}
+                    key={shape.id}
                     shape={shape}
                     draggable={draggable}
                     handleChange={(attributes: any) => {
-                        setElements([
-                            ...elements.slice(0, i),
-                            { ...shape, ...attributes },
-                            ...elements.slice(i + 1),
-                        ]);
+                        setElements((elements) =>
+                            elements.map((element) =>
+                                element.id === shape.id ? { ...shape, ...attributes } : element
+                            )
+                        );
                     }}
                     handleSelect={() => handleSelect(shape.id)}
                     handleDragEnd={handleDragEnd(elements, setElements)}
@@ -314,17 +308,17 @@ export default function App() {
             const text = element as TextProp;
             return (
                 <TextElement
-                    key={i}
+                    key={text.id}
                     text={text}
                     groupSelection={groupSelection}
                     setGroupSelection={setGroupSelection}
                     draggable={draggable}
                     handleChange={(attributes: any) => {
-                        setElements([
-                            ...elements.slice(0, i),
-                            { ...text, ...attributes },
-                            ...elements.slice(i + 1),
-                        ]);
+                        setElements((elements) =>
+                            elements.map((element) =>
+                                element.id === text.id ? { ...text, ...attributes } : element
+                            )
+                        );
                     }}
                     handleSelect={() => {
                         setView(APP_VIEW.select);
@@ -341,15 +335,15 @@ export default function App() {
             const line = element as LineProp;
             return (
                 <LineElement
-                    key={i}
+                    key={line.id}
                     line={line}
                     draggable={draggable}
                     handleChange={(attributes: any) => {
-                        setElements([
-                            ...elements.slice(0, i),
-                            { ...line, ...attributes },
-                            ...elements.slice(i + 1),
-                        ]);
+                        setElements((elements) =>
+                            elements.map((element) =>
+                                element.id === line.id ? { ...line, ...attributes } : element
+                            )
+                        );
                     }}
                     handleSelect={() => handleSelect(line.id)}
                     handleDragEnd={handleDragEnd(elements, setElements)}
@@ -615,7 +609,7 @@ export default function App() {
                 <Layer id="elements-layer">
                     {elements
                         .filter((element) => !groupSelection.includes(element.id))
-                        .map((element, i) => elementToReactElement(element, i, false))}
+                        .map((element, index) => elementToReactElement(element, false))}
                     <Group
                         draggable
                         ref={groupRef}
@@ -623,9 +617,11 @@ export default function App() {
                             updateResetGroup();
                         }}
                     >
-                        {groupSelection.map((id) => {
-                            const idx = elements.findIndex((element) => element.id === id);
-                            return elementToReactElement(elements[idx], idx, true);
+                        {groupSelection.map((id, index) => {
+                            const target = elements.find((element) => element.id === id);
+                            return target !== undefined
+                                ? elementToReactElement(target, true)
+                                : null;
                         })}
                     </Group>
                 </Layer>
