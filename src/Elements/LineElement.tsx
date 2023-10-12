@@ -56,6 +56,18 @@ const LineElement = ({
         // eslint-disable-next-line
     }, [lineRef.current]);
 
+    // Update width and height when the element is created
+    useEffect(() => {
+        if (lineRef.current !== null) {
+            const node = lineRef.current;
+            handleChange({
+                ...line,
+                width: node.width(),
+                height: node.height(),
+            });
+        }
+    }, []);
+
     return (
         <Fragment>
             <Line
