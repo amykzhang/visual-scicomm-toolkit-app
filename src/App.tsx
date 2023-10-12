@@ -428,7 +428,9 @@ export default function App() {
 
     // Group Selection
     useEffect(() => {
-        setGroupSelection(elementsWithinBounds);
+        if (shiftKey)
+            setGroupSelection(Array.from(new Set([...groupSelection, ...elementsWithinBounds])));
+        else setGroupSelection(elementsWithinBounds);
     }, [elementsWithinBounds]);
 
     // --- HISTORY ---
