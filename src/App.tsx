@@ -155,19 +155,19 @@ export default function App() {
         }
     }
 
-    function bringToFront(id: string) {
-        const index = elements.findIndex((element) => element.id === id);
-        if (index !== -1 && index !== elements.length - 1) {
-            setElements((elements) => {
-                const element = elements[index];
-                elements.splice(index, 1);
-                elements.push(element);
-                return elements;
-            });
-        }
+    function bringToFront(ids: string[]) {
+        console.log(ids);
+        const indices = ids.map((id) => elements.findIndex((element) => element.id === id));
+        if (indices.includes(-1)) return;
+        setElements((elements) => {
+            const elementsToMove = indices.map((index) => elements[index]);
+            elements = elements.filter((element) => !elementsToMove.includes(element));
+            elements.push(...elementsToMove);
+            return elements;
+        });
     }
 
-    function bringBackward(id: string) {
+    function sendBackward(id: string) {
         const index = elements.findIndex((element) => element.id === id);
         if (index !== -1 && index !== 0) {
             setElements((elements) => {
@@ -177,16 +177,16 @@ export default function App() {
         }
     }
 
-    function bringToBack(id: string) {
-        const index = elements.findIndex((element) => element.id === id);
-        if (index !== -1 && index !== 0) {
-            setElements((elements) => {
-                const element = elements[index];
-                elements.splice(index, 1);
-                elements.unshift(element);
-                return elements;
-            });
-        }
+    function sendToBack(ids: string[]) {
+        console.log(ids);
+        const indices = ids.map((id) => elements.findIndex((element) => element.id === id));
+        if (indices.includes(-1)) return;
+        setElements((elements) => {
+            const elementsToMove = indices.map((index) => elements[index]);
+            elements = elements.filter((element) => !elementsToMove.includes(element));
+            elements.unshift(...elementsToMove);
+            return elements;
+        });
     }
 
     // -- KEY PRESSES --
@@ -218,6 +218,12 @@ export default function App() {
                         if (e.shiftKey && e.metaKey) handleRedo();
                         else if (e.metaKey) handleUndo();
                         break;
+                    case "[":
+                        sendToBack(groupSelection);
+                        break;
+                    case "]":
+                        bringToFront(groupSelection);
+                        break;
                     default:
                         break;
                 }
@@ -226,14 +232,6 @@ export default function App() {
             else if (view === APP_VIEW.pan) {
                 switch (e.key) {
                     case "Escape":
-                        setView(APP_VIEW.select);
-                        break;
-                    // TODO: remove shortcut
-                    case "t":
-                        setView(APP_VIEW.text);
-                        break;
-                    // TODO: remove shortcut
-                    case "v":
                         setView(APP_VIEW.select);
                         break;
                     default:
@@ -245,9 +243,9 @@ export default function App() {
                     case "Escape":
                         setView(APP_VIEW.select);
                         break;
-                    // TODO: remove shortcut
-                    case "v":
-                        setView(APP_VIEW.select);
+                    case "z":
+                        if (e.shiftKey && e.metaKey) handleRedo();
+                        else if (e.metaKey) handleUndo();
                         break;
                     default:
                         break;
@@ -256,6 +254,10 @@ export default function App() {
                 switch (e.key) {
                     case "Escape":
                         setView(APP_VIEW.select);
+                        break;
+                    case "z":
+                        if (e.shiftKey && e.metaKey) handleRedo();
+                        else if (e.metaKey) handleUndo();
                         break;
                     default:
                         break;
