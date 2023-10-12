@@ -180,7 +180,7 @@ export default function App() {
                             }
                             break;
                         case "=":
-                            console.log(elements);
+                            console.log(groupSelection);
                             break;
                         default:
                             break;
@@ -428,9 +428,7 @@ export default function App() {
 
     // Group Selection
     useEffect(() => {
-        if (shiftKey)
-            setGroupSelection(Array.from(new Set([...groupSelection, ...elementsWithinBounds])));
-        else setGroupSelection(elementsWithinBounds);
+        setGroupSelection(elementsWithinBounds);
     }, [elementsWithinBounds]);
 
     // --- HISTORY ---
