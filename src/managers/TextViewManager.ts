@@ -8,36 +8,21 @@ import constants from "../utils/constants";
 export const TextViewManager = (
     view: APP_VIEW,
     setView: (view: APP_VIEW) => void,
-    elements: ElementProp[],
     setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>,
     stageRef: React.RefObject<Konva.Stage>,
-    groupSelection: string[],
     setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>
 ) => {
     const [isEditingText, setIsEditing] = useState<boolean>(false);
     const [justCreated, setJustCreated] = useState<string | null>(null);
 
-    function enterTextMode() {
-        setView(APP_VIEW.text);
-    }
-
-    function exitTextMode() {
-        setView(APP_VIEW.select);
-    }
-
     function toggleTextMode() {
-        if (view === APP_VIEW.text) exitTextMode();
-        else enterTextMode();
+        if (view === APP_VIEW.text) setView(APP_VIEW.select);
+        else setView(APP_VIEW.text);
     }
 
-    function addTextBox(
-        x: number,
-        y: number,
-        elements: ElementProp[],
-        setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>
-    ) {
+    function addTextBox(x: number, y: number) {
         const id = uuid();
-        setElements([
+        setElements((elements) => [
             ...elements,
             {
                 id: id,
@@ -50,26 +35,6 @@ export const TextViewManager = (
         return id;
     }
 
-    const handleAddTextBox = (
-        elements: ElementProp[],
-        setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>,
-        stageRef: React.RefObject<Konva.Stage>
-    ) => {
-        return (e: Konva.KonvaEventObject<MouseEvent>) => {
-            // if clicked anywhere other than a textbox
-            if (stageRef.current !== null && e.target.getAttrs().type !== "text") {
-                const stage = stageRef.current;
-                const x = (e.evt.clientX - stage.x()) / stage.scaleX();
-                const y = (e.evt.clientY - stage.y()) / stage.scaleX();
-                const id = addTextBox(x, y, elements, setElements);
-
-                // set justCreated for side effect to enter edit mode
-                setJustCreated(id);
-                setGroupSelection([id]);
-            }
-        };
-    };
-
     // handle stage click in text mode
     // 1) check for click on any are not a 'text'
     // 2) if isEditingText is true, just blurred off a textarea, do nothing
@@ -81,7 +46,16 @@ export const TextViewManager = (
                 setGroupSelection([]);
             } else {
                 setIsEditing(false);
-                handleAddTextBox(elements, setElements, stageRef)(e);
+                if (stageRef.current !== null && e.target.getAttrs().type !== "text") {
+                    const stage = stageRef.current;
+                    const x = (e.evt.clientX - stage.x()) / stage.scaleX();
+                    const y = (e.evt.clientY - stage.y()) / stage.scaleX();
+                    const id = addTextBox(x, y);
+
+                    // set justCreated for side effect to enter edit mode
+                    setJustCreated(id);
+                    setGroupSelection([id]);
+                }
             }
         }
     }
@@ -198,8 +172,7 @@ export const TextViewManager = (
 
                 if (newText === "") {
                     // removeComment
-                    const newElements = elements.filter((element) => element.id !== text.id);
-                    setElements(newElements);
+                    setElements((elements) => elements.filter((element) => element.id !== text.id));
 
                     removeTextarea();
                     return;

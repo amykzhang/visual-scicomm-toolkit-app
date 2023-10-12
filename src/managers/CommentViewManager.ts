@@ -5,21 +5,15 @@ import { v4 as uuid } from "uuid";
 import constants from "../utils/constants";
 
 export const CommentViewManager = (
-    comments: CommentProp[],
     setComments: React.Dispatch<React.SetStateAction<CommentProp[]>>,
     stageRef: React.RefObject<Konva.Stage>
 ) => {
     const [selectedComment, setSelectedComment] = useState<string | null>(null);
     const [isEditingComment, setIsEditing] = useState<boolean>(false);
 
-    function addComment(
-        x: number,
-        y: number,
-        comments: CommentProp[],
-        setComments: React.Dispatch<React.SetStateAction<CommentProp[]>>
-    ) {
+    function addComment(x: number, y: number) {
         const id = uuid();
-        setComments([
+        setComments((comments) => [
             ...comments,
             {
                 id: id,
@@ -31,29 +25,9 @@ export const CommentViewManager = (
         return id;
     }
 
-    function removeComment(
-        id: string,
-        comments: CommentProp[],
-        setComments: React.Dispatch<React.SetStateAction<CommentProp[]>>
-    ) {
-        setComments(comments.filter((comment) => comment.id !== id));
+    function removeComment(id: string) {
+        setComments((comments) => comments.filter((comment) => comment.id !== id));
     }
-
-    const handleAddComment = (
-        comments: CommentProp[],
-        setComments: React.Dispatch<React.SetStateAction<CommentProp[]>>,
-        stageRef: React.RefObject<Konva.Stage>
-    ) => {
-        return (e: Konva.KonvaEventObject<MouseEvent>) => {
-            if (stageRef.current !== null) {
-                const stage = stageRef.current;
-                const x = (e.evt.clientX - stage.x()) / stage.scaleX();
-                const y = (e.evt.clientY - stage.y()) / stage.scaleX();
-                const id = addComment(x, y, comments, setComments);
-                setSelectedComment(id);
-            }
-        };
-    };
 
     // handle stage click in comment mode
     // 1) check for click on any are not a 'comment'
@@ -66,7 +40,13 @@ export const CommentViewManager = (
                 setSelectedComment(null);
             } else {
                 setIsEditing(false);
-                handleAddComment(comments, setComments, stageRef)(e);
+                if (stageRef.current !== null) {
+                    const stage = stageRef.current;
+                    const x = (e.evt.clientX - stage.x()) / stage.scaleX();
+                    const y = (e.evt.clientY - stage.y()) / stage.scaleX();
+                    const id = addComment(x, y);
+                    setSelectedComment(id);
+                }
             }
         }
     }
@@ -195,7 +175,7 @@ export const CommentViewManager = (
                 const newText = textarea.value;
 
                 if (newText === "") {
-                    removeComment(comment.id, comments, setComments);
+                    removeComment(comment.id);
                     removeTextarea();
                     setIsEditing(false);
                     return;
@@ -213,20 +193,21 @@ export const CommentViewManager = (
                 });
 
                 // update Comment props
-                const newComments = comments.map((comment_i) => {
-                    if (comment.id === comment_i.id) {
-                        return {
-                            ...comment_i,
-                            text: newText,
-                            width: textNode.width(),
-                            height: textNode.height(),
-                            scale: textNode.scaleX(),
-                        };
-                    } else {
-                        return comment_i;
-                    }
-                });
-                setComments(newComments);
+                setComments((comments) =>
+                    comments.map((comment_i) => {
+                        if (comment.id === comment_i.id) {
+                            return {
+                                ...comment_i,
+                                text: newText,
+                                width: textNode.width(),
+                                height: textNode.height(),
+                                scale: textNode.scaleX(),
+                            };
+                        } else {
+                            return comment_i;
+                        }
+                    })
+                );
 
                 removeTextarea();
                 setIsEditing(false);

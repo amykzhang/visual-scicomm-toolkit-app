@@ -72,16 +72,56 @@ export const DragSelectManager = (
             height: Math.abs(selectionBounds.height),
         };
 
-        const newSelection = elements
-            .filter(
-                (element) =>
-                    element.x > actualBounds.x &&
-                    element.y > actualBounds.y &&
-                    element.x + element.width < actualBounds.x + actualBounds.width &&
-                    element.y + element.height < actualBounds.y + actualBounds.height
-            )
+        const filteredElementIds = elements
+            .filter((element) => {
+                // return (
+                //     element.x > actualBounds.x &&
+                //     element.y > actualBounds.y &&
+                //     element.x + element.width < actualBounds.x + actualBounds.width &&
+                //     element.y + element.height < actualBounds.y + actualBounds.height
+                // );
+
+                // const A = {
+                //     x0: element.x,
+                //     y0: element.y,
+                //     x1: element.x + element.width,
+                //     y1: element.y + element.height,
+                // };
+                // const B = {
+                //     x0: actualBounds.x,
+                //     y0: actualBounds.y,
+                //     x1: actualBounds.x + actualBounds.width,
+                //     y1: actualBounds.y + actualBounds.height,
+                // };
+                // const aLeftOfB = A.x1 < B.x0;
+                // const aRightOfB = A.x0 > B.x1;
+                // const aAboveB = A.y0 > B.y1;
+                // const aBelowB = A.y1 < B.y0;
+
+                // const hasIntersection = !(aLeftOfB || aRightOfB || aAboveB || aBelowB);
+
+                const hasIntersectionKonva = Konva.Util.haveIntersection(
+                    {
+                        x: element.x,
+                        y: element.y,
+                        width: element.width,
+                        height: element.height,
+                    },
+                    actualBounds
+                );
+                // console.log(hasIntersectionKonva);
+                // console.log("actualBounds", actualBounds);
+                // console.log("element", {
+                //     x: element.x,
+                //     y: element.y,
+                //     width: element.width,
+                //     height: element.height,
+                // });
+                return hasIntersectionKonva;
+            })
             .map((element) => element.id);
-        return newSelection;
+
+        return filteredElementIds;
     }
 
     return {

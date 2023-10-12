@@ -1,10 +1,11 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Line, Transformer } from "react-konva";
+import { LineProp } from "../utils/interfaces";
 import Konva from "konva";
-import { Image, Transformer } from "react-konva";
-import { ImageProp } from "../utils/interfaces";
+import { Fragment, useEffect, useRef, useState } from "react";
+import constants from "../utils/constants";
 
-interface ImageElementProp {
-    image: ImageProp;
+interface LineElementProp {
+    line: LineProp;
     draggable: boolean;
     transformFlag: boolean;
     setTransformFlag: React.Dispatch<React.SetStateAction<boolean>>;
@@ -15,8 +16,8 @@ interface ImageElementProp {
     setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const ImageElement = ({
-    image,
+const LineElement = ({
+    line,
     draggable,
     transformFlag,
     setTransformFlag,
@@ -25,8 +26,8 @@ const ImageElement = ({
     handleDragEnd,
     groupSelection,
     setGroupSelection,
-}: ImageElementProp) => {
-    const isSelected = groupSelection.includes(image.id);
+}: LineElementProp) => {
+    const isSelected = groupSelection.includes(line.id);
     // When the element is dragged selected but not selected yet (to show transformer when dragging and globalflag is disabled)
     const [dragSelected, setDragSelected] = useState(false);
 
@@ -34,32 +35,46 @@ const ImageElement = ({
     // Otherwise, show if it is selected or drag selected
     const showTransform = (transformFlag || dragSelected) && (isSelected || dragSelected);
 
-    const imageRef = useRef<Konva.Image | null>(null);
+    const lineRef = useRef<Konva.Line | null>(null);
     const transformerRef = useRef<Konva.Transformer | null>(null);
 
-    const imageElement = new window.Image();
-    imageElement.width = image.width;
-    imageElement.height = image.height;
-    imageElement.src = image.src;
-
     useEffect(() => {
-        // Show transformer when the image is selected or dragged
+        // Show transformer when the shape is selected or dragged
         if (showTransform) {
             // we need to attach transformer manually
-            if (transformerRef.current !== null && imageRef.current !== null) {
+            if (transformerRef.current !== null && lineRef.current !== null) {
                 const transformer = transformerRef.current;
-                transformer.nodes([imageRef.current]);
+                transformer.nodes([lineRef.current]);
                 transformer.getLayer()?.batchDraw();
             }
         }
     }, [showTransform]);
 
+    // Backdoor set line cap (Konva Bug, can't set linecap with string)
+    useEffect(() => {
+        lineRef.current?.lineCap("round");
+        // eslint-disable-next-line
+    }, [lineRef.current]);
+
+    // Update width and height when the element is created
+    useEffect(() => {
+        if (lineRef.current !== null) {
+            const node = lineRef.current;
+            handleChange({
+                ...line,
+                width: node.width(),
+                height: node.height(),
+            });
+        }
+        // eslint-disable-next-line
+    }, []);
+
     return (
         <Fragment>
-            <Image
-                {...image}
-                image={imageElement}
-                ref={imageRef}
+            <Line
+                {...line}
+                {...constants.line}
+                ref={lineRef}
                 draggable={draggable}
                 onClick={handleSelect}
                 onDragStart={(e) => {
@@ -68,31 +83,49 @@ const ImageElement = ({
                 }}
                 onDragEnd={(e) => {
                     handleDragEnd(e);
-                    setGroupSelection([image.id]);
+                    setGroupSelection([line.id]);
                     setTransformFlag(true);
                     setDragSelected(false);
+                }}
+                onTransform={(e) => {
+                    if (lineRef.current !== null) {
+                        const node = lineRef.current;
+                        const scaleX = node.scaleX();
+                        const scaleY = node.scaleY();
+                        const scaledPoints = node.points().map((point, i) => {
+                            if (i % 2 === 0) return point * scaleX;
+                            else return point * scaleY;
+                        });
+
+                        node.scaleX(1);
+                        node.scaleY(1);
+                        node.points(scaledPoints);
+                    }
                 }}
                 onTransformEnd={() => {
                     // transformer is changing scale of the node
                     // and NOT its width or height
                     // but in the store we have only width and height
                     // to match the data better we will reset scale on transform end
-                    if (imageRef.current !== null) {
-                        const node = imageRef.current;
+                    if (lineRef.current !== null) {
+                        const node = lineRef.current;
                         const scaleX = node.scaleX();
                         const scaleY = node.scaleY();
                         const rotation = node.rotation();
+                        const scaledPoints = node.points().map((point, i) => {
+                            if (i % 2 === 0) return point * scaleX;
+                            else return point * scaleY;
+                        });
 
-                        // we will reset it back
                         node.scaleX(1);
                         node.scaleY(1);
 
                         handleChange({
                             x: node.x(),
                             y: node.y(),
-                            // set minimal value
-                            width: Math.max(5, node.width() * scaleX),
-                            height: Math.max(5, node.height() * scaleY),
+                            width: node.width(),
+                            height: node.height(),
+                            points: scaledPoints,
                             rotation: rotation,
                         });
                     }
@@ -119,4 +152,4 @@ const ImageElement = ({
     );
 };
 
-export default ImageElement;
+export default LineElement;

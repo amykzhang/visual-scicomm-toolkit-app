@@ -61,9 +61,12 @@ function persistStageState(state: StageStateProp) {
 function retrieveStageState(): StageStateProp | null {
     const saved = window.localStorage.getItem(LOCALSTORAGE_STAGE_STATE_KEY);
     if (saved !== null) {
+        console.log("Found saved stage state");
         const persistedStageState = JSON.parse(saved);
         return persistedStageState;
-    } else return null;
+    }
+    console.log("No saved stage state found");
+    return null;
 }
 
 export const persistance = {

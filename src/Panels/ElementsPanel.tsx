@@ -5,7 +5,6 @@ import { Activity } from "../activity/activity";
 import { ReactComponent as LeftArrow } from "../assets/arrowhead-left.svg";
 import { ReactComponent as RightArrow } from "../assets/arrowhead-right.svg";
 import { ReactComponent as PenAndRuler } from "../assets/penandruler.svg";
-import { ReactComponent as Doodle } from "../assets/doodle.svg";
 import { ImageTool } from "../components/ImageTool";
 import { TextTool } from "../components/TextTool";
 import { ShapeTool } from "../components/ShapeTool";
@@ -20,6 +19,7 @@ import {
 import styled from "styled-components";
 import color from "../styles/color";
 import { APP_VIEW } from "../utils/enums";
+import { DrawTool } from "../components/DrawTool";
 
 const ElementsPanelContainer = styled(SideBar)`
     right: 0;
@@ -66,6 +66,7 @@ const ImageSubheadingText = styled(typography.BoldSmallText)`
 `;
 
 interface ElementsMenuProps {
+    view: APP_VIEW;
     activity: Activity;
     elements: ElementProp[];
     setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>;
@@ -73,7 +74,7 @@ interface ElementsMenuProps {
     isOpen: boolean;
     handleToggle: () => void;
     toggleTextMode: () => void;
-    view: APP_VIEW;
+    toggleDrawMode: () => void;
 }
 
 export const ElementsPanel: FC<ElementsMenuProps> = ({
@@ -84,6 +85,7 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     isOpen,
     handleToggle,
     toggleTextMode,
+    toggleDrawMode,
     view,
 }) => {
     // For expanding and collapsing the sidebar
@@ -93,77 +95,61 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     const activity_shapes = activity.elements.shapes;
     const activity_lines = activity.elements.lines;
 
-    const TextSection = () => {
-        return (
-            <>
-                <ImageSubheadingText>{activity.elements.text.heading}</ImageSubheadingText>
-                <ElementsRow>
-                    <TextTool isTextMode={view === APP_VIEW.text} toggleTextMode={toggleTextMode} />
-                </ElementsRow>
-            </>
-        );
-    };
+    const TextSection = () => (
+        <>
+            <ImageSubheadingText>{activity.elements.text.heading}</ImageSubheadingText>
+            <ElementsRow>
+                <TextTool isTextMode={view === APP_VIEW.text} toggleTextMode={toggleTextMode} />
+            </ElementsRow>
+        </>
+    );
+    const DrawSection = () => (
+        <>
+            <ImageSubheadingText>{activity.elements.draw.heading}</ImageSubheadingText>
+            <ElementsRow>
+                <DrawTool isDrawMode={view === APP_VIEW.draw} toggleDrawMode={toggleDrawMode} />
+            </ElementsRow>
+        </>
+    );
 
-    const DrawSection = () => {
-        const { heading, contents } = activity.elements.draw;
-        return (
-            <>
-                <ImageSubheadingText>{heading}</ImageSubheadingText>
-                <ElementsRow>
-                    {contents.map((item, i) => {
-                        if (item.type === "tool" && item.tool === "freehand-draw") {
-                            return <Doodle key={i} />;
-                        } else return <></>;
-                    })}
-                </ElementsRow>
-            </>
-        );
-    };
-
-    const LinesSection = () => {
-        const { srcs, icons, sizes } = activity_lines;
-        return (
-            <>
-                <ImageSubheadingText>{activity_lines.heading}</ImageSubheadingText>
-                <ElementsRow>
-                    {srcs.map((src, i) => {
-                        return (
-                            <ImageTool
-                                key={i}
-                                src={src}
-                                name={icons[i]}
-                                dimensions={sizes[i]}
-                                elements={elements}
-                                setElements={setElements}
-                                stageRef={stageRef}
-                            />
-                        );
-                    })}
-                </ElementsRow>
-            </>
-        );
-    };
-
-    const ShapeSection = () => {
-        const { heading, shapes, fill } = activity_shapes;
-        return (
-            <>
-                <ImageSubheadingText>{heading}</ImageSubheadingText>
-                <ElementsRow>
-                    {shapes.map((shape_icon, i) => (
-                        <ShapeTool
+    const LinesSection = () => (
+        <>
+            <ImageSubheadingText>{activity_lines.heading}</ImageSubheadingText>
+            <ElementsRow>
+                {activity_lines.srcs.map((src, i) => {
+                    return (
+                        <ImageTool
                             key={i}
-                            shape={shape_icon}
-                            fill={fill[i]}
+                            src={src}
+                            name={activity_lines.icons[i]}
+                            dimensions={activity_lines.sizes[i]}
                             elements={elements}
                             setElements={setElements}
                             stageRef={stageRef}
                         />
-                    ))}
-                </ElementsRow>
-            </>
-        );
-    };
+                    );
+                })}
+            </ElementsRow>
+        </>
+    );
+
+    const ShapeSection = () => (
+        <>
+            <ImageSubheadingText>{activity_shapes.heading}</ImageSubheadingText>
+            <ElementsRow>
+                {activity_shapes.shapes.map((shape_icon, i) => (
+                    <ShapeTool
+                        key={i}
+                        shape={shape_icon}
+                        fill={activity_shapes.fill[i]}
+                        elements={elements}
+                        setElements={setElements}
+                        stageRef={stageRef}
+                    />
+                ))}
+            </ElementsRow>
+        </>
+    );
 
     const ImageSection = () => {
         return (

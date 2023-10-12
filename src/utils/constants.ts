@@ -31,12 +31,19 @@ const textbox = {
     },
 };
 
+const line = {
+    tension: 0.4,
+    stroke: color.black,
+    strokeWidth: 2,
+};
+
 const resizeAnchors = ["top-left", "top-right", "bottom-right", "bottom-left"];
 
 const constants = {
     comment,
     resizeAnchors,
     textbox,
+    line,
 };
 
 export default constants;

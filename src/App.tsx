@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Stage, Layer, Group } from "react-konva";
+import { Stage, Layer, Group, Line } from "react-konva";
 import { PanelsContainer } from "./styles/containers";
 import {
     ExportManager,
@@ -8,6 +8,7 @@ import {
     TextViewManager,
     CommentViewManager,
     DragSelectManager,
+    DrawViewManager,
 } from "./managers";
 import {
     TitlePanel,
@@ -28,6 +29,7 @@ import {
     CommentProp,
     ElementProp,
     ImageProp,
+    LineProp,
     ShapeProp,
     TextProp,
     UiStateProp,
@@ -38,6 +40,8 @@ import { ImageElement, CommentElement, ShapeElement, TextElement } from "./Eleme
 import Konva from "konva";
 import { SelectionRect } from "./components/SelectionRect";
 import color from "./styles/color";
+import LineElement from "./Elements/LineElement";
+import constants from "./utils/constants";
 
 const activity = activity_visual_strategies;
 
@@ -61,6 +65,7 @@ export default function App() {
     const groupRef = useRef<Konva.Group>(null);
     const exportAreaRef = useRef<Konva.Rect>(null);
     const selectionRectRef = useRef<Konva.Rect>(null);
+    const lineRef = useRef<Konva.Line>(null);
 
     const [shiftKey, setShiftKey] = useState(false);
 
@@ -102,7 +107,6 @@ export default function App() {
 
     // Selection
     const { handleSelect, deleteSelected, updateResetGroup } = SelectionManager(
-        elements,
         setElements,
         view,
         setView,
@@ -118,18 +122,10 @@ export default function App() {
         handleCommentViewClickOff,
         editComment,
         isEditingComment,
-    } = CommentViewManager(comments, setComments, stageRef);
+    } = CommentViewManager(setComments, stageRef);
 
     const { toggleTextMode, handleTextClick, editText, isEditingText, justCreated } =
-        TextViewManager(
-            view,
-            setView,
-            elements,
-            setElements,
-            stageRef,
-            groupSelection,
-            setGroupSelection
-        );
+        TextViewManager(view, setView, setElements, stageRef, setGroupSelection);
 
     const {
         isSelectionMode,
@@ -139,6 +135,15 @@ export default function App() {
         handleDragSelectMouseMove,
         handleDragSelectMouseUp,
     } = DragSelectManager(stageRef, elements);
+
+    const {
+        points,
+        isDrawing,
+        handleDrawMouseDown,
+        handleDrawMouseMove,
+        handleDrawMouseUp,
+        toggleDrawMode,
+    } = DrawViewManager(view, setView, setElements, stageRef);
 
     // -- KEY PRESSES --
     const handleKeyDown = useCallback(
@@ -174,6 +179,9 @@ export default function App() {
                                 setView(APP_VIEW.text);
                             }
                             break;
+                        case "=":
+                            console.log(groupSelection);
+                            break;
                         default:
                             break;
                     }
@@ -204,6 +212,17 @@ export default function App() {
                         // TODO: remove shortcut
                         case "v":
                             setView(APP_VIEW.select);
+                            break;
+                        default:
+                            break;
+                    }
+                } else if (view === APP_VIEW.draw) {
+                    switch (e.key) {
+                        case "Escape":
+                            setView(APP_VIEW.select);
+                            break;
+                        case "=":
+                            console.log(elements);
                             break;
                         default:
                             break;
@@ -253,6 +272,8 @@ export default function App() {
         i: number,
         group: boolean
     ): React.ReactElement {
+        if (i === -1) return <></>;
+
         const draggable = view === APP_VIEW.select && !group;
         if (element.type === "image") {
             const image = element as ImageProp;
@@ -325,6 +346,28 @@ export default function App() {
                     isJustCreated={justCreated === text.id}
                 />
             );
+        } else if (element.type === "line") {
+            const line = element as LineProp;
+            return (
+                <LineElement
+                    key={i}
+                    line={line}
+                    draggable={draggable}
+                    handleChange={(attributes: any) => {
+                        setElements([
+                            ...elements.slice(0, i),
+                            { ...line, ...attributes },
+                            ...elements.slice(i + 1),
+                        ]);
+                    }}
+                    handleSelect={() => handleSelect(line.id)}
+                    handleDragEnd={handleDragEnd(elements, setElements)}
+                    transformFlag={transformFlag}
+                    setTransformFlag={setTransformFlag}
+                    groupSelection={groupSelection}
+                    setGroupSelection={setGroupSelection}
+                />
+            );
         } else return <></>;
     }
 
@@ -353,16 +396,16 @@ export default function App() {
     }
 
     const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
-        if (stageRef.current === null) return;
-        const stage = stageRef.current;
-
         if (view === APP_VIEW.select) {
+            if (stageRef.current === null) return;
+            const stage = stageRef.current;
+
             // Only start bounding box drag select if user clicks on stage or export area
             if (e.target === stage || e.target === exportAreaRef.current) {
                 handleDragSelectMouseDown(e);
             }
         } else if (view === APP_VIEW.draw) {
-            console.log("draw mousedown");
+            handleDrawMouseDown(e);
         }
     };
 
@@ -370,7 +413,7 @@ export default function App() {
         if (view === APP_VIEW.select && isSelectionMode) {
             handleDragSelectMouseMove(e);
         } else if (view === APP_VIEW.draw) {
-            console.log("draw mousemove");
+            handleDrawMouseMove(e);
         }
     };
 
@@ -379,7 +422,7 @@ export default function App() {
             handleDragSelectMouseUp(e);
         }
         if (view === APP_VIEW.draw) {
-            console.log("draw mouseup");
+            handleDrawMouseUp(e);
         }
     };
 
@@ -480,6 +523,12 @@ export default function App() {
         }
     }, [view]);
 
+    // Backdoor set line cap (Konva Bug, can't set linecap with string)
+    useEffect(() => {
+        lineRef.current?.lineCap("round");
+        // eslint-disable-next-line
+    }, [lineRef.current]);
+
     return (
         <div>
             <PanelsContainer>
@@ -505,6 +554,7 @@ export default function App() {
                     }}
                 />
                 <ElementsPanel
+                    view={view}
                     activity={activity}
                     elements={elements}
                     setElements={setElements}
@@ -517,7 +567,7 @@ export default function App() {
                         });
                     }}
                     toggleTextMode={toggleTextMode}
-                    view={view}
+                    toggleDrawMode={toggleDrawMode}
                 />
                 <BottomZone>
                     <ZoomPanel
@@ -562,6 +612,7 @@ export default function App() {
                             height={selectionBounds.height}
                         />
                     )}
+                    {isDrawing && <Line ref={lineRef} {...constants.line} points={points} />}
                 </Layer>
                 <Layer id="elements-layer">
                     {elements
@@ -576,9 +627,7 @@ export default function App() {
                     >
                         {groupSelection.map((id) => {
                             const idx = elements.findIndex((element) => element.id === id);
-                            return idx !== -1
-                                ? elementToReactElement(elements[idx], idx, true)
-                                : null;
+                            return elementToReactElement(elements[idx], idx, true);
                         })}
                     </Group>
                 </Layer>

@@ -108,20 +108,25 @@ October 6 (friday):
 
 -   Undo/redo stack (https://konvajs.org/docs/react/Undo-Redo.html) (2h)✅
 
-October 8 (sunday):
+October 7 (saturday):
 
--   freehand draw (https://konvajs.org/docs/sandbox/Free_Drawing.html) (2h)\
+-   Fix drag select issues (1h)✅
+
+DEADLINE:
+
+-   freehand draw (3h) ✅
 -   contextmenu for copy paste change color etc. (3h)
--   tooltips !
+-   tooltips (3h)
+-   Add shortcuts for commands (3h)
+-   Add support for chrome, safari, firefox, edge (4h)
+-   Landing Page (look into it) (2h)
 
-October 9 (monday):
-
--   Add shortcuts for commands (1h)
--   Add support for chrome, safari, firefox, edge (2h)
--   Landing Page (look into it) (1h)
-
-Production and staging servers: t
+Production and staging servers:
 document code, how to deploy, how to run, how to test
+
+little things:
+
+-   pan: closed hand on mousedown, open hand on mouseup
 
 nice-to-haves:
 

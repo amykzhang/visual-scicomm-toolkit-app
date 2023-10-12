@@ -4,7 +4,6 @@ import { APP_VIEW } from "../utils/enums";
 import Konva from "konva";
 
 export const SelectionManager = (
-    elements: ElementProp[],
     setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>,
     view: APP_VIEW,
     setView_: (view: APP_VIEW) => void,
@@ -45,29 +44,32 @@ export const SelectionManager = (
     const updateResetGroup = () => {
         if (groupRef.current !== null) {
             const group = groupRef.current;
-
-            const newElements = elements.map((element) => {
-                if (groupSelection.includes(element.id)) {
-                    return {
-                        ...element,
-                        x: element.x + group.x(),
-                        y: element.y + group.y(),
-                    };
-                } else {
-                    return element;
-                }
-            });
-            setElements(newElements);
+            const offsetX = group.x();
+            const offsetY = group.y();
+            setElements((elements) =>
+                elements.map((element) => {
+                    if (groupSelection.includes(element.id)) {
+                        return {
+                            ...element,
+                            x: element.x + offsetX,
+                            y: element.y + offsetY,
+                        };
+                    } else {
+                        return element;
+                    }
+                })
+            );
             group.x(0);
             group.y(0);
         }
     };
 
     const deleteSelected = useCallback(() => {
-        const newImages = elements.filter((element) => !groupSelection.includes(element.id));
-        setElements(newImages);
+        setElements((elements) =>
+            elements.filter((element) => !groupSelection.includes(element.id))
+        );
         setGroupSelection([]);
-    }, [elements, setElements, groupSelection, setGroupSelection]);
+    }, [setElements, groupSelection, setGroupSelection]);
 
     return {
         handleSelect,

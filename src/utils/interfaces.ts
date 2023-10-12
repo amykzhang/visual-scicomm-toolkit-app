@@ -19,11 +19,11 @@ export interface StageStateProp {
 
 // Elements
 
-export type ElementProp = ImageProp | ShapeProp | TextProp;
+export type ElementProp = ImageProp | ShapeProp | TextProp | LineProp;
 
 interface BaseProp {
     id: string;
-    type: "image" | "shape" | "text";
+    type: "image" | "shape" | "text" | "line";
     x: number;
     y: number;
     width: number;
@@ -52,6 +52,15 @@ export interface TextProp extends BaseProp {
     fill: string;
     align: "left" | "center" | "right";
     scale: number;
+}
+
+export interface LineProp extends BaseProp {
+    points: number[];
+    tension: number;
+    stroke: string;
+    strokeWidth: number;
+    scaleX: number;
+    scaleY: number;
 }
 
 export interface CommentProp {
