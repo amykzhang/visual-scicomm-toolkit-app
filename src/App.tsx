@@ -150,101 +150,93 @@ export default function App() {
         (e: KeyboardEvent) => {
             if (e.key === "Shift") setShiftKey(true);
 
-            if (groupSelection !== null) {
-                // SELECT VIEW
-                if (view === APP_VIEW.select) {
-                    if (isEditingText) {
-                        return;
-                    }
-                    switch (e.key) {
-                        case "a":
-                            if (e.metaKey) {
-                                setGroupSelection(elements.map((element) => element.id));
-                                setElements(elements.slice()); // force update (TODO: FIX HACK)
-                            }
-                            break;
-                        case "Escape":
-                            setGroupSelection([]);
-                            setElements(elements.slice());
-                            break;
-                        case "Delete":
-                        case "Backspace":
-                            if (!e.metaKey) {
-                                deleteSelected();
-                            }
-                            break;
-                        // TODO: remove shortcut
-                        case "t":
-                            if (e.metaKey) {
-                                setView(APP_VIEW.text);
-                            }
-                            break;
-                        case "=":
-                            console.log(groupSelection);
-                            break;
-                        default:
-                            break;
-                    }
+            // SELECT VIEW
+            if (view === APP_VIEW.select) {
+                if (isEditingText) {
+                    return;
                 }
-                // PAN VIEW
-                else if (view === APP_VIEW.pan) {
-                    switch (e.key) {
-                        case "Escape":
-                            setView(APP_VIEW.select);
-                            break;
-                        // TODO: remove shortcut
-                        case "t":
+                switch (e.key) {
+                    case "a":
+                        if (e.metaKey) {
+                            setGroupSelection(elements.map((element) => element.id));
+                            setElements(elements.slice()); // force update (TODO: FIX HACK)
+                        }
+                        break;
+                    case "Escape":
+                        setGroupSelection([]);
+                        setElements(elements.slice());
+                        break;
+                    case "Delete":
+                    case "Backspace":
+                        if (!e.metaKey) {
+                            deleteSelected();
+                        }
+                        break;
+                    // TODO: remove shortcut
+                    case "t":
+                        if (e.metaKey) {
                             setView(APP_VIEW.text);
-                            break;
-                        // TODO: remove shortcut
-                        case "v":
-                            setView(APP_VIEW.select);
-                            break;
-                        default:
-                            break;
-                    }
-                    // TEXT VIEW
-                } else if (view === APP_VIEW.text) {
-                    switch (e.key) {
-                        case "Escape":
-                            setView(APP_VIEW.select);
-                            break;
-                        // TODO: remove shortcut
-                        case "v":
-                            setView(APP_VIEW.select);
-                            break;
-                        default:
-                            break;
-                    }
-                } else if (view === APP_VIEW.draw) {
-                    switch (e.key) {
-                        case "Escape":
-                            setView(APP_VIEW.select);
-                            break;
-                        case "=":
-                            console.log(elements);
-                            break;
-                        default:
-                            break;
-                    }
-                    // COMMENT VIEW
-                } else if (view === APP_VIEW.comment) {
-                    if (isEditingComment) {
-                        return;
-                    }
-                    switch (e.key) {
-                        case "Delete":
-                        case "Backspace":
-                            if (selectedComment !== null) {
-                                setComments(
-                                    comments.filter((comment) => comment.id !== selectedComment)
-                                );
-                                setSelectedComment(null);
-                            }
-                            break;
-                        default:
-                            break;
-                    }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            // PAN VIEW
+            else if (view === APP_VIEW.pan) {
+                switch (e.key) {
+                    case "Escape":
+                        setView(APP_VIEW.select);
+                        break;
+                    // TODO: remove shortcut
+                    case "t":
+                        setView(APP_VIEW.text);
+                        break;
+                    // TODO: remove shortcut
+                    case "v":
+                        setView(APP_VIEW.select);
+                        break;
+                    default:
+                        break;
+                }
+                // TEXT VIEW
+            } else if (view === APP_VIEW.text) {
+                switch (e.key) {
+                    case "Escape":
+                        setView(APP_VIEW.select);
+                        break;
+                    // TODO: remove shortcut
+                    case "v":
+                        setView(APP_VIEW.select);
+                        break;
+                    default:
+                        break;
+                }
+            } else if (view === APP_VIEW.draw) {
+                switch (e.key) {
+                    case "Escape":
+                        setView(APP_VIEW.select);
+                        break;
+                    default:
+                        break;
+                }
+                // COMMENT VIEW
+            } else if (view === APP_VIEW.comment) {
+                if (isEditingComment) {
+                    return;
+                }
+                switch (e.key) {
+                    case "Delete":
+                    case "Backspace":
+                        if (selectedComment !== null) {
+                            setComments(
+                                comments.filter((comment) => comment.id !== selectedComment)
+                            );
+                            setSelectedComment(null);
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
         },
@@ -258,7 +250,6 @@ export default function App() {
             deleteSelected,
             setSelectedComment,
             setView,
-            groupSelection,
         ]
     );
 
