@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Stage, Layer, Group } from "react-konva";
+import { Stage, Layer, Group, Line } from "react-konva";
 import { PanelsContainer } from "./styles/containers";
 import {
     ExportManager,
@@ -41,6 +41,7 @@ import Konva from "konva";
 import { SelectionRect } from "./components/SelectionRect";
 import color from "./styles/color";
 import LineElement from "./Elements/LineElement";
+import constants from "./utils/constants";
 
 const activity = activity_visual_strategies;
 
@@ -64,6 +65,7 @@ export default function App() {
     const groupRef = useRef<Konva.Group>(null);
     const exportAreaRef = useRef<Konva.Rect>(null);
     const selectionRectRef = useRef<Konva.Rect>(null);
+    const lineRef = useRef<Konva.Line>(null);
 
     const [shiftKey, setShiftKey] = useState(false);
 
@@ -134,8 +136,14 @@ export default function App() {
         handleDragSelectMouseUp,
     } = DragSelectManager(stageRef, elements);
 
-    const { handleDrawMouseDown, handleDrawMouseMove, handleDrawMouseUp, toggleDrawMode } =
-        DrawViewManager(view, setView, setElements, stageRef);
+    const {
+        points,
+        isDrawing,
+        handleDrawMouseDown,
+        handleDrawMouseMove,
+        handleDrawMouseUp,
+        toggleDrawMode,
+    } = DrawViewManager(view, setView, setElements, stageRef);
 
     // -- KEY PRESSES --
     const handleKeyDown = useCallback(
@@ -513,6 +521,12 @@ export default function App() {
         }
     }, [view]);
 
+    // Backdoor set line cap (Konva Bug, can't set linecap with string)
+    useEffect(() => {
+        lineRef.current?.lineCap("round");
+        // eslint-disable-next-line
+    }, [lineRef.current]);
+
     return (
         <div>
             <PanelsContainer>
@@ -596,6 +610,7 @@ export default function App() {
                             height={selectionBounds.height}
                         />
                     )}
+                    {isDrawing && <Line ref={lineRef} {...constants.line} points={points} />}
                 </Layer>
                 <Layer id="elements-layer">
                     {elements

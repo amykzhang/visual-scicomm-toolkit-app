@@ -2,6 +2,7 @@ import { Line, Transformer } from "react-konva";
 import { LineProp } from "../utils/interfaces";
 import Konva from "konva";
 import { Fragment, useEffect, useRef, useState } from "react";
+import constants from "../utils/constants";
 
 interface LineElementProp {
     line: LineProp;
@@ -49,10 +50,17 @@ const LineElement = ({
         }
     }, [showTransform]);
 
+    // Backdoor set line cap (Konva Bug, can't set linecap with string)
+    useEffect(() => {
+        lineRef.current?.lineCap("round");
+        // eslint-disable-next-line
+    }, [lineRef.current]);
+
     return (
         <Fragment>
             <Line
                 {...line}
+                {...constants.line}
                 ref={lineRef}
                 draggable={draggable}
                 onClick={handleSelect}
