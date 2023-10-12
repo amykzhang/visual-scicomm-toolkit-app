@@ -66,6 +66,7 @@ const LineElement = ({
                 height: node.height(),
             });
         }
+        // eslint-disable-next-line
     }, []);
 
     return (
