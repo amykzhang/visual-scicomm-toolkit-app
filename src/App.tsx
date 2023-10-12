@@ -145,6 +145,50 @@ export default function App() {
         toggleDrawMode,
     } = DrawViewManager(view, setView, setElements, stageRef);
 
+    function bringForward(id: string) {
+        const index = elements.findIndex((element) => element.id === id);
+        if (index !== -1 && index !== elements.length - 1) {
+            setElements((elements) => {
+                [elements[index], elements[index + 1]] = [elements[index + 1], elements[index]];
+                return elements;
+            });
+        }
+    }
+
+    function bringToFront(id: string) {
+        const index = elements.findIndex((element) => element.id === id);
+        if (index !== -1 && index !== elements.length - 1) {
+            setElements((elements) => {
+                const element = elements[index];
+                elements.splice(index, 1);
+                elements.push(element);
+                return elements;
+            });
+        }
+    }
+
+    function bringBackward(id: string) {
+        const index = elements.findIndex((element) => element.id === id);
+        if (index !== -1 && index !== 0) {
+            setElements((elements) => {
+                [elements[index], elements[index - 1]] = [elements[index - 1], elements[index]];
+                return elements;
+            });
+        }
+    }
+
+    function bringToBack(id: string) {
+        const index = elements.findIndex((element) => element.id === id);
+        if (index !== -1 && index !== 0) {
+            setElements((elements) => {
+                const element = elements[index];
+                elements.splice(index, 1);
+                elements.unshift(element);
+                return elements;
+            });
+        }
+    }
+
     // -- KEY PRESSES --
     const handleKeyDown = useCallback(
         (e: KeyboardEvent) => {
@@ -168,15 +212,11 @@ export default function App() {
                         break;
                     case "Delete":
                     case "Backspace":
-                        if (!e.metaKey) {
-                            deleteSelected();
-                        }
+                        deleteSelected();
                         break;
-                    // TODO: remove shortcut
-                    case "t":
-                        if (e.metaKey) {
-                            setView(APP_VIEW.text);
-                        }
+                    case "z":
+                        if (e.shiftKey && e.metaKey) handleRedo();
+                        else if (e.metaKey) handleUndo();
                         break;
                     default:
                         break;
@@ -258,7 +298,12 @@ export default function App() {
     }, []);
 
     // Given an elementProp, return a ReactElement representing the type of element
-    function elementToReactElement(element: ElementProp, group: boolean): React.ReactElement {
+    function elementToReactElement(
+        element: ElementProp | undefined,
+        group: boolean
+    ): React.ReactElement {
+        if (element === undefined) return <></>;
+
         const draggable = view === APP_VIEW.select && !group;
         if (element.type === "image") {
             const image = element as ImageProp;
@@ -609,7 +654,7 @@ export default function App() {
                 <Layer id="elements-layer">
                     {elements
                         .filter((element) => !groupSelection.includes(element.id))
-                        .map((element, index) => elementToReactElement(element, false))}
+                        .map((element) => elementToReactElement(element, false))}
                     <Group
                         draggable
                         ref={groupRef}
@@ -617,11 +662,9 @@ export default function App() {
                             updateResetGroup();
                         }}
                     >
-                        {groupSelection.map((id, index) => {
+                        {groupSelection.map((id) => {
                             const target = elements.find((element) => element.id === id);
-                            return target !== undefined
-                                ? elementToReactElement(target, true)
-                                : null;
+                            return elementToReactElement(target, true);
                         })}
                     </Group>
                 </Layer>
