@@ -272,6 +272,8 @@ export default function App() {
         i: number,
         group: boolean
     ): React.ReactElement {
+        if (i === -1) return <></>;
+
         const draggable = view === APP_VIEW.select && !group;
         if (element.type === "image") {
             const image = element as ImageProp;
@@ -623,11 +625,9 @@ export default function App() {
                             updateResetGroup();
                         }}
                     >
-                        {groupSelection.map((id, i) => {
+                        {groupSelection.map((id) => {
                             const idx = elements.findIndex((element) => element.id === id);
-                            return idx !== -1
-                                ? elementToReactElement(elements[idx], i, true)
-                                : null;
+                            return elementToReactElement(elements[idx], idx, true);
                         })}
                     </Group>
                 </Layer>
