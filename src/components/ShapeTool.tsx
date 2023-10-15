@@ -63,13 +63,13 @@ const TriangleOutline = styled(StyledBase)`
     &:after {
         content: "";
         position: relative;
-        left: -12px;
+        left: -11.5px;
         top: -16px;
         width: 0;
         height: 0;
         border-left: 12px solid transparent;
         border-right: 12px solid transparent;
-        border-bottom: 24px solid ${color.white};
+        border-bottom: 24px solid ${color.lighterBlue}};
     }
 `;
 
