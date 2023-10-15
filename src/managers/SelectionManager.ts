@@ -1,16 +1,14 @@
 import { useCallback } from "react";
 import { ElementProp } from "../utils/interfaces";
 import { APP_VIEW } from "../utils/enums";
-import Konva from "konva";
 
 export const SelectionManager = (
     setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>,
     view: APP_VIEW,
-    setView_: (view: APP_VIEW) => void,
+    setView: (view: APP_VIEW) => void,
     shiftKey: boolean,
     groupSelection: string[],
-    setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>,
-    groupRef: React.MutableRefObject<Konva.Group | null>
+    setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>
 ) => {
     // Selection mode: true when dragging selection rectangle
     const toggleSelectedId = (id: string) => {
@@ -21,7 +19,7 @@ export const SelectionManager = (
         }
     };
 
-    const handleSelect = (id: string) => {
+    const handleSelect = (id: string) => () => {
         if (view === APP_VIEW.select) {
             if (shiftKey) {
                 toggleSelectedId(id);
@@ -32,36 +30,15 @@ export const SelectionManager = (
                     setGroupSelection([id]);
                 }
             }
-            updateResetGroup();
         }
         if (view === APP_VIEW.text) {
-            setView_(APP_VIEW.select);
+            setView(APP_VIEW.select);
             setGroupSelection([id]);
         }
     };
 
-    // Updates the elements with offset position and makes a new selection
-    const updateResetGroup = () => {
-        if (groupRef.current !== null) {
-            const group = groupRef.current;
-            const offsetX = group.x();
-            const offsetY = group.y();
-            setElements((elements) =>
-                elements.map((element) => {
-                    if (groupSelection.includes(element.id)) {
-                        return {
-                            ...element,
-                            x: element.x + offsetX,
-                            y: element.y + offsetY,
-                        };
-                    } else {
-                        return element;
-                    }
-                })
-            );
-            group.x(0);
-            group.y(0);
-        }
+    const handleDragStart = (id: string) => () => {
+        if (!groupSelection.includes(id)) setGroupSelection([id]);
     };
 
     const deleteSelected = useCallback(() => {
@@ -73,7 +50,7 @@ export const SelectionManager = (
 
     return {
         handleSelect,
+        handleDragStart,
         deleteSelected,
-        updateResetGroup,
     };
 };

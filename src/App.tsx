@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Stage, Layer, Group, Line } from "react-konva";
+import { Stage, Layer, Line, Transformer } from "react-konva";
 import { PanelsContainer } from "./styles/containers";
 import {
     ExportManager,
@@ -62,9 +62,10 @@ let history: HistoryProp[] = [
 let historyStep = 0;
 
 export default function App() {
-    const groupRef = useRef<Konva.Group>(null);
+    const elementsLayerRef = useRef<Konva.Layer>(null);
     const exportAreaRef = useRef<Konva.Rect>(null);
     const selectionRectRef = useRef<Konva.Rect>(null);
+    const transformerRef = useRef<Konva.Transformer>(null);
     const lineRef = useRef<Konva.Line>(null);
 
     const [shiftKey, setShiftKey] = useState(false);
@@ -106,14 +107,13 @@ export default function App() {
     // --- MANAGERS FOR VIEWS ---
 
     // Selection
-    const { handleSelect, deleteSelected, updateResetGroup } = SelectionManager(
+    const { handleSelect, handleDragStart, deleteSelected } = SelectionManager(
         setElements,
         view,
         setView,
         shiftKey,
         groupSelection,
-        setGroupSelection,
-        groupRef
+        setGroupSelection
     );
 
     const {
@@ -257,9 +257,15 @@ export default function App() {
         if (e.key === "Shift") setShiftKey(false);
     }, []);
 
-    // Given an elementProp, return a ReactElement representing the type of element
-    function elementToReactElement(element: ElementProp, group: boolean): React.ReactElement {
-        const draggable = view === APP_VIEW.select && !group;
+    // Given an id and attributes, update the element with the given id with the given attributes
+    const handleChange = (id: string, attributes: any) =>
+        setElements((elements) =>
+            elements.map((element) => (element.id === id ? { ...element, ...attributes } : element))
+        );
+
+    // Given an elementProp, return the appropriate element
+    function elementToReactElement(element: ElementProp): React.ReactElement {
+        const draggable = view === APP_VIEW.select;
         if (element.type === "image") {
             const image = element as ImageProp;
             return (
@@ -267,19 +273,9 @@ export default function App() {
                     key={image.id}
                     image={image}
                     draggable={draggable}
-                    handleChange={(attributes: any) => {
-                        setElements((elements) =>
-                            elements.map((element) =>
-                                element.id === image.id ? { ...image, ...attributes } : element
-                            )
-                        );
-                    }}
-                    handleSelect={() => handleSelect(image.id)}
-                    handleDragEnd={handleDragEnd(elements, setElements)}
-                    transformFlag={transformFlag}
-                    setTransformFlag={setTransformFlag}
-                    groupSelection={groupSelection}
-                    setGroupSelection={setGroupSelection}
+                    handleSelect={handleSelect(image.id)}
+                    handleDragStart={handleDragStart(image.id)}
+                    handleChange={handleChange}
                 />
             );
         } else if (element.type === "shape") {
@@ -360,8 +356,6 @@ export default function App() {
     function handleCanvasClick(e: Konva.KonvaEventObject<MouseEvent>) {
         switch (view) {
             case APP_VIEW.select:
-                setGroupSelection([]);
-                setElements(elements.slice());
                 break;
             case APP_VIEW.pan:
                 // do something for pan view
@@ -521,6 +515,19 @@ export default function App() {
         // eslint-disable-next-line
     }, [lineRef.current]);
 
+    // Updates transformer nodes everytime there is a new selection
+    useEffect(() => {
+        if (transformerRef.current !== null && elementsLayerRef.current !== null) {
+            const transformer = transformerRef.current;
+            const layer = elementsLayerRef.current;
+            const selected = layer.getChildren().filter((node) => {
+                return groupSelection.includes(node.id());
+            });
+            transformer.nodes(selected);
+            layer.batchDraw();
+        }
+    }, [groupSelection]);
+
     return (
         <div>
             <PanelsContainer>
@@ -606,24 +613,22 @@ export default function App() {
                     )}
                     {isDrawing && <Line ref={lineRef} {...constants.line} points={points} />}
                 </Layer>
-                <Layer id="elements-layer">
-                    {elements
-                        .filter((element) => !groupSelection.includes(element.id))
-                        .map((element, index) => elementToReactElement(element, false))}
-                    <Group
-                        draggable
-                        ref={groupRef}
-                        onDragEnd={(e) => {
-                            updateResetGroup();
+                <Layer ref={elementsLayerRef} id="elements-layer">
+                    {elements.map((element, index) => elementToReactElement(element))}
+                    <Transformer
+                        ref={transformerRef}
+                        // shouldOverdrawWholeArea
+                        borderStroke={constants.transformer.borderStroke}
+                        keepRatio={false}
+                        rotationSnaps={[0, 45, 90, 135, 180, 225, 270, 315]}
+                        boundBoxFunc={(oldBox, newBox) => {
+                            // limit resize
+                            if (newBox.width < 5 || newBox.height < 5) {
+                                return oldBox;
+                            }
+                            return newBox;
                         }}
-                    >
-                        {groupSelection.map((id, index) => {
-                            const target = elements.find((element) => element.id === id);
-                            return target !== undefined
-                                ? elementToReactElement(target, true)
-                                : null;
-                        })}
-                    </Group>
+                    />
                 </Layer>
                 <Layer id="comment-layer">
                     {view === APP_VIEW.comment &&

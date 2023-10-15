@@ -115,17 +115,29 @@ October 7 (saturday):
 DEADLINE:
 
 -   freehand draw (3h) ✅
--   contextmenu for copy paste change color etc. (3h)
--   tooltips (3h)
--   Add shortcuts for commands (3h)
+-   change group selection 🚧
+-   contextmenu for copy paste change color etc.
+    -   left click:
+        -   shape, lines: stroke color (incl transparent, fill color (incl transparent), opacity
+        -   text: fill color, style (bold, italic, underline, strikethrough), opacity
+        -   image: opacity,
+    -   right click: copy, paste, bring to front, send to back, delete
+-   tooltips
+-   Add shortcuts for commands
 -   Add support for chrome, safari, firefox, edge (4h)
--   Landing Page (look into it) (2h)
+-   Landing Page in react App, rich text (html, css, js)
+
+-   pan: drag out sets view to select
+-   up down left right shortcut (shift in larget chunks)
+-   commment view: close sidebars
 
 Production and staging servers:
 document code, how to deploy, how to run, how to test
-
+comment: just make aspect the same
 little things:
 
+-   overflow y
+-   side effect on window vwvh change to update stage
 -   pan: closed hand on mousedown, open hand on mouseup
 
 nice-to-haves:
