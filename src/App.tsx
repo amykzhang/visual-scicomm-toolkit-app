@@ -38,6 +38,7 @@ import { ImageElement, CommentElement, ShapeElement, TextElement, LineElement } 
 import color from "./styles/color";
 import typography from "./styles/typography";
 import constants from "./utils/constants";
+import { Tooltip } from "react-tooltip";
 
 const activity = activity_visual_strategies;
 
@@ -148,17 +149,22 @@ export default function App() {
         }
     }
 
-    function bringToFront(ids: string[]) {
-        console.log(ids);
-        const indices = ids.map((id) => elements.findIndex((element) => element.id === id));
-        if (indices.includes(-1)) return;
-        setElements((elements) => {
-            const elementsToMove = indices.map((index) => elements[index]);
-            elements = elements.filter((element) => !elementsToMove.includes(element));
-            elements.push(...elementsToMove);
-            return elements;
-        });
-    }
+    const bringToFront = useCallback(
+        (ids?: string[]) => {
+            if (ids === undefined) {
+                ids = groupSelection;
+            }
+            const indices = ids.map((id) => elements.findIndex((element) => element.id === id));
+            if (indices.includes(-1)) return;
+            setElements((elements) => {
+                const elementsToMove = indices.map((index) => elements[index]);
+                elements = elements.filter((element) => !elementsToMove.includes(element));
+                elements.push(...elementsToMove);
+                return elements;
+            });
+        },
+        [elements, groupSelection]
+    );
 
     function sendBackward(id: string) {
         const index = elements.findIndex((element) => element.id === id);
@@ -170,17 +176,22 @@ export default function App() {
         }
     }
 
-    function sendToBack(ids: string[]) {
-        console.log(ids);
-        const indices = ids.map((id) => elements.findIndex((element) => element.id === id));
-        if (indices.includes(-1)) return;
-        setElements((elements) => {
-            const elementsToMove = indices.map((index) => elements[index]);
-            elements = elements.filter((element) => !elementsToMove.includes(element));
-            elements.unshift(...elementsToMove);
-            return elements;
-        });
-    }
+    const sendToBack = useCallback(
+        (ids?: string[]) => {
+            if (ids === undefined) {
+                ids = groupSelection;
+            }
+            const indices = ids.map((id) => elements.findIndex((element) => element.id === id));
+            if (indices.includes(-1)) return;
+            setElements((elements) => {
+                const elementsToMove = indices.map((index) => elements[index]);
+                elements = elements.filter((element) => !elementsToMove.includes(element));
+                elements.unshift(...elementsToMove);
+                return elements;
+            });
+        },
+        [elements, groupSelection]
+    );
 
     // -- KEY PRESSES --
     const handleKeyDown = useCallback(
@@ -210,10 +221,10 @@ export default function App() {
                         else if (e.metaKey) handleUndo();
                         break;
                     case "[":
-                        sendToBack(groupSelection);
+                        sendToBack();
                         break;
                     case "]":
-                        bringToFront(groupSelection);
+                        bringToFront();
                         break;
                     default:
                         break;
@@ -283,13 +294,15 @@ export default function App() {
             deleteSelected,
             setSelectedComment,
             setView,
+            bringToFront,
+            sendToBack,
         ]
     );
 
     const handleKeyUp = useCallback((e: KeyboardEvent) => {
         if (e.key === "Shift") setShiftKey(false);
     }, []);
-  
+
     // Given an id and attributes, update the element with the given id with the given attributes
     const handleChange = (id: string, attributes: any) =>
         setElements((elements) =>
@@ -579,6 +592,7 @@ export default function App() {
                         toggleFullscreen={toggleFullscreen}
                     />
                 </BottomZone>
+                <Tooltip />
             </PanelsContainer>
             <Stage
                 width={window.innerWidth}
