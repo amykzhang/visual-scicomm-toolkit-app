@@ -141,6 +141,50 @@ export default function App() {
         toggleDrawMode,
     } = DrawViewManager(view, setView, setElements, stageRef);
 
+    function bringForward(id: string) {
+        const index = elements.findIndex((element) => element.id === id);
+        if (index !== -1 && index !== elements.length - 1) {
+            setElements((elements) => {
+                [elements[index], elements[index + 1]] = [elements[index + 1], elements[index]];
+                return elements;
+            });
+        }
+    }
+
+    function bringToFront(ids: string[]) {
+        console.log(ids);
+        const indices = ids.map((id) => elements.findIndex((element) => element.id === id));
+        if (indices.includes(-1)) return;
+        setElements((elements) => {
+            const elementsToMove = indices.map((index) => elements[index]);
+            elements = elements.filter((element) => !elementsToMove.includes(element));
+            elements.push(...elementsToMove);
+            return elements;
+        });
+    }
+
+    function sendBackward(id: string) {
+        const index = elements.findIndex((element) => element.id === id);
+        if (index !== -1 && index !== 0) {
+            setElements((elements) => {
+                [elements[index], elements[index - 1]] = [elements[index - 1], elements[index]];
+                return elements;
+            });
+        }
+    }
+
+    function sendToBack(ids: string[]) {
+        console.log(ids);
+        const indices = ids.map((id) => elements.findIndex((element) => element.id === id));
+        if (indices.includes(-1)) return;
+        setElements((elements) => {
+            const elementsToMove = indices.map((index) => elements[index]);
+            elements = elements.filter((element) => !elementsToMove.includes(element));
+            elements.unshift(...elementsToMove);
+            return elements;
+        });
+    }
+
     // -- KEY PRESSES --
     const handleKeyDown = useCallback(
         (e: KeyboardEvent) => {
@@ -162,9 +206,17 @@ export default function App() {
                         break;
                     case "Delete":
                     case "Backspace":
-                        if (!e.metaKey) {
-                            deleteSelected();
-                        }
+                        deleteSelected();
+                        break;
+                    case "z":
+                        if (e.shiftKey && e.metaKey) handleRedo();
+                        else if (e.metaKey) handleUndo();
+                        break;
+                    case "[":
+                        sendToBack(groupSelection);
+                        break;
+                    case "]":
+                        bringToFront(groupSelection);
                         break;
                     default:
                         break;
@@ -185,6 +237,10 @@ export default function App() {
                     case "Escape":
                         setView(APP_VIEW.select);
                         break;
+                    case "z":
+                        if (e.shiftKey && e.metaKey) handleRedo();
+                        else if (e.metaKey) handleUndo();
+                        break;
                     default:
                         break;
                 }
@@ -192,6 +248,10 @@ export default function App() {
                 switch (e.key) {
                     case "Escape":
                         setView(APP_VIEW.select);
+                        break;
+                    case "z":
+                        if (e.shiftKey && e.metaKey) handleRedo();
+                        else if (e.metaKey) handleUndo();
                         break;
                     default:
                         break;
@@ -232,7 +292,7 @@ export default function App() {
     const handleKeyUp = useCallback((e: KeyboardEvent) => {
         if (e.key === "Shift") setShiftKey(false);
     }, []);
-
+  
     // Given an id and attributes, update the element with the given id with the given attributes
     const handleChange = (id: string, attributes: any) =>
         setElements((elements) =>
