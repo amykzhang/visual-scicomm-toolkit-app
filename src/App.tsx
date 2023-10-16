@@ -155,23 +155,15 @@ export default function App() {
                     case "a":
                         if (e.metaKey) {
                             setGroupSelection(elements.map((element) => element.id));
-                            setElements(elements.slice()); // force update (TODO: FIX HACK)
                         }
                         break;
                     case "Escape":
                         setGroupSelection([]);
-                        setElements(elements.slice());
                         break;
                     case "Delete":
                     case "Backspace":
                         if (!e.metaKey) {
                             deleteSelected();
-                        }
-                        break;
-                    // TODO: remove shortcut
-                    case "t":
-                        if (e.metaKey) {
-                            setView(APP_VIEW.text);
                         }
                         break;
                     default:
@@ -184,14 +176,6 @@ export default function App() {
                     case "Escape":
                         setView(APP_VIEW.select);
                         break;
-                    // TODO: remove shortcut
-                    case "t":
-                        setView(APP_VIEW.text);
-                        break;
-                    // TODO: remove shortcut
-                    case "v":
-                        setView(APP_VIEW.select);
-                        break;
                     default:
                         break;
                 }
@@ -199,10 +183,6 @@ export default function App() {
             } else if (view === APP_VIEW.text) {
                 switch (e.key) {
                     case "Escape":
-                        setView(APP_VIEW.select);
-                        break;
-                    // TODO: remove shortcut
-                    case "v":
                         setView(APP_VIEW.select);
                         break;
                     default:
