@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useRef, useState } from "react";
-import { Text, Transformer } from "react-konva";
+import { useEffect, useRef } from "react";
+import { Text } from "react-konva";
 import { TextProp, editTextProp } from "../utils/interfaces";
 import Konva from "konva";
 import constants from "../utils/constants";
@@ -7,63 +7,61 @@ import constants from "../utils/constants";
 interface TextElementProp {
     text: TextProp;
     draggable: boolean;
-    groupSelection: string[];
-    setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>;
-    transformFlag: boolean;
-    isJustCreated: boolean;
-    setTransformFlag: React.Dispatch<React.SetStateAction<boolean>>;
-    handleChange: (attributes: any) => void;
     handleSelect: () => void;
-    handleDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => void;
+    handleDragStart: () => void;
+    handleChange: (id: string, attributes: any) => void;
+    isJustCreated: boolean;
+    isSelected: boolean;
     editText: editTextProp;
+    transformerRef: React.MutableRefObject<Konva.Transformer | null>;
 }
 
 const TextElement = ({
     text,
     draggable,
-    groupSelection,
-    setGroupSelection,
-    transformFlag,
-    isJustCreated,
-    setTransformFlag,
-    handleChange,
     handleSelect,
-    handleDragEnd,
+    handleDragStart,
+    handleChange,
+    isSelected,
+    isJustCreated,
     editText,
+    transformerRef,
 }: TextElementProp) => {
-    const isSelected = groupSelection.includes(text.id);
-    // When the element is dragged selected but not selected yet (to show transformer when dragging and globalflag is disabled)
-    const [dragSelected, setDragSelected] = useState(false);
-
-    // If transformFlag is disabled from App, no transformer will be shown unless the specific element is drag selected
-    // Otherwise, show if it is selected or drag selected
-    const showTransform = (transformFlag || dragSelected) && (isSelected || dragSelected);
-
     const textRef = useRef<Konva.Text>(null);
-    const transformerRef = useRef<Konva.Transformer>(null);
 
-    // Behaviour: If the element is selected, next click enters edit text mode
-    function handleClick(e: Konva.KonvaEventObject<MouseEvent>) {
-        if (isSelected) {
-            editText(text, handleChange, textRef, transformerRef);
-        } else {
-            handleSelect();
-        }
-    }
+    const handleClick = (e: Konva.KonvaEventObject<Event>) => {
+        if (isSelected) editText(text, handleChange, textRef, transformerRef);
+        else handleSelect();
+    };
 
     function handleTransform(e: Konva.KonvaEventObject<Event>) {
-        // reset scale, so only width is changing by transformer
         if (textRef.current !== null && transformerRef.current !== null) {
             const textNode = textRef.current;
             const transformerNode = transformerRef.current;
-
             const activeAnchor = transformerNode.getActiveAnchor();
-            if (!constants.resizeAnchors.includes(activeAnchor)) {
+
+            // If only transformer this textbox: corners scale proportionally, sides change w/h
+            // if transforming this and other elements: do not change at all
+            if (isSelected) {
+                if (constants.resizeAnchors.includes(activeAnchor)) {
+                    transformerNode.keepRatio(true);
+                } else {
+                    textNode.setAttrs({
+                        width: (textNode.width() * textNode.scaleX()) / text.scaleX,
+                        height: Math.max(
+                            constants.textbox.minHeight,
+                            (textNode.height() * textNode.scaleY()) / text.scaleX
+                        ),
+                        scaleX: text.scaleX,
+                        scaleY: text.scaleX,
+                    });
+                }
+            } else {
                 textNode.setAttrs({
-                    width: (textNode.width() * textNode.scaleX()) / text.scale,
-                    height: (textNode.height() * textNode.scaleY()) / text.scale,
-                    scaleX: text.scale,
-                    scaleY: text.scale,
+                    width: text.width,
+                    height: text.height,
+                    scaleX: text.scaleX,
+                    scaleY: text.scaleY,
                 });
             }
         }
@@ -74,6 +72,10 @@ const TextElement = ({
             const textNode = textRef.current;
             const transformerNode = transformerRef.current;
 
+            if (isSelected) {
+                transformerNode.keepRatio(false);
+            }
+
             const activeAnchor = transformerNode.getActiveAnchor();
             const transformedTextAttributes = constants.resizeAnchors.includes(activeAnchor)
                 ? {
@@ -82,7 +84,7 @@ const TextElement = ({
                       y: textNode.y(),
                       width: textNode.width(),
                       height: textNode.height(),
-                      scale: textNode.scaleX(),
+                      scaleX: textNode.scaleX(),
                   }
                 : {
                       // otherwise is resizing
@@ -93,21 +95,9 @@ const TextElement = ({
                       rotation: textNode.rotation(),
                   };
 
-            handleChange(transformedTextAttributes);
+            handleChange(text.id, transformedTextAttributes);
         }
     }
-
-    useEffect(() => {
-        // Show transformer when the text is selected or dragged
-        if (showTransform) {
-            // we need to attach transformer manually
-            if (transformerRef.current !== null && textRef.current !== null) {
-                const transformerNode = transformerRef.current;
-                transformerNode.nodes([textRef.current]);
-                transformerNode.getLayer()?.batchDraw();
-            }
-        }
-    }, [showTransform]);
 
     // Enter edit mode when first added
     useEffect(() => {
@@ -118,54 +108,22 @@ const TextElement = ({
     }, []);
 
     return (
-        <Fragment>
-            <Text
-                type="text"
-                ref={textRef}
-                id={text.id}
-                text={text.text}
-                x={text.x}
-                y={text.y}
-                width={text.width}
-                height={text.height}
-                rotation={text.rotation}
-                scaleX={text.scale}
-                scaleY={text.scale}
-                fontSize={text.fontSize}
-                fontFamily={text.fontFamily}
-                fontStyle={text.fontStyle}
-                fill={text.fill}
-                draggable={draggable}
-                onClick={handleClick}
-                onDragStart={(e) => {
-                    setDragSelected(true);
-                    setTransformFlag(false);
-                }}
-                onDragEnd={(e) => {
-                    handleDragEnd(e);
-                    setGroupSelection([text.id]);
-                    setTransformFlag(true);
-                    setDragSelected(false);
-                }}
-                onTransform={handleTransform}
-                onTransformEnd={handleTransformEnd}
-                onContextMenu={(e) => {
-                    e.evt.preventDefault();
-                }}
-            />
-            {showTransform && (
-                <Transformer
-                    ref={transformerRef}
-                    boundBoxFunc={(oldBox, newBox) => {
-                        // limit resize
-                        if (newBox.width < 5 || newBox.height < 5) {
-                            return oldBox;
-                        }
-                        return newBox;
-                    }}
-                />
-            )}
-        </Fragment>
+        <Text
+            {...text}
+            ref={textRef}
+            id={text.id}
+            draggable={draggable}
+            onClick={handleClick}
+            onDragStart={handleDragStart}
+            onDragEnd={(e) => {
+                handleChange(text.id, {
+                    x: e.target.x(),
+                    y: e.target.y(),
+                });
+            }}
+            onTransform={handleTransform}
+            onTransformEnd={handleTransformEnd}
+        />
     );
 };
 

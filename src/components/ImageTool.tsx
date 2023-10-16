@@ -44,6 +44,8 @@ export const ImageTool: FC<ImageToolProps> = ({
                 y: y - offset.y,
                 width: dimensions.width,
                 height: dimensions.height,
+                scaleX: 1,
+                scaleY: 1,
                 rotation: 0,
                 src: src,
             } as ImageProp,

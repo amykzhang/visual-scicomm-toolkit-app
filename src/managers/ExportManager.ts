@@ -5,11 +5,11 @@ import { useCallback, useEffect, useState } from "react";
 
 export function ExportManager(
     activity: Activity,
-    stageRef: React.MutableRefObject<Konva.Stage | null>,
-    setTransformFlag: React.Dispatch<React.SetStateAction<boolean>>
+    stageRef: React.MutableRefObject<Konva.Stage | null>
 ) {
     const exportSize = activity.canvas_size;
 
+    const [isExporting, setIsExporting] = useState(false);
     const [exportType, setExportType] = useState<"png" | "jpeg" | "pdf" | null>(null);
 
     function downloadURI(uri: string, name: string) {
@@ -100,7 +100,7 @@ export function ExportManager(
     }, [activity.name, exportImage, exportSize, stageRef]);
 
     const startExportProcess = (type: "png" | "jpeg" | "pdf" | null) => {
-        setTransformFlag(false);
+        setIsExporting(true);
         setExportType(type);
     };
 
@@ -119,9 +119,9 @@ export function ExportManager(
                     break;
             }
             setExportType(null);
-            setTransformFlag(true);
+            setIsExporting(false);
         }
-    }, [exportType, setTransformFlag, exportPNG, exportJPEG, exportPDF]);
+    }, [exportType, setIsExporting, exportPNG, exportJPEG, exportPDF]);
 
-    return startExportProcess;
+    return { isExporting, startExportProcess };
 }

@@ -1,7 +1,7 @@
 import { APP_VIEW } from "../utils/enums";
 import Konva from "konva";
 import { v4 as uuid } from "uuid";
-import { ElementProp, TextProp } from "../utils/interfaces";
+import { ElementProp, TextProp, editTextProp } from "../utils/interfaces";
 import { useEffect, useState } from "react";
 import constants from "../utils/constants";
 
@@ -62,12 +62,7 @@ export const TextViewManager = (
 
     // Similar to CommentViewManager.editComment()
     // Hides konva element, creates a textarea, and updates konva elements on blur
-    const editText = (
-        text: TextProp,
-        handleChange: (attributes: any) => void,
-        textRef: React.RefObject<Konva.Text>,
-        transformerRef: React.RefObject<Konva.Transformer>
-    ) => {
+    const editText: editTextProp = (text, handleChange, textRef, transformerRef) => {
         if (
             textRef.current !== null &&
             transformerRef.current !== null &&
@@ -96,7 +91,7 @@ export const TextViewManager = (
             const textarea = document.createElement("textarea");
             document.body.appendChild(textarea);
 
-            const scale = stage.scaleX() * text.scale;
+            const scale = stage.scaleX() * text.scaleX;
             let width: number = 0;
             let height: number = 0;
 
@@ -182,11 +177,11 @@ export const TextViewManager = (
                     width: width / scale,
                     height: height / scale,
                 });
-                handleChange({
+                handleChange(text.id, {
                     text: newText,
                     width: textNode.width(),
                     height: textNode.height(),
-                    scale: textNode.scaleX(),
+                    scaleX: textNode.scaleX(),
                 });
                 removeTextarea();
 

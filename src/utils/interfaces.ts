@@ -28,6 +28,8 @@ interface BaseProp {
     y: number;
     width: number;
     height: number;
+    scaleX: number;
+    scaleY: number;
     rotation: number;
 }
 
@@ -40,8 +42,6 @@ export interface ShapeProp extends BaseProp {
     stroke: string;
     strokeWidth: number;
     shape: string;
-    scaleX: number;
-    scaleY: number;
 }
 
 export interface TextProp extends BaseProp {
@@ -51,16 +51,12 @@ export interface TextProp extends BaseProp {
     fontStyle: string;
     fill: string;
     align: "left" | "center" | "right";
-    scale: number;
 }
 
 export interface LineProp extends BaseProp {
     points: number[];
-    tension: number;
     stroke: string;
     strokeWidth: number;
-    scaleX: number;
-    scaleY: number;
 }
 
 export interface CommentProp {
@@ -82,7 +78,7 @@ export interface SelectionBoundsProp {
 
 export type editTextProp = (
     text: TextProp,
-    handleChange: (attributes: any) => void,
+    handleChange: (id: string, attributes: any) => void,
     textRef: React.RefObject<Konva.Text>,
     transformerRef: React.RefObject<Konva.Transformer>
 ) => void;

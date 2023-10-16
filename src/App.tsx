@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Stage, Layer, Group, Line } from "react-konva";
+import { Stage, Layer, Line, Transformer } from "react-konva";
 import { PanelsContainer } from "./styles/containers";
 import {
     ExportManager,
@@ -34,7 +34,6 @@ import {
     TextProp,
     UiStateProp,
 } from "./utils/interfaces";
-import { handleDragEnd } from "./utils/dragging";
 import { persistance } from "./utils/persistance";
 import { ImageElement, CommentElement, ShapeElement, TextElement } from "./Elements";
 import Konva from "konva";
@@ -62,9 +61,10 @@ let history: HistoryProp[] = [
 let historyStep = 0;
 
 export default function App() {
-    const groupRef = useRef<Konva.Group>(null);
+    const elementsLayerRef = useRef<Konva.Layer>(null);
     const exportAreaRef = useRef<Konva.Rect>(null);
     const selectionRectRef = useRef<Konva.Rect>(null);
+    const transformerRef = useRef<Konva.Transformer>(null);
     const lineRef = useRef<Konva.Line>(null);
 
     const [shiftKey, setShiftKey] = useState(false);
@@ -100,20 +100,16 @@ export default function App() {
     // Group Selection
     const [groupSelection, setGroupSelection] = useState<string[]>(history[0].selection);
 
-    // App wide transform flag (for isolating drag selecting elements)
-    const [transformFlag, setTransformFlag] = useState(true);
-
     // --- MANAGERS FOR VIEWS ---
 
     // Selection
-    const { handleSelect, deleteSelected, updateResetGroup } = SelectionManager(
+    const { handleSelect, handleDragStart, deleteSelected } = SelectionManager(
         setElements,
         view,
         setView,
         shiftKey,
         groupSelection,
-        setGroupSelection,
-        groupRef
+        setGroupSelection
     );
 
     const {
@@ -203,12 +199,10 @@ export default function App() {
                     case "a":
                         if (e.metaKey) {
                             setGroupSelection(elements.map((element) => element.id));
-                            setElements(elements.slice()); // force update (TODO: FIX HACK)
                         }
                         break;
                     case "Escape":
                         setGroupSelection([]);
-                        setElements(elements.slice());
                         break;
                     case "Delete":
                     case "Backspace":
@@ -298,15 +292,16 @@ export default function App() {
     const handleKeyUp = useCallback((e: KeyboardEvent) => {
         if (e.key === "Shift") setShiftKey(false);
     }, []);
+  
+    // Given an id and attributes, update the element with the given id with the given attributes
+    const handleChange = (id: string, attributes: any) =>
+        setElements((elements) =>
+            elements.map((element) => (element.id === id ? { ...element, ...attributes } : element))
+        );
 
-    // Given an elementProp, return a ReactElement representing the type of element
-    function elementToReactElement(
-        element: ElementProp | undefined,
-        group: boolean
-    ): React.ReactElement {
-        if (element === undefined) return <></>;
-
-        const draggable = view === APP_VIEW.select && !group;
+    // Given an elementProp, return the appropriate element
+    function elementToReactElement(element: ElementProp): React.ReactElement {
+        const draggable = view === APP_VIEW.select;
         if (element.type === "image") {
             const image = element as ImageProp;
             return (
@@ -314,19 +309,9 @@ export default function App() {
                     key={image.id}
                     image={image}
                     draggable={draggable}
-                    handleChange={(attributes: any) => {
-                        setElements((elements) =>
-                            elements.map((element) =>
-                                element.id === image.id ? { ...image, ...attributes } : element
-                            )
-                        );
-                    }}
-                    handleSelect={() => handleSelect(image.id)}
-                    handleDragEnd={handleDragEnd(elements, setElements)}
-                    transformFlag={transformFlag}
-                    setTransformFlag={setTransformFlag}
-                    groupSelection={groupSelection}
-                    setGroupSelection={setGroupSelection}
+                    handleSelect={handleSelect(image.id)}
+                    handleDragStart={handleDragStart(image.id)}
+                    handleChange={handleChange}
                 />
             );
         } else if (element.type === "shape") {
@@ -336,19 +321,9 @@ export default function App() {
                     key={shape.id}
                     shape={shape}
                     draggable={draggable}
-                    handleChange={(attributes: any) => {
-                        setElements((elements) =>
-                            elements.map((element) =>
-                                element.id === shape.id ? { ...shape, ...attributes } : element
-                            )
-                        );
-                    }}
-                    handleSelect={() => handleSelect(shape.id)}
-                    handleDragEnd={handleDragEnd(elements, setElements)}
-                    transformFlag={transformFlag}
-                    setTransformFlag={setTransformFlag}
-                    groupSelection={groupSelection}
-                    setGroupSelection={setGroupSelection}
+                    handleSelect={handleSelect(shape.id)}
+                    handleDragStart={handleDragStart(shape.id)}
+                    handleChange={handleChange}
                 />
             );
         } else if (element.type === "text") {
@@ -357,25 +332,14 @@ export default function App() {
                 <TextElement
                     key={text.id}
                     text={text}
-                    groupSelection={groupSelection}
-                    setGroupSelection={setGroupSelection}
                     draggable={draggable}
-                    handleChange={(attributes: any) => {
-                        setElements((elements) =>
-                            elements.map((element) =>
-                                element.id === text.id ? { ...text, ...attributes } : element
-                            )
-                        );
-                    }}
-                    handleSelect={() => {
-                        setView(APP_VIEW.select);
-                        handleSelect(text.id);
-                    }}
-                    handleDragEnd={handleDragEnd(elements, setElements)}
-                    transformFlag={transformFlag}
-                    setTransformFlag={setTransformFlag}
-                    editText={editText}
                     isJustCreated={justCreated === text.id}
+                    isSelected={groupSelection.length === 1 && groupSelection.includes(text.id)}
+                    handleSelect={handleSelect(text.id)}
+                    handleDragStart={handleDragStart(text.id)}
+                    handleChange={handleChange}
+                    editText={editText}
+                    transformerRef={transformerRef}
                 />
             );
         } else if (element.type === "line") {
@@ -385,19 +349,9 @@ export default function App() {
                     key={line.id}
                     line={line}
                     draggable={draggable}
-                    handleChange={(attributes: any) => {
-                        setElements((elements) =>
-                            elements.map((element) =>
-                                element.id === line.id ? { ...line, ...attributes } : element
-                            )
-                        );
-                    }}
-                    handleSelect={() => handleSelect(line.id)}
-                    handleDragEnd={handleDragEnd(elements, setElements)}
-                    transformFlag={transformFlag}
-                    setTransformFlag={setTransformFlag}
-                    groupSelection={groupSelection}
-                    setGroupSelection={setGroupSelection}
+                    handleSelect={handleSelect(line.id)}
+                    handleDragStart={handleDragStart(line.id)}
+                    handleChange={handleChange}
                 />
             );
         } else return <></>;
@@ -407,8 +361,6 @@ export default function App() {
     function handleCanvasClick(e: Konva.KonvaEventObject<MouseEvent>) {
         switch (view) {
             case APP_VIEW.select:
-                setGroupSelection([]);
-                setElements(elements.slice());
                 break;
             case APP_VIEW.pan:
                 // do something for pan view
@@ -484,7 +436,7 @@ export default function App() {
     };
 
     // Export
-    const startExportProcess = ExportManager(activity, stageRef, setTransformFlag);
+    const { isExporting, startExportProcess } = ExportManager(activity, stageRef);
 
     // Save canvas state
     useEffect(() => {
@@ -567,6 +519,19 @@ export default function App() {
         lineRef.current?.lineCap("round");
         // eslint-disable-next-line
     }, [lineRef.current]);
+
+    // Updates transformer nodes everytime there is a new selection
+    useEffect(() => {
+        if (transformerRef.current !== null && elementsLayerRef.current !== null) {
+            const transformer = transformerRef.current;
+            const layer = elementsLayerRef.current;
+            const selected = layer.getChildren().filter((node) => {
+                return groupSelection.includes(node.id());
+            });
+            transformer.nodes(selected);
+            layer.batchDraw();
+        }
+    }, [groupSelection]);
 
     return (
         <div>
@@ -653,22 +618,23 @@ export default function App() {
                     )}
                     {isDrawing && <Line ref={lineRef} {...constants.line} points={points} />}
                 </Layer>
-                <Layer id="elements-layer">
-                    {elements
-                        .filter((element) => !groupSelection.includes(element.id))
-                        .map((element) => elementToReactElement(element, false))}
-                    <Group
-                        draggable
-                        ref={groupRef}
-                        onDragEnd={(e) => {
-                            updateResetGroup();
+                <Layer ref={elementsLayerRef} id="elements-layer">
+                    {elements.map((element, index) => elementToReactElement(element))}
+                    <Transformer
+                        ref={transformerRef}
+                        visible={!isExporting}
+                        // shouldOverdrawWholeArea
+                        borderStroke={constants.transformer.borderStroke}
+                        keepRatio={false}
+                        rotationSnaps={[0, 45, 90, 135, 180, 225, 270, 315]}
+                        boundBoxFunc={(oldBox, newBox) => {
+                            // limit resize
+                            if (newBox.width < 5 || newBox.height < 5) {
+                                return oldBox;
+                            }
+                            return newBox;
                         }}
-                    >
-                        {groupSelection.map((id) => {
-                            const target = elements.find((element) => element.id === id);
-                            return elementToReactElement(target, true);
-                        })}
-                    </Group>
+                    />
                 </Layer>
                 <Layer id="comment-layer">
                     {view === APP_VIEW.comment &&
