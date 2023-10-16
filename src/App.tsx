@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Stage, Layer, Line, Transformer } from "react-konva";
-import { PanelsContainer } from "./styles/containers";
+import Konva from "konva";
+import { Stage, Layer, Line, Transformer, Rect } from "react-konva";
+import activity_visual_strategies from "./activity/activity";
+import { PanelsContainer, BottomZone, TopZone } from "./styles/containers";
 import {
     ExportManager,
     SelectionManager,
@@ -19,11 +21,8 @@ import {
     ExportPanel,
 } from "./Panels";
 import { APP_VIEW } from "./utils/enums";
-import { BottomZone, TopZone } from "./styles/containers";
-import typography from "./styles/typography";
 import { ExportArea } from "./components/ExportArea";
 import { ExitCommentViewButton } from "./components/Components";
-import activity_visual_strategies from "./activity/activity";
 import {
     CanvasStateProp,
     CommentProp,
@@ -35,11 +34,9 @@ import {
     UiStateProp,
 } from "./utils/interfaces";
 import { persistance } from "./utils/persistance";
-import { ImageElement, CommentElement, ShapeElement, TextElement } from "./Elements";
-import Konva from "konva";
-import { SelectionRect } from "./components/SelectionRect";
+import { ImageElement, CommentElement, ShapeElement, TextElement, LineElement } from "./Elements";
 import color from "./styles/color";
-import LineElement from "./Elements/LineElement";
+import typography from "./styles/typography";
 import constants from "./utils/constants";
 
 const activity = activity_visual_strategies;
@@ -607,15 +604,18 @@ export default function App() {
                         // handle unfocus/click on stage (for export area since it is a rect element technically)
                         onClick={handleCanvasClick}
                     />
-                    {isSelectionMode && view === APP_VIEW.select && (
-                        <SelectionRect
-                            selectionRectRef={selectionRectRef}
-                            x={selectionBounds.x}
-                            y={selectionBounds.y}
-                            width={selectionBounds.width}
-                            height={selectionBounds.height}
-                        />
-                    )}
+                    <Rect // Selection Rectangle Bounding Box
+                        visible={isSelectionMode && view === APP_VIEW.select}
+                        ref={selectionRectRef}
+                        x={selectionBounds.x}
+                        y={selectionBounds.y}
+                        width={selectionBounds.width}
+                        height={selectionBounds.height}
+                        fill={color.lightBlue}
+                        stroke={color.blue}
+                        strokeWidth={2}
+                        opacity={0.25}
+                    />
                     {isDrawing && <Line ref={lineRef} {...constants.line} points={points} />}
                 </Layer>
                 <Layer ref={elementsLayerRef} id="elements-layer">
