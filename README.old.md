@@ -116,15 +116,15 @@ DEADLINE:
 
 -   freehand draw (3h) ✅
 -   change group selection ✅
+-   tooltips
+-   Add shortcuts for commands
+-   Add support for chrome, safari, firefox, edge
 -   contextmenu for copy paste change color etc.
     -   left click:
         -   shape, lines: stroke color (incl transparent, fill color (incl transparent), opacity
         -   text: fill color, style (bold, italic, underline, strikethrough), opacity
         -   image: opacity,
     -   right click: copy, paste, bring to front, send to back, delete
--   tooltips
--   Add shortcuts for commands
--   Add support for chrome, safari, firefox, edge (4h)
 -   Landing Page in react App, rich text (html, css, js)
 
 -   pan: drag out sets view to select
