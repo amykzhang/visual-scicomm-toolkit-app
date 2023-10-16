@@ -79,7 +79,7 @@ export interface SelectionBoundsProp {
 
 export type editTextProp = (
     text: TextProp,
-    handleChange: (attributes: any) => void,
+    handleChange: (id: string, attributes: any) => void,
     textRef: React.RefObject<Konva.Text>,
     transformerRef: React.RefObject<Konva.Transformer>
 ) => void;

@@ -34,7 +34,6 @@ import {
     TextProp,
     UiStateProp,
 } from "./utils/interfaces";
-import { handleDragEnd } from "./utils/dragging";
 import { persistance } from "./utils/persistance";
 import { ImageElement, CommentElement, ShapeElement, TextElement } from "./Elements";
 import Konva from "konva";
@@ -100,9 +99,6 @@ export default function App() {
 
     // Group Selection
     const [groupSelection, setGroupSelection] = useState<string[]>(history[0].selection);
-
-    // App wide transform flag (for isolating drag selecting elements)
-    const [transformFlag, setTransformFlag] = useState(true);
 
     // --- MANAGERS FOR VIEWS ---
 
@@ -285,19 +281,9 @@ export default function App() {
                     key={shape.id}
                     shape={shape}
                     draggable={draggable}
-                    handleChange={(attributes: any) => {
-                        setElements((elements) =>
-                            elements.map((element) =>
-                                element.id === shape.id ? { ...shape, ...attributes } : element
-                            )
-                        );
-                    }}
-                    handleSelect={() => handleSelect(shape.id)}
-                    handleDragEnd={handleDragEnd(elements, setElements)}
-                    transformFlag={transformFlag}
-                    setTransformFlag={setTransformFlag}
-                    groupSelection={groupSelection}
-                    setGroupSelection={setGroupSelection}
+                    handleSelect={handleSelect(shape.id)}
+                    handleDragStart={handleDragStart(shape.id)}
+                    handleChange={handleChange}
                 />
             );
         } else if (element.type === "text") {
@@ -306,25 +292,14 @@ export default function App() {
                 <TextElement
                     key={text.id}
                     text={text}
-                    groupSelection={groupSelection}
-                    setGroupSelection={setGroupSelection}
                     draggable={draggable}
-                    handleChange={(attributes: any) => {
-                        setElements((elements) =>
-                            elements.map((element) =>
-                                element.id === text.id ? { ...text, ...attributes } : element
-                            )
-                        );
-                    }}
-                    handleSelect={() => {
-                        setView(APP_VIEW.select);
-                        handleSelect(text.id);
-                    }}
-                    handleDragEnd={handleDragEnd(elements, setElements)}
-                    transformFlag={transformFlag}
-                    setTransformFlag={setTransformFlag}
-                    editText={editText}
                     isJustCreated={justCreated === text.id}
+                    isSelected={groupSelection.length === 1 && groupSelection.includes(text.id)}
+                    handleSelect={handleSelect(text.id)}
+                    handleDragStart={handleDragStart(text.id)}
+                    handleChange={handleChange}
+                    editText={editText}
+                    transformerRef={transformerRef}
                 />
             );
         } else if (element.type === "line") {
@@ -334,19 +309,9 @@ export default function App() {
                     key={line.id}
                     line={line}
                     draggable={draggable}
-                    handleChange={(attributes: any) => {
-                        setElements((elements) =>
-                            elements.map((element) =>
-                                element.id === line.id ? { ...line, ...attributes } : element
-                            )
-                        );
-                    }}
-                    handleSelect={() => handleSelect(line.id)}
-                    handleDragEnd={handleDragEnd(elements, setElements)}
-                    transformFlag={transformFlag}
-                    setTransformFlag={setTransformFlag}
-                    groupSelection={groupSelection}
-                    setGroupSelection={setGroupSelection}
+                    handleSelect={handleSelect(line.id)}
+                    handleDragStart={handleDragStart(line.id)}
+                    handleChange={handleChange}
                 />
             );
         } else return <></>;
@@ -431,7 +396,7 @@ export default function App() {
     };
 
     // Export
-    const startExportProcess = ExportManager(activity, stageRef, setTransformFlag);
+    const { isExporting, startExportProcess } = ExportManager(activity, stageRef);
 
     // Save canvas state
     useEffect(() => {
@@ -617,6 +582,7 @@ export default function App() {
                     {elements.map((element, index) => elementToReactElement(element))}
                     <Transformer
                         ref={transformerRef}
+                        visible={!isExporting}
                         // shouldOverdrawWholeArea
                         borderStroke={constants.transformer.borderStroke}
                         keepRatio={false}

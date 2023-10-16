@@ -18,7 +18,7 @@ const ImageElement = ({
     handleDragStart,
     handleChange,
 }: ImageElementProp) => {
-    const imageRef = useRef<Konva.Image | null>(null);
+    const imageRef = useRef<Konva.Image>(null);
 
     const imageElement = new window.Image(image.width, image.height);
     imageElement.src = image.src;
@@ -43,11 +43,14 @@ const ImageElement = ({
                     handleChange(image.id, {
                         x: node.x(),
                         y: node.y(),
-                        width: node.width(),
-                        height: node.height(),
-                        scaleX: node.scaleX(),
-                        scaleY: node.scaleY(),
+                        width: node.width() * node.scaleX(),
+                        height: node.height() * node.scaleY(),
+                        scaleX: 1,
+                        scaleY: 1,
+                        rotation: node.rotation(),
                     });
+                    node.scaleX(1);
+                    node.scaleY(1);
                 }
             }}
         />
