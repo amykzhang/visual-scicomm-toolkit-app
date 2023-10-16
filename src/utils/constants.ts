@@ -34,8 +34,7 @@ const constants = {
     },
     line: {
         tension: 0.4,
-        stroke: color.black,
-        strokeWidth: 2,
+        hitStrokeWidth: 50,
     },
     transformer: {
         borderStroke: color.blue,

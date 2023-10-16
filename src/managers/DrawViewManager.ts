@@ -28,7 +28,6 @@ export const DrawViewManager = (
                 scaleX: 1,
                 scaleY: 1,
                 points: points,
-                tension: 0.05,
                 stroke: color.black,
                 strokeWidth: 2,
             } as LineProp,

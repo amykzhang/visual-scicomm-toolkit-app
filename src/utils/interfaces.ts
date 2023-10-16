@@ -55,7 +55,6 @@ export interface TextProp extends BaseProp {
 
 export interface LineProp extends BaseProp {
     points: number[];
-    tension: number;
     stroke: string;
     strokeWidth: number;
 }

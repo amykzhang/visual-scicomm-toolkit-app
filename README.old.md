@@ -115,7 +115,7 @@ October 7 (saturday):
 DEADLINE:
 
 -   freehand draw (3h) ✅
--   change group selection 🚧
+-   change group selection ✅
 -   contextmenu for copy paste change color etc.
     -   left click:
         -   shape, lines: stroke color (incl transparent, fill color (incl transparent), opacity
