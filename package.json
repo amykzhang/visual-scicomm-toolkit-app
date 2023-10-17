@@ -13,6 +13,7 @@
     "jspdf": "^2.5.1",
     "konva": "^9.2.0",
     "react": "^18.2.0",
+    "react-contexify": "^6.0.0",
     "react-dom": "^18.2.0",
     "react-konva": "^18.2.10",
     "react-scripts": "5.0.1",
