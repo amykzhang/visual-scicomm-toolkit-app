@@ -11,7 +11,6 @@ const ExportPanelContainer = styled.div`
     pointer-events: all;
     user-select: none;
     position: absolute;
-    width: 380px;
     height: 69px;
     right: 0px;
     top: 0px;
@@ -23,12 +22,13 @@ const ExportPanelContainer = styled.div`
     align-items: center;
     justify-content: center;
     gap: 10px;
+    padding: 0px 8px;
 `;
 
 const ExportButton = styled.div`
     cursor: pointer;
     display: flex;
-    width: 230px;
+    width: 160px;
     padding: 10px 24px;
     flex-direction: row;
     align-items: center;
@@ -67,7 +67,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ activity, startExportP
             <SettingTool />
             <ExportButton data-isactive={isExportOptionsOpen} onClick={toggleExportOptions}>
                 <UploadIcon />
-                <ExportText>Share Canvas</ExportText>
+                <ExportText>Export</ExportText>
             </ExportButton>
             {isExportOptionsOpen && (
                 <>

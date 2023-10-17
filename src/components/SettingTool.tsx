@@ -4,6 +4,7 @@ import { ReactComponent as GearIcon } from "../assets/gear.svg";
 import { ReactComponent as CrossIcon } from "../assets/cross.svg";
 import color from "../styles/color";
 import { SquareButton } from "./Components";
+import constants from "../utils/constants";
 
 export const SettingTool = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -17,6 +18,8 @@ export const SettingTool = () => {
             <SquareButton
                 data-isactive={isPopupOpen}
                 onClick={toggleSettingPopup}
+                {...constants.tooltip}
+                data-tooltip-content="Settings"
             >
                 <GearIcon />
             </SquareButton>

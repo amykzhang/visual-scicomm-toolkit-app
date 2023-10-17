@@ -4,6 +4,7 @@ import { ReactComponent as QuestionIcon } from "../assets/questionmarkcircle.svg
 import { ReactComponent as CrossIcon } from "../assets/cross.svg";
 import color from "../styles/color";
 import { SquareButton } from "./Components";
+import constants from "../utils/constants";
 
 export const InformationTool = ({ content }: { content: string }) => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -17,6 +18,8 @@ export const InformationTool = ({ content }: { content: string }) => {
             <SquareButton
                 data-isactive={isPopupOpen}
                 onClick={toggleInformationPopup}
+                {...constants.tooltip}
+                data-tooltip-content="Info"
             >
                 <QuestionIcon />
             </SquareButton>
