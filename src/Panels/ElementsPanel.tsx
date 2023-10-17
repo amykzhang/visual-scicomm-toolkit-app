@@ -51,10 +51,13 @@ const ElementsToggle = styled(SideBarToggle)`
 
 const ElementsRow = styled.div`
     width: 290px;
+    min-height: 47px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
+    align-content: center;
+    align-items: center;
     gap: 12px 3px;
     padding: 4px 4px;
     border-radius: 5px;
@@ -96,45 +99,43 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
     const activity_lines = activity.elements.lines;
 
     const TextSection = () => (
-        <>
+        <div>
             <ImageSubheadingText>{activity.elements.text.heading}</ImageSubheadingText>
             <ElementsRow>
                 <TextTool isTextMode={view === APP_VIEW.text} toggleTextMode={toggleTextMode} />
             </ElementsRow>
-        </>
+        </div>
     );
     const DrawSection = () => (
-        <>
+        <div>
             <ImageSubheadingText>{activity.elements.draw.heading}</ImageSubheadingText>
             <ElementsRow>
                 <DrawTool isDrawMode={view === APP_VIEW.draw} toggleDrawMode={toggleDrawMode} />
             </ElementsRow>
-        </>
+        </div>
     );
 
     const LinesSection = () => (
-        <>
+        <div>
             <ImageSubheadingText>{activity_lines.heading}</ImageSubheadingText>
             <ElementsRow>
-                {activity_lines.srcs.map((src, i) => {
-                    return (
-                        <ImageTool
-                            key={i}
-                            src={src}
-                            name={activity_lines.icons[i]}
-                            dimensions={activity_lines.sizes[i]}
-                            elements={elements}
-                            setElements={setElements}
-                            stageRef={stageRef}
-                        />
-                    );
-                })}
+                {activity_lines.srcs.map((src, i) => (
+                    <ImageTool
+                        key={i}
+                        src={src}
+                        dimensions={activity_lines.sizes[i]}
+                        name={activity_lines.icons[i]}
+                        elements={elements}
+                        setElements={setElements}
+                        stageRef={stageRef}
+                    />
+                ))}
             </ElementsRow>
-        </>
+        </div>
     );
 
     const ShapeSection = () => (
-        <>
+        <div>
             <ImageSubheadingText>{activity_shapes.heading}</ImageSubheadingText>
             <ElementsRow>
                 {activity_shapes.shapes.map((shape_icon, i) => (
@@ -148,34 +149,31 @@ export const ElementsPanel: FC<ElementsMenuProps> = ({
                     />
                 ))}
             </ElementsRow>
-        </>
+        </div>
     );
 
-    const ImageSection = () => {
-        return (
-            <>
-                {image_sections.map((section, i) => (
-                    <div key={i}>
-                        <ImageSubheadingText>{section.subheading}</ImageSubheadingText>
-
-                        <ElementsRow>
-                            {section.srcs.map((src, j) => (
-                                <ImageTool
-                                    key={j}
-                                    src={src}
-                                    dimensions={section.sizes[j]}
-                                    name={section.icons[j]}
-                                    elements={elements}
-                                    setElements={setElements}
-                                    stageRef={stageRef}
-                                />
-                            ))}
-                        </ElementsRow>
-                    </div>
-                ))}
-            </>
-        );
-    };
+    const ImageSection = () => (
+        <div>
+            {image_sections.map((section, i) => (
+                <div key={i}>
+                    <ImageSubheadingText>{section.subheading}</ImageSubheadingText>
+                    <ElementsRow>
+                        {section.srcs.map((src, j) => (
+                            <ImageTool
+                                key={j}
+                                src={src}
+                                dimensions={section.sizes[j]}
+                                name={section.icons[j]}
+                                elements={elements}
+                                setElements={setElements}
+                                stageRef={stageRef}
+                            />
+                        ))}
+                    </ElementsRow>
+                </div>
+            ))}
+        </div>
+    );
 
     return (
         <ElementsPanelContainer className={isOpen ? "" : "slide-right"}>

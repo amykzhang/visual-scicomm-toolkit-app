@@ -6,6 +6,8 @@ import { v4 as uuid } from "uuid";
 import color from "../styles/color";
 
 const StyledBase = styled.div`
+    margin: 0px 6px;
+
     cursor: move; /* fallback if grab cursor is unsupported */
     cursor: grab;
     cursor: -moz-grab;
