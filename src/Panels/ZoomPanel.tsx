@@ -5,6 +5,7 @@ import { ReactComponent as FitToScreenIcon } from "../assets/fit-to-screen.svg";
 import { ReactComponent as MinusIcon } from "../assets/minus.svg";
 import { ReactComponent as PlusIcon } from "../assets/plus.svg";
 import { ReactComponent as FullscreenIcon } from "../assets/fullscreen.svg";
+import constants from "../utils/constants";
 
 const ZoomPanelContainer = styled(CenterBar)`
     bottom: 0px;
@@ -47,18 +48,30 @@ export const ZoomPanel: React.FC<ZoomPanelProps> = ({
 }) => {
     return (
         <ZoomPanelContainer>
-            <SquareButton onClick={toggleFullscreen}>
+            <SquareButton
+                onClick={toggleFullscreen}
+                {...constants.tooltip}
+                data-tooltip-content="Fullscreen"
+            >
                 <FullscreenIcon />
             </SquareButton>
-            <SquareButton onClick={zoomFit}>
+            <SquareButton
+                onClick={zoomFit}
+                {...constants.tooltip}
+                data-tooltip-content="Zoom to fit"
+            >
                 <FitToScreenIcon />
             </SquareButton>
             <Divider />
-            <SquareButton onClick={zoomOut}>
+            <SquareButton
+                onClick={zoomOut}
+                {...constants.tooltip}
+                data-tooltip-content="Zoom out ⌘-"
+            >
                 <StyledMinusIcon />
             </SquareButton>
             <StyledPercentage>{zoomLevel}%</StyledPercentage>
-            <SquareButton onClick={zoomIn}>
+            <SquareButton onClick={zoomIn} {...constants.tooltip} data-tooltip-content="Zoom in ⌘+">
                 <PlusIcon />
             </SquareButton>
         </ZoomPanelContainer>
