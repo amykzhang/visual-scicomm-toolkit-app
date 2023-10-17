@@ -11,7 +11,7 @@ import {
     CommentViewManager,
     DragSelectManager,
     DrawViewManager,
-} from "./managers";
+} from "./hooks";
 import {
     TitlePanel,
     ToolbarPanel,
@@ -80,11 +80,6 @@ export default function App() {
         },
         [uiState]
     );
-
-    // Dragging Behaviour depending on View
-    const stageConstants = {
-        draggable: view === APP_VIEW.pan,
-    };
 
     // Stage View
     const { stageRef, handleWheel, zoomLevel, zoomIn, zoomOut, zoomFit, toggleFullscreen } =
@@ -602,28 +597,25 @@ export default function App() {
                 />
             </PanelsContainer>
             <Stage
+                draggable={view === APP_VIEW.pan}
                 width={window.innerWidth}
                 height={window.innerHeight}
                 onWheel={handleWheel}
                 // handle unfocus/click on stage
                 onClick={(e) => {
-                    if (e.target === stageRef.current) handleCanvasClick(e);
+                    handleCanvasClick(e);
                 }}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
-                onContextMenu={(e) => {
-                    e.evt.preventDefault();
-                }}
                 ref={stageRef}
-                {...stageConstants}
             >
                 <Layer>
                     <ExportArea
                         exportAreaRef={exportAreaRef}
                         {...activity.canvas_size}
                         // handle unfocus/click on stage (for export area since it is a rect element technically)
-                        onClick={handleCanvasClick}
+                        onClick={() => {}}
                     />
                     <Rect // Selection Rectangle Bounding Box
                         visible={isSelectionMode && view === APP_VIEW.select}
