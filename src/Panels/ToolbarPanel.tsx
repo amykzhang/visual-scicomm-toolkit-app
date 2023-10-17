@@ -7,6 +7,7 @@ import { ReactComponent as UndoIcon } from "../assets/undo.svg";
 import { ReactComponent as RedoIcon } from "../assets/redo.svg";
 import styled from "styled-components";
 import { CenterBar } from "../styles/containers";
+import constants from "../utils/constants";
 
 const ToolbarPanelContainer = styled(CenterBar)`
     top: 0;
@@ -31,21 +32,33 @@ export const ToolbarPanel: React.FC<ToolbarPanelProps> = ({
             <SquareButton
                 data-isactive={view === APP_VIEW.select}
                 onClick={() => setView(APP_VIEW.select)}
+                {...constants.tooltip}
+                data-tooltip-content="Select"
             >
                 <SelectIcon />
             </SquareButton>
             <SquareButton
                 data-isactive={view === APP_VIEW.pan}
                 onClick={() => setView(APP_VIEW.pan)}
+                {...constants.tooltip}
+                data-tooltip-content="Pan"
             >
                 <PanIcon />
             </SquareButton>
             <CommentTool view={view} setView={setView}></CommentTool>
             <Divider />
-            <SquareButton onClick={handleUndo}>
+            <SquareButton
+                onClick={handleUndo}
+                {...constants.tooltip}
+                data-tooltip-content="Undo ⌘Z"
+            >
                 <UndoIcon />
             </SquareButton>
-            <SquareButton onClick={handleRedo}>
+            <SquareButton
+                onClick={handleRedo}
+                {...constants.tooltip}
+                data-tooltip-content="Redo ⇧⌘Z"
+            >
                 <RedoIcon />
             </SquareButton>
         </ToolbarPanelContainer>
