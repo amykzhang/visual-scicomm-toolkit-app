@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import color from "../styles/color";
 import { ReactComponent as Doodle } from "../assets/doodle.svg";
+import constants from "../utils/constants";
 
 const StyledDrawContainer = styled.div``;
 
@@ -25,7 +26,12 @@ interface DrawToolProps {
 export const DrawTool = ({ isDrawMode, toggleDrawMode }: DrawToolProps) => {
     return (
         <StyledDrawContainer>
-            <StyledDrawButton data-isactive={isDrawMode} onClick={toggleDrawMode}>
+            <StyledDrawButton
+                data-isactive={isDrawMode}
+                onClick={toggleDrawMode}
+                {...constants.tooltip}
+                data-tooltip-content="Freehand draw"
+            >
                 <Doodle />
             </StyledDrawButton>
         </StyledDrawContainer>

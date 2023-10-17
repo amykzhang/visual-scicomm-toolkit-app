@@ -39,6 +39,11 @@ const constants = {
     transformer: {
         borderStroke: color.blue,
     },
+    tooltip: {
+        "data-tooltip-id": "ui-tooltip",
+        "data-tooltip-delay-show": 1000,
+        // "data-tooltip-float": true,
+    },
 };
 
 export default constants;

@@ -592,7 +592,14 @@ export default function App() {
                         toggleFullscreen={toggleFullscreen}
                     />
                 </BottomZone>
-                <Tooltip />
+                <Tooltip
+                    id="ui-tooltip"
+                    style={{
+                        borderRadius: "2px",
+                        fontSize: "12px",
+                        padding: "6px 10px",
+                    }}
+                />
             </PanelsContainer>
             <Stage
                 width={window.innerWidth}
