@@ -39,6 +39,7 @@ import color from "./styles/color";
 import typography from "./styles/typography";
 import constants from "./utils/constants";
 import { Tooltip } from "react-tooltip";
+import styled from "styled-components";
 
 const activity = activity_visual_strategies;
 
@@ -57,6 +58,36 @@ let history: HistoryProp[] = [
     },
 ];
 let historyStep = 0;
+
+const Menu = styled.div`
+    user-select: none;
+    z-index: 400;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    background-color: #ffffff;
+    padding: 5px;
+    gap: 5px;
+`;
+
+const Item = styled.div`
+    background-color: green;
+    padding: 4px 10px;
+`;
+
+const Separator = styled.div`
+    border: 1px solid #000000;
+    border-radius: 5px;
+    margin: 5px;
+`;
+
+const Submenu = styled.div`
+    background-color: red;
+`;
 
 export default function App() {
     const elementsLayerRef = useRef<Konva.Layer>(null);
@@ -133,6 +164,12 @@ export default function App() {
         handleDrawMouseUp,
         toggleDrawMode,
     } = DrawViewManager(view, setView, setElements, stageRef);
+
+    // --- CONTEXT MENU ---
+    const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+    const [clicked, setClicked] = useState(true);
+
+    useEffect(() => {}, []);
 
     function bringForward(id: string) {
         const index = elements.findIndex((element) => element.id === id);
@@ -314,7 +351,6 @@ export default function App() {
                     key={image.id}
                     image={image}
                     draggable={draggable}
-                    handleSelect={handleSelect(image.id)}
                     handleDragStart={handleDragStart(image.id)}
                     handleChange={handleChange}
                 />
@@ -326,7 +362,6 @@ export default function App() {
                     key={shape.id}
                     shape={shape}
                     draggable={draggable}
-                    handleSelect={handleSelect(shape.id)}
                     handleDragStart={handleDragStart(shape.id)}
                     handleChange={handleChange}
                 />
@@ -340,7 +375,6 @@ export default function App() {
                     draggable={draggable}
                     isJustCreated={justCreated === text.id}
                     isSelected={groupSelection.length === 1 && groupSelection.includes(text.id)}
-                    handleSelect={handleSelect(text.id)}
                     handleDragStart={handleDragStart(text.id)}
                     handleChange={handleChange}
                     editText={editText}
@@ -354,7 +388,6 @@ export default function App() {
                     key={line.id}
                     line={line}
                     draggable={draggable}
-                    handleSelect={handleSelect(line.id)}
                     handleDragStart={handleDragStart(line.id)}
                     handleChange={handleChange}
                 />
@@ -364,8 +397,17 @@ export default function App() {
 
     // Handle click off stage for all views
     function handleCanvasClick(e: Konva.KonvaEventObject<MouseEvent>) {
+        if (stageRef.current === null || exportAreaRef.current === null) return;
+        const id = e.target.id();
+
+        // setCursorPosition({ x: e.evt.clientX, y: e.evt.clientY });
         switch (view) {
             case APP_VIEW.select:
+                if (e.target === stageRef.current || e.target === exportAreaRef.current) {
+                    setGroupSelection([]);
+                } else {
+                    handleSelect(id);
+                }
                 break;
             case APP_VIEW.pan:
                 // do something for pan view
@@ -603,7 +645,11 @@ export default function App() {
                 onWheel={handleWheel}
                 // handle unfocus/click on stage
                 onClick={(e) => {
+                    console.log("stage click");
                     handleCanvasClick(e);
+                }}
+                onContextMenu={(e) => {
+                    e.evt.preventDefault();
                 }}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
@@ -611,12 +657,7 @@ export default function App() {
                 ref={stageRef}
             >
                 <Layer>
-                    <ExportArea
-                        exportAreaRef={exportAreaRef}
-                        {...activity.canvas_size}
-                        // handle unfocus/click on stage (for export area since it is a rect element technically)
-                        onClick={() => {}}
-                    />
+                    <ExportArea exportAreaRef={exportAreaRef} {...activity.canvas_size} />
                     <Rect // Selection Rectangle Bounding Box
                         visible={isSelectionMode && view === APP_VIEW.select}
                         ref={selectionRectRef}
@@ -668,6 +709,22 @@ export default function App() {
                         })}
                 </Layer>
             </Stage>
+
+            {clicked && (
+                <Menu
+                    style={{
+                        top: cursorPosition.y,
+                        left: cursorPosition.x,
+                        // display: clicked ? "flex" : "none",
+                    }}
+                >
+                    <Item>One</Item>
+                    <Item>Two</Item>
+                    <Item>Three</Item>
+                    <Separator />
+                    <Item>Four</Item>
+                </Menu>
+            )}
         </div>
     );
 }

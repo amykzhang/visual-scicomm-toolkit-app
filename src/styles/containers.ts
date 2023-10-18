@@ -126,6 +126,6 @@ export const PanelsContainer = styled.div`
     width: 100vw;
     height: 100vh;
     inset: 0px;
-    z-index: 300;
+    z-index: 100;
     pointer-events: none;
 `;

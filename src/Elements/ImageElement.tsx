@@ -6,18 +6,11 @@ import { ImageProp } from "../utils/interfaces";
 interface ImageElementProp {
     image: ImageProp;
     draggable: boolean;
-    handleSelect: () => void;
     handleDragStart: () => void;
     handleChange: (id: string, attributes: any) => void;
 }
 
-const ImageElement = ({
-    image,
-    draggable,
-    handleSelect,
-    handleDragStart,
-    handleChange,
-}: ImageElementProp) => {
+const ImageElement = ({ image, draggable, handleDragStart, handleChange }: ImageElementProp) => {
     const imageRef = useRef<Konva.Image>(null);
 
     const imageElement = new window.Image(image.width, image.height);
@@ -28,7 +21,6 @@ const ImageElement = ({
             {...image}
             image={imageElement}
             ref={imageRef}
-            onClick={handleSelect}
             draggable={draggable}
             onDragStart={handleDragStart}
             onDragEnd={(e) =>

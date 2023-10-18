@@ -20,19 +20,15 @@ export const SelectionManager = (
     };
 
     const handleSelect = (id: string) => () => {
-        if (view === APP_VIEW.select) {
-            if (shiftKey) {
-                toggleSelectedId(id);
-            } else {
-                if (groupSelection.length === 1 && groupSelection.includes(id)) {
-                    setGroupSelection([]);
+        if (shiftKey) {
+            setGroupSelection((groupSelection) => {
+                if (groupSelection.includes(id)) {
+                    return groupSelection.filter((elementId) => elementId !== id);
                 } else {
-                    setGroupSelection([id]);
+                    return [...groupSelection, id];
                 }
-            }
-        }
-        if (view === APP_VIEW.text) {
-            setView(APP_VIEW.select);
+            });
+        } else {
             setGroupSelection([id]);
         }
     };

@@ -7,7 +7,6 @@ import constants from "../utils/constants";
 interface TextElementProp {
     text: TextProp;
     draggable: boolean;
-    handleSelect: () => void;
     handleDragStart: () => void;
     handleChange: (id: string, attributes: any) => void;
     isJustCreated: boolean;
@@ -19,7 +18,6 @@ interface TextElementProp {
 const TextElement = ({
     text,
     draggable,
-    handleSelect,
     handleDragStart,
     handleChange,
     isSelected,
@@ -31,7 +29,6 @@ const TextElement = ({
 
     const handleClick = (e: Konva.KonvaEventObject<Event>) => {
         if (isSelected) editText(text, handleChange, textRef, transformerRef);
-        else handleSelect();
     };
 
     function handleTransform(e: Konva.KonvaEventObject<Event>) {
