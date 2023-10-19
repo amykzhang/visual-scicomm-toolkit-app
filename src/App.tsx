@@ -113,10 +113,10 @@ export default function App() {
     // --- MANAGERS FOR VIEWS ---
 
     // Selection
-    const { selectElement, handleDragStart, deleteSelected } = SelectionManager(
+    const { selectElement, deleteSelected } = SelectionManager(
         setElements,
-        view,
-        setView,
+        // view,
+        // setView,
         shiftKey,
         groupSelection,
         setGroupSelection
@@ -156,11 +156,18 @@ export default function App() {
     const [showSecondaryMenu, setShowSecondaryMenu] = useState(false);
     const [primaryMenuPosition, setPrimaryMenuPosition] = useState({ x: -1000, y: -1000 });
     const [secondaryMenuPosition, setSecondaryMenuPosition] = useState({ x: -1000, y: -1000 });
-    const [primaryMenuItems, setPrimaryMenuItems] = useState({
+    const [primaryMenuItems, setPrimaryMenuItems] = useState<{
+        stroke: boolean;
+        fill: boolean;
+        textStyle: boolean;
+        opacity: boolean;
+        values: any;
+    }>({
         stroke: true,
         fill: true,
         textStyle: true,
         opacity: true,
+        values: { opacity: 1 },
     });
 
     function bringForward(id: string) {
@@ -343,7 +350,7 @@ export default function App() {
                     key={image.id}
                     image={image}
                     draggable={draggable}
-                    handleDragStart={handleDragStart(image.id)}
+                    // handleDragStart={handleDragStart(image.id)}
                     handleChange={handleChange}
                 />
             );
@@ -354,7 +361,7 @@ export default function App() {
                     key={shape.id}
                     shape={shape}
                     draggable={draggable}
-                    handleDragStart={handleDragStart(shape.id)}
+                    // handleDragStart={handleDragStart(shape.id)}
                     handleChange={handleChange}
                 />
             );
@@ -367,7 +374,7 @@ export default function App() {
                     draggable={draggable}
                     isJustCreated={justCreated === text.id}
                     isSelected={groupSelection.length === 1 && groupSelection.includes(text.id)}
-                    handleDragStart={handleDragStart(text.id)}
+                    // handleDragStart={handleDragStart(text.id)}
                     handleChange={handleChange}
                     editText={editText}
                     transformerRef={transformerRef}
@@ -380,7 +387,7 @@ export default function App() {
                     key={line.id}
                     line={line}
                     draggable={draggable}
-                    handleDragStart={handleDragStart(line.id)}
+                    // handleDragStart={handleDragStart(line.id)}
                     handleChange={handleChange}
                 />
             );
@@ -751,7 +758,28 @@ export default function App() {
                         left: primaryMenuPosition.x,
                     }}
                 >
-                    <Item>Opacity</Item>
+                    {primaryMenuItems.opacity && (
+                        <Item>
+                            Opacity:&nbsp;
+                            <StyledInput
+                                type="range"
+                                min="0"
+                                max="1"
+                                step="0.01"
+                                value={primaryMenuItems.values.opacity}
+                                onChange={(e) => {
+                                    const opacity = parseFloat(e.target.value);
+                                    setPrimaryMenuItems({
+                                        ...primaryMenuItems,
+                                        values: { ...primaryMenuItems.values, opacity },
+                                    });
+                                    groupSelection.forEach((id) => {
+                                        handleChange(id, { opacity });
+                                    });
+                                }}
+                            />
+                        </Item>
+                    )}
                     <Item>Fill</Item>
                     <Item>Stroke</Item>
                     <Separator />
@@ -788,7 +816,7 @@ const Menu1 = styled.div`
     top: 0;
     left: 0;
     border-radius: 5px;
-    background-color: ${color.white};
+    background-color: ${color.lightBlue};
     padding: 5px;
     gap: 5px;
 `;
@@ -808,8 +836,10 @@ const Menu2 = styled.div`
 `;
 
 const Item = styled.div`
-    background-color: green;
+    background-color: ${color.lighterBlue};
     padding: 4px 10px;
+    display: flex;
+    align-items: center;
 `;
 
 const Separator = styled.div`
@@ -820,4 +850,11 @@ const Separator = styled.div`
 
 const Submenu = styled.div`
     background-color: red;
+`;
+
+const StyledInput = styled.input`
+    width: 100%;
+    height: 100%;
+    color: ${color.black};
+    background-color: ${color.white};
 `;

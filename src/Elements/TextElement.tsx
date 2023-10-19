@@ -7,7 +7,7 @@ import constants from "../utils/constants";
 interface TextElementProp {
     text: TextProp;
     draggable: boolean;
-    handleDragStart: () => void;
+    // handleDragStart: () => void;
     handleChange: (id: string, attributes: any) => void;
     isJustCreated: boolean;
     isSelected: boolean;
@@ -18,7 +18,7 @@ interface TextElementProp {
 const TextElement = ({
     text,
     draggable,
-    handleDragStart,
+    // handleDragStart,
     handleChange,
     isSelected,
     isJustCreated,
@@ -111,7 +111,7 @@ const TextElement = ({
             id={text.id}
             draggable={draggable}
             onClick={handleClick}
-            onDragStart={handleDragStart}
+            // onDragStart={handleDragStart}
             onDragEnd={(e) => {
                 handleChange(text.id, {
                     x: e.target.x(),

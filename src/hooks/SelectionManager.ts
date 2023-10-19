@@ -4,8 +4,8 @@ import { APP_VIEW } from "../utils/enums";
 
 export const SelectionManager = (
     setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>,
-    view: APP_VIEW,
-    setView: (view: APP_VIEW) => void,
+    // view: APP_VIEW,
+    // setView: (view: APP_VIEW) => void,
     shiftKey: boolean,
     groupSelection: string[],
     setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>
@@ -33,9 +33,9 @@ export const SelectionManager = (
         }
     };
 
-    const handleDragStart = (id: string) => () => {
-        if (!groupSelection.includes(id)) setGroupSelection([id]);
-    };
+    // const handleDragStart = (id: string) => () => {
+    //     // if (!groupSelection.includes(id)) setGroupSelection([id]);
+    // };
 
     const deleteSelected = useCallback(() => {
         setElements((elements) =>
@@ -46,7 +46,7 @@ export const SelectionManager = (
 
     return {
         selectElement,
-        handleDragStart,
+        // handleDragStart,
         deleteSelected,
     };
 };

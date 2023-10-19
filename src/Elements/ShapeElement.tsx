@@ -6,11 +6,11 @@ import { ShapeProp } from "../utils/interfaces";
 interface ShapeElementProp {
     shape: ShapeProp;
     draggable: boolean;
-    handleDragStart: () => void;
+    // handleDragStart: () => void;
     handleChange: (id: string, attributes: any) => void;
 }
 
-const ShapeElement = ({ shape, draggable, handleDragStart, handleChange }: ShapeElementProp) => {
+const ShapeElement = ({ shape, draggable, handleChange }: ShapeElementProp) => {
     const shapeRef = useRef<Konva.Rect | Konva.Circle | Konva.RegularPolygon>(null);
 
     const Shape =
@@ -24,7 +24,7 @@ const ShapeElement = ({ shape, draggable, handleDragStart, handleChange }: Shape
             strokeScaleEnabled={false}
             radius={shape.width / 2} // For Circle
             sides={3} // For Triangle
-            onDragStart={handleDragStart}
+            // onDragStart={handleDragStart}
             onDragEnd={(e) =>
                 handleChange(shape.id, {
                     x: e.target.x(),
