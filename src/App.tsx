@@ -235,6 +235,12 @@ export default function App() {
     const handleKeyDown = useCallback(
         (e: KeyboardEvent) => {
             if (e.key === "Shift") setShiftKey(true);
+            if (e.metaKey && (e.key === "=" || e.key === "-" || e.key === "0")) {
+                e.preventDefault();
+                if (e.key === "=") zoomIn();
+                if (e.key === "-") zoomOut();
+                if (e.key === "0") zoomFit();
+            }
 
             // SELECT VIEW
             if (view === APP_VIEW.select) {
@@ -735,11 +741,11 @@ export default function App() {
                 </BottomZone>
                 <Tooltip
                     id="ui-tooltip"
-                    style={{
-                        borderRadius: "2px",
-                        fontSize: "12px",
-                        padding: "6px 10px",
-                    }}
+                    // style={{
+                    //     borderRadius: "2px",
+                    //     fontSize: "12px",
+                    //     padding: "6px 10px",
+                    // }}
                 />
             </PanelsContainer>
             <Stage
