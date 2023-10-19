@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { ElementProp } from "../utils/interfaces";
-import { APP_VIEW } from "../utils/enums";
 
 export const SelectionManager = (
     setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>,

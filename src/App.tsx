@@ -74,6 +74,12 @@ let history: HistoryProp[] = [
 ];
 let historyStep = 0;
 
+let wheeldelta = {
+    x: 0,
+    y: 0,
+};
+let wheeling: any;
+
 export default function App() {
     const elementsLayerRef = useRef<Konva.Layer>(null);
     const exportAreaRef = useRef<Konva.Rect>(null);
@@ -83,6 +89,7 @@ export default function App() {
     const primaryMenuRef = useRef<HTMLDivElement>(null);
 
     const [shiftKey, setShiftKey] = useState(false);
+    const [isWheeling, setIsWheeling] = useState(false);
 
     // App State (stage position, zoom, view, panels)
     const [uiState, setUiState] = useState<UiStateProp>(initialUiState);
@@ -159,13 +166,13 @@ export default function App() {
     const [primaryMenuItems, setPrimaryMenuItems] = useState<{
         stroke: boolean;
         fill: boolean;
-        textStyle: boolean;
+        fontStyle: boolean;
         opacity: boolean;
         values: any;
     }>({
         stroke: true,
         fill: true,
-        textStyle: true,
+        fontStyle: true,
         opacity: true,
         values: { opacity: 1 },
     });
@@ -468,11 +475,6 @@ export default function App() {
         }
     };
 
-    // Group Selection
-    useEffect(() => {
-        setGroupSelection(elementsWithinBounds);
-    }, [elementsWithinBounds]);
-
     // --- HISTORY ---
 
     const handleUndo = () => {
@@ -500,6 +502,11 @@ export default function App() {
     useEffect(() => {
         persistance.persistCanvasState(elements, comments);
     }, [elements, comments]);
+
+    // Group Selection
+    useEffect(() => {
+        setGroupSelection(elementsWithinBounds);
+    }, [elementsWithinBounds]);
 
     // Save UI state
     useEffect(() => {
@@ -589,11 +596,73 @@ export default function App() {
             transformer.nodes(selected);
             layer.batchDraw();
         }
-
-        if (groupSelection.length > 0) {
-            setShowPrimaryMenu(true);
-        } else setShowPrimaryMenu(false);
     }, [groupSelection]);
+
+    useEffect(() => {
+        // Show primary menu if there is a selection
+        if (groupSelection.length > 0 && !isWheeling) {
+            setShowPrimaryMenu(true);
+        } else {
+            setShowPrimaryMenu(false);
+        }
+    }, [groupSelection, isWheeling]);
+
+    useEffect(() => {
+        // Setting primary menu items
+        const selectedElements = elements.filter((element) => groupSelection.includes(element.id));
+        let someImage = false;
+        let someShape = false;
+        let someText = false;
+        let someLine = false;
+        selectedElements.forEach((element) => {
+            if (element.type === "image") someImage = true;
+            else if (element.type === "shape") someShape = true;
+            else if (element.type === "text") someText = true;
+            else if (element.type === "line") someLine = true;
+        });
+
+        const showStroke = (someShape || someLine) && !someImage && !someText;
+        const showFill = someShape && !someLine && !someImage && !someText;
+        const showTextStyle = someText && !someShape && !someLine && !someImage;
+        const showOpacity = someShape || someImage || someLine || someText;
+
+        let stroke = {};
+        let fill = {};
+        let fontStyle = {};
+        let opacity = {};
+        if (showStroke) {
+            const shapesAndLines = selectedElements as (ShapeProp | LineProp)[];
+            const sameColor = shapesAndLines.every(
+                (element) => element.stroke === shapesAndLines[0].stroke
+            );
+            stroke = { stroke: sameColor ? shapesAndLines[0].stroke : "#000000" };
+        }
+        if (showFill) {
+            const shapes = selectedElements as ShapeProp[];
+            const sameColor = shapes.every((element) => element.fill === shapes[0].fill);
+            fill = { fill: sameColor ? shapes[0].fill : "#000000" };
+        }
+        if (showTextStyle) {
+            const texts = selectedElements as TextProp[];
+            const sameStyle = texts.every((element) => element.fontStyle === texts[0].fontStyle);
+            fontStyle = { fontStyle: sameStyle ? texts[0].fontStyle : "normal" };
+        }
+        if (showOpacity) {
+            const elements = selectedElements as (ShapeProp | ImageProp | LineProp | TextProp)[];
+            const sameOpacity = elements.every(
+                (element) => element.opacity === elements[0].opacity
+            );
+            opacity = { opacity: sameOpacity ? elements[0].opacity : 1 };
+        }
+
+        setPrimaryMenuItems({
+            stroke: showStroke,
+            fill: showFill,
+            fontStyle: showTextStyle,
+            opacity: showOpacity,
+            values: { ...stroke, ...fill, ...fontStyle, ...opacity },
+        });
+    }, [groupSelection, elements]);
 
     useEffect(() => {
         if (showPrimaryMenu) {
@@ -606,8 +675,6 @@ export default function App() {
                     transformer.width() / 2 -
                     primaryMenu.getBoundingClientRect().width / 2;
                 const y = transformer.y() - 100;
-
-                console.log(x, y);
 
                 setPrimaryMenuPosition({
                     x: x,
@@ -680,9 +747,20 @@ export default function App() {
                 width={window.innerWidth}
                 height={window.innerHeight}
                 onWheel={(e) => {
+                    setIsWheeling(true);
                     handleWheel(e);
-                    setShowPrimaryMenu(false);
-                    setShowSecondaryMenu(false);
+
+                    clearTimeout(wheeling);
+                    wheeling = setTimeout(function () {
+                        setIsWheeling(false);
+                        wheeling = undefined;
+                        // reset wheeldelta
+                        wheeldelta.x = 0;
+                        wheeldelta.y = 0;
+                    }, 100);
+
+                    wheeldelta.x += e.evt.deltaX;
+                    wheeldelta.y += e.evt.deltaY;
                 }}
                 // handle unfocus/click on stage
                 onClick={handleStageClick}
@@ -706,7 +784,14 @@ export default function App() {
                         strokeWidth={2}
                         opacity={0.25}
                     />
-                    {isDrawing && <Line ref={lineRef} {...constants.line} points={points} />}
+                    {isDrawing && (
+                        <Line
+                            ref={lineRef}
+                            {...constants.line}
+                            stroke={color.black}
+                            points={points}
+                        />
+                    )}
                 </Layer>
                 <Layer ref={elementsLayerRef} id="elements-layer">
                     {elements.map((element, index) => elementToReactElement(element))}
@@ -758,6 +843,14 @@ export default function App() {
                         left: primaryMenuPosition.x,
                     }}
                 >
+                    {primaryMenuItems.fill && <Item>Fill</Item>}
+                    {primaryMenuItems.stroke && <Item>Stroke</Item>}
+                    {primaryMenuItems.stroke && primaryMenuItems.fontStyle && <Separator />}
+                    {primaryMenuItems.fontStyle && <Item>Text Style</Item>}
+                    {(primaryMenuItems.stroke ||
+                        primaryMenuItems.fill ||
+                        primaryMenuItems.fontStyle) &&
+                        primaryMenuItems.opacity && <Separator />}
                     {primaryMenuItems.opacity && (
                         <Item>
                             Opacity:&nbsp;
@@ -780,10 +873,6 @@ export default function App() {
                             />
                         </Item>
                     )}
-                    <Item>Fill</Item>
-                    <Item>Stroke</Item>
-                    <Separator />
-                    <Item>Text Style</Item>
                 </Menu1>
             )}
             {showSecondaryMenu && (
