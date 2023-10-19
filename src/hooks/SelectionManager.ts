@@ -11,15 +11,15 @@ export const SelectionManager = (
     setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>
 ) => {
     // Selection mode: true when dragging selection rectangle
-    const toggleSelectedId = (id: string) => {
-        if (groupSelection.includes(id)) {
-            setGroupSelection(groupSelection.filter((selectedId) => selectedId !== id));
-        } else {
-            setGroupSelection([...groupSelection, id]);
-        }
-    };
+    // const toggleSelectedId = (id: string) => {
+    //     if (groupSelection.includes(id)) {
+    //         setGroupSelection(groupSelection.filter((selectedId) => selectedId !== id));
+    //     } else {
+    //         setGroupSelection([...groupSelection, id]);
+    //     }
+    // };
 
-    const handleSelect = (id: string) => () => {
+    const selectElement = (id: string) => {
         if (shiftKey) {
             setGroupSelection((groupSelection) => {
                 if (groupSelection.includes(id)) {
@@ -45,7 +45,7 @@ export const SelectionManager = (
     }, [setElements, groupSelection, setGroupSelection]);
 
     return {
-        handleSelect,
+        selectElement,
         handleDragStart,
         deleteSelected,
     };

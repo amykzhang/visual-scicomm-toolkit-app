@@ -41,6 +41,21 @@ import constants from "./utils/constants";
 import { Tooltip } from "react-tooltip";
 import styled from "styled-components";
 
+interface ExitCommentStateProps {
+    view: APP_VIEW;
+    setView: (view: APP_VIEW) => void;
+}
+
+const ExitCommentView: React.FC<ExitCommentStateProps> = ({ view, setView }) => {
+    const displayStyle = view === APP_VIEW.comment ? {} : { display: "none" };
+
+    return (
+        <ExitCommentViewButton style={displayStyle} onClick={() => setView(APP_VIEW.select)}>
+            <typography.LargeText>Exit Comment Mode</typography.LargeText>
+        </ExitCommentViewButton>
+    );
+};
+
 const activity = activity_visual_strategies;
 
 const initialCanvasState = persistance.retrieveCanvasState();
@@ -59,42 +74,13 @@ let history: HistoryProp[] = [
 ];
 let historyStep = 0;
 
-const Menu = styled.div`
-    user-select: none;
-    z-index: 400;
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    top: 0;
-    left: 0;
-    border: 1px solid #000000;
-    border-radius: 5px;
-    background-color: #ffffff;
-    padding: 5px;
-    gap: 5px;
-`;
-
-const Item = styled.div`
-    background-color: green;
-    padding: 4px 10px;
-`;
-
-const Separator = styled.div`
-    border: 1px solid #000000;
-    border-radius: 5px;
-    margin: 5px;
-`;
-
-const Submenu = styled.div`
-    background-color: red;
-`;
-
 export default function App() {
     const elementsLayerRef = useRef<Konva.Layer>(null);
     const exportAreaRef = useRef<Konva.Rect>(null);
     const selectionRectRef = useRef<Konva.Rect>(null);
     const transformerRef = useRef<Konva.Transformer>(null);
     const lineRef = useRef<Konva.Line>(null);
+    const primaryMenuRef = useRef<HTMLDivElement>(null);
 
     const [shiftKey, setShiftKey] = useState(false);
 
@@ -127,7 +113,7 @@ export default function App() {
     // --- MANAGERS FOR VIEWS ---
 
     // Selection
-    const { handleSelect, handleDragStart, deleteSelected } = SelectionManager(
+    const { selectElement, handleDragStart, deleteSelected } = SelectionManager(
         setElements,
         view,
         setView,
@@ -166,10 +152,16 @@ export default function App() {
     } = DrawViewManager(view, setView, setElements, stageRef);
 
     // --- CONTEXT MENU ---
-    const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
-    const [clicked, setClicked] = useState(true);
-
-    useEffect(() => {}, []);
+    const [showPrimaryMenu, setShowPrimaryMenu] = useState(false);
+    const [showSecondaryMenu, setShowSecondaryMenu] = useState(false);
+    const [primaryMenuPosition, setPrimaryMenuPosition] = useState({ x: -1000, y: -1000 });
+    const [secondaryMenuPosition, setSecondaryMenuPosition] = useState({ x: -1000, y: -1000 });
+    const [primaryMenuItems, setPrimaryMenuItems] = useState({
+        stroke: true,
+        fill: true,
+        textStyle: true,
+        opacity: true,
+    });
 
     function bringForward(id: string) {
         const index = elements.findIndex((element) => element.id === id);
@@ -396,17 +388,17 @@ export default function App() {
     }
 
     // Handle click off stage for all views
-    function handleCanvasClick(e: Konva.KonvaEventObject<MouseEvent>) {
-        if (stageRef.current === null || exportAreaRef.current === null) return;
-        const id = e.target.id();
+    function handleStageClick(e: Konva.KonvaEventObject<MouseEvent>) {
+        if (e.evt.button !== 0) return; // Only handle left click
 
-        // setCursorPosition({ x: e.evt.clientX, y: e.evt.clientY });
+        if (stageRef.current === null || exportAreaRef.current === null) return;
+
         switch (view) {
             case APP_VIEW.select:
                 if (e.target === stageRef.current || e.target === exportAreaRef.current) {
                     setGroupSelection([]);
                 } else {
-                    handleSelect(id);
+                    selectElement(e.target.id());
                 }
                 break;
             case APP_VIEW.pan:
@@ -426,6 +418,16 @@ export default function App() {
         }
     }
 
+    const handleContextMenu = (e: Konva.KonvaEventObject<MouseEvent>) => {
+        e.evt.preventDefault();
+        e.evt.stopPropagation();
+
+        if (e.target === stageRef.current || e.target === exportAreaRef.current) return;
+
+        setShowSecondaryMenu(true);
+        setSecondaryMenuPosition({ x: e.evt.clientX, y: e.evt.clientY });
+    };
+
     const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
         if (view === APP_VIEW.select) {
             if (stageRef.current === null) return;
@@ -435,6 +437,8 @@ export default function App() {
             if (e.target === stage || e.target === exportAreaRef.current) {
                 handleDragSelectMouseDown(e);
             }
+
+            setShowSecondaryMenu(false);
         } else if (view === APP_VIEW.draw) {
             handleDrawMouseDown(e);
         }
@@ -449,8 +453,8 @@ export default function App() {
     };
 
     const handleMouseUp = (e: Konva.KonvaEventObject<MouseEvent>) => {
-        if (view === APP_VIEW.select && isSelectionMode) {
-            handleDragSelectMouseUp(e);
+        if (view === APP_VIEW.select) {
+            if (isSelectionMode) handleDragSelectMouseUp(e);
         }
         if (view === APP_VIEW.draw) {
             handleDrawMouseUp(e);
@@ -578,7 +582,33 @@ export default function App() {
             transformer.nodes(selected);
             layer.batchDraw();
         }
+
+        if (groupSelection.length > 0) {
+            setShowPrimaryMenu(true);
+        } else setShowPrimaryMenu(false);
     }, [groupSelection]);
+
+    useEffect(() => {
+        if (showPrimaryMenu) {
+            if (transformerRef.current !== null && primaryMenuRef.current !== null) {
+                const transformer = transformerRef.current;
+                const primaryMenu = primaryMenuRef.current;
+
+                const x =
+                    transformer.x() +
+                    transformer.width() / 2 -
+                    primaryMenu.getBoundingClientRect().width / 2;
+                const y = transformer.y() - 100;
+
+                console.log(x, y);
+
+                setPrimaryMenuPosition({
+                    x: x,
+                    y: y,
+                });
+            }
+        } else setPrimaryMenuPosition({ x: -1000, y: -1000 });
+    }, [groupSelection, showPrimaryMenu]);
 
     return (
         <div>
@@ -642,15 +672,14 @@ export default function App() {
                 draggable={view === APP_VIEW.pan}
                 width={window.innerWidth}
                 height={window.innerHeight}
-                onWheel={handleWheel}
+                onWheel={(e) => {
+                    handleWheel(e);
+                    setShowPrimaryMenu(false);
+                    setShowSecondaryMenu(false);
+                }}
                 // handle unfocus/click on stage
-                onClick={(e) => {
-                    console.log("stage click");
-                    handleCanvasClick(e);
-                }}
-                onContextMenu={(e) => {
-                    e.evt.preventDefault();
-                }}
+                onClick={handleStageClick}
+                onContextMenu={handleContextMenu}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
@@ -688,6 +717,10 @@ export default function App() {
                             }
                             return newBox;
                         }}
+                        onDragStart={() => setShowPrimaryMenu(false)}
+                        onDragEnd={() => setShowPrimaryMenu(true)}
+                        onTransformStart={() => setShowPrimaryMenu(false)}
+                        onTransformEnd={() => setShowPrimaryMenu(true)}
                     />
                 </Layer>
                 <Layer id="comment-layer">
@@ -710,36 +743,81 @@ export default function App() {
                 </Layer>
             </Stage>
 
-            {clicked && (
-                <Menu
+            {showPrimaryMenu && (
+                <Menu1
+                    ref={primaryMenuRef}
                     style={{
-                        top: cursorPosition.y,
-                        left: cursorPosition.x,
-                        // display: clicked ? "flex" : "none",
+                        top: primaryMenuPosition.y,
+                        left: primaryMenuPosition.x,
                     }}
                 >
-                    <Item>One</Item>
-                    <Item>Two</Item>
-                    <Item>Three</Item>
+                    <Item>Opacity</Item>
+                    <Item>Fill</Item>
+                    <Item>Stroke</Item>
                     <Separator />
-                    <Item>Four</Item>
-                </Menu>
+                    <Item>Text Style</Item>
+                </Menu1>
+            )}
+            {showSecondaryMenu && (
+                <Menu2
+                    style={{
+                        top: secondaryMenuPosition.y,
+                        left: secondaryMenuPosition.x,
+                    }}
+                >
+                    <Item>Copy</Item>
+                    <Item>Paste</Item>
+                    <Item>Delete</Item>
+                    <Separator />
+                    <Item>Bring Forward</Item>
+                    <Item>Send Backward</Item>
+                    <Item>Bring to Front</Item>
+                    <Item>Send to Back</Item>
+                </Menu2>
             )}
         </div>
     );
 }
 
-interface ExitCommentStateProps {
-    view: APP_VIEW;
-    setView: (view: APP_VIEW) => void;
-}
+const Menu1 = styled.div`
+    user-select: none;
+    z-index: 400;
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 5px;
+    background-color: ${color.white};
+    padding: 5px;
+    gap: 5px;
+`;
 
-const ExitCommentView: React.FC<ExitCommentStateProps> = ({ view, setView }) => {
-    const displayStyle = view === APP_VIEW.comment ? {} : { display: "none" };
+const Menu2 = styled.div`
+    user-select: none;
+    z-index: 401;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 5px;
+    background-color: ${color.white};
+    padding: 5px;
+    gap: 5px;
+`;
 
-    return (
-        <ExitCommentViewButton style={displayStyle} onClick={() => setView(APP_VIEW.select)}>
-            <typography.LargeText>Exit Comment Mode</typography.LargeText>
-        </ExitCommentViewButton>
-    );
-};
+const Item = styled.div`
+    background-color: green;
+    padding: 4px 10px;
+`;
+
+const Separator = styled.div`
+    border: 1px solid #000000;
+    border-radius: 5px;
+    margin: 5px;
+`;
+
+const Submenu = styled.div`
+    background-color: red;
+`;
