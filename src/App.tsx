@@ -86,7 +86,11 @@ export default function App() {
     const selectionRectRef = useRef<Konva.Rect>(null);
     const transformerRef = useRef<Konva.Transformer>(null);
     const lineRef = useRef<Konva.Line>(null);
-    const primaryMenuRef = useRef<HTMLDivElement>(null);
+
+    const primaryMenuRef = useRef<HTMLDivElement | null>(null);
+    const fillRef = useRef<HTMLDivElement>(null);
+    const strokeRef = useRef<HTMLDivElement>(null);
+    const colorPaletteRef = useRef<HTMLDivElement | null>(null);
 
     const [shiftKey, setShiftKey] = useState(false);
     const [isWheeling, setIsWheeling] = useState(false);
@@ -161,7 +165,6 @@ export default function App() {
     // --- CONTEXT MENU ---
     const [showPrimaryMenu, setShowPrimaryMenu] = useState(false);
     const [showSecondaryMenu, setShowSecondaryMenu] = useState(false);
-    const [primaryMenuPosition, setPrimaryMenuPosition] = useState({ x: -1000, y: -1000 });
     const [secondaryMenuPosition, setSecondaryMenuPosition] = useState({ x: -1000, y: -1000 });
     const [primaryMenuItems, setPrimaryMenuItems] = useState<{
         stroke: boolean;
@@ -176,6 +179,8 @@ export default function App() {
         opacity: true,
         values: { opacity: 1 },
     });
+
+    const [colorPalette, setColorPalette] = useState<"stroke" | "fill" | null>(null);
 
     function bringForward(id: string) {
         const index = elements.findIndex((element) => element.id === id);
@@ -611,6 +616,7 @@ export default function App() {
         } else {
             setShowPrimaryMenu(false);
         }
+        setColorPalette(null);
     }, [groupSelection, isWheeling]);
 
     useEffect(() => {
@@ -671,10 +677,11 @@ export default function App() {
     }, [groupSelection, elements]);
 
     useEffect(() => {
-        if (showPrimaryMenu) {
-            if (transformerRef.current !== null && primaryMenuRef.current !== null) {
-                const transformer = transformerRef.current;
-                const primaryMenu = primaryMenuRef.current;
+        if (primaryMenuRef.current !== null && transformerRef.current !== null) {
+            const transformer = transformerRef.current;
+            const primaryMenu = primaryMenuRef.current;
+
+            if (showPrimaryMenu) {
                 const { width, height } = primaryMenu.getBoundingClientRect();
 
                 let x =
@@ -683,15 +690,41 @@ export default function App() {
                     primaryMenu.getBoundingClientRect().width / 2;
                 let y = transformer.y() - 100;
 
-                const [newX, newY] = fitInFrame(x, y, width, height);
+                const [newX, newY] = fitInFrame(x, y, width, height, [10, 10]);
 
-                setPrimaryMenuPosition({
-                    x: newX,
-                    y: newY,
-                });
+                primaryMenu.style.left = newX + "px";
+                primaryMenu.style.top = newY + "px";
+            } else {
+                primaryMenu.style.left = "";
+                primaryMenu.style.top = "";
             }
-        } else setPrimaryMenuPosition({ x: -1000, y: -1000 });
+        }
     }, [groupSelection, showPrimaryMenu]);
+
+    useEffect(() => {
+        if (primaryMenuRef.current === null || colorPaletteRef.current === null) return;
+        const menu = primaryMenuRef.current.getBoundingClientRect();
+        const palette = colorPaletteRef.current.getBoundingClientRect();
+
+        let buttonX = 0;
+        let buttonW = 0;
+        if (colorPalette === "fill" && fillRef.current !== null) {
+            buttonX = fillRef.current.getBoundingClientRect().x;
+            buttonW = fillRef.current.getBoundingClientRect().width;
+        } else if (colorPalette === "stroke" && strokeRef.current !== null) {
+            buttonX = strokeRef.current.getBoundingClientRect().x;
+            buttonW = strokeRef.current.getBoundingClientRect().width;
+        }
+        let x = buttonX + buttonW / 2 - palette.width / 2;
+        let y = menu.y - palette.height;
+        const [newX, newY] = fitInFrame(x, y, palette.width, palette.height, [
+            10,
+            menu.height + 10,
+        ]);
+
+        colorPaletteRef.current.style.left = newX + "px";
+        colorPaletteRef.current.style.top = newY + "px";
+    }, [colorPalette]);
 
     return (
         <div>
@@ -845,44 +878,80 @@ export default function App() {
             </Stage>
 
             {showPrimaryMenu && (
-                <Menu1
-                    ref={primaryMenuRef}
-                    style={{
-                        top: primaryMenuPosition.y,
-                        left: primaryMenuPosition.x,
-                    }}
-                >
-                    {primaryMenuItems.fill && <Item>Fill</Item>}
-                    {primaryMenuItems.stroke && <Item>Stroke</Item>}
-                    {primaryMenuItems.stroke && primaryMenuItems.fontStyle && <Separator />}
-                    {primaryMenuItems.fontStyle && <Item>Text Style</Item>}
-                    {(primaryMenuItems.stroke ||
-                        primaryMenuItems.fill ||
-                        primaryMenuItems.fontStyle) &&
-                        primaryMenuItems.opacity && <Separator />}
-                    {primaryMenuItems.opacity && (
-                        <Item>
-                            Opacity:&nbsp;
-                            <StyledInput
-                                type="range"
-                                min="0"
-                                max="1"
-                                step="0.01"
-                                value={primaryMenuItems.values.opacity}
-                                onChange={(e) => {
-                                    const opacity = parseFloat(e.target.value);
-                                    setPrimaryMenuItems({
-                                        ...primaryMenuItems,
-                                        values: { ...primaryMenuItems.values, opacity },
-                                    });
-                                    groupSelection.forEach((id) => {
-                                        handleChange(id, { opacity });
-                                    });
+                <div>
+                    {colorPalette && (
+                        <ColorPaletteContainer ref={colorPaletteRef}>
+                            {activity.color_palette.colors.map((color, i) => {
+                                return (
+                                    <ColorCircle
+                                        key={i}
+                                        onClick={() => {
+                                            console.log(color);
+                                        }}
+                                        style={{ backgroundColor: color }}
+                                    />
+                                );
+                            })}
+                            <PlusCircle
+                                onClick={() => {
+                                    console.log("add color");
                                 }}
-                            />
-                        </Item>
+                            >
+                                +
+                            </PlusCircle>
+                        </ColorPaletteContainer>
                     )}
-                </Menu1>
+                    <Menu1 ref={primaryMenuRef}>
+                        {primaryMenuItems.fill && (
+                            <Item
+                                ref={fillRef}
+                                onClick={() =>
+                                    setColorPalette(colorPalette !== "fill" ? "fill" : null)
+                                }
+                            >
+                                Fill
+                            </Item>
+                        )}
+                        {primaryMenuItems.stroke && (
+                            <Item
+                                ref={strokeRef}
+                                onClick={() =>
+                                    setColorPalette(colorPalette !== "stroke" ? "stroke" : null)
+                                }
+                            >
+                                Stroke
+                            </Item>
+                        )}
+                        {primaryMenuItems.stroke && primaryMenuItems.fontStyle && <Separator />}
+                        {primaryMenuItems.fontStyle && <Item>Text Style</Item>}
+                        {(primaryMenuItems.stroke ||
+                            primaryMenuItems.fill ||
+                            primaryMenuItems.fontStyle) &&
+                            primaryMenuItems.opacity && <Separator />}
+                        {primaryMenuItems.opacity && (
+                            <Item>
+                                Opacity:&nbsp;
+                                <StyledInput
+                                    type="range"
+                                    min="0"
+                                    max="1"
+                                    step="0.01"
+                                    value={primaryMenuItems.values.opacity}
+                                    onChange={(e) => {
+                                        const opacity = parseFloat(e.target.value);
+                                        setPrimaryMenuItems({
+                                            ...primaryMenuItems,
+                                            values: { ...primaryMenuItems.values, opacity },
+                                        });
+                                        groupSelection.forEach((id) => {
+                                            handleChange(id, { opacity });
+                                        });
+                                    }}
+                                />
+                            </Item>
+                        )}
+                    </Menu1>
+                </div>
             )}
             {showSecondaryMenu && (
                 <Menu2
@@ -958,7 +1027,13 @@ const StyledInput = styled.input`
 `;
 
 const ColorPaletteContainer = styled.div`
-    width: 90px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 150px;
     padding: 10px;
     gap: 5px;
     background: ${color.white};
@@ -967,36 +1042,38 @@ const ColorPaletteContainer = styled.div`
 
 const ColorCircle = styled.div`
     cursor: pointer;
-    width: 20px;
-    height: 20px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    border: 1px solid ${color.black};
-    background-color: none;
-    margin: 5px;
 `;
 
 const PlusCircle = styled.div`
     cursor: pointer;
-    width: 20px;
-    height: 20px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    border: 1px solid ${color.black};
-    background-color: none;
-    margin: 5px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    border: 0.1px solid ${color.grey};
+    background-color: ${color.white};
+    text-align: center;
+    line-height: 35px;
+    font-size: 40px;
+    color: ${color.grey};
 `;
 
-function fitInFrame(x: number, y: number, width: number, height: number): [number, number] {
+function fitInFrame(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    padding: [number, number]
+): [number, number] {
     const margin = 70;
-    const padding = 10;
     // Check if menu is out of bounds
-    if (x < padding) x = padding;
-    if (x + width > window.innerWidth - padding) x = window.innerWidth - width - padding;
-    if (y < margin + padding) y = margin + padding;
-    if (y > window.innerHeight - height - margin - padding)
-        y = window.innerHeight - height - margin - padding;
+    if (x < padding[0]) x = padding[0];
+    if (x + width > window.innerWidth - padding[0]) x = window.innerWidth - width - padding[0];
+    if (y < margin + padding[1]) y = margin + padding[1];
+    if (y > window.innerHeight - height - margin - padding[1])
+        y = window.innerHeight - height - margin - padding[1];
 
     return [x, y];
 }
