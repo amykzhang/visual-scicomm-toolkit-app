@@ -181,6 +181,7 @@ export default function App() {
     });
 
     const [colorPalette, setColorPalette] = useState<"stroke" | "fill" | null>(null);
+    const [colorClicked, setColorClicked] = useState<string>("");
 
     function bringForward(id: string) {
         const index = elements.findIndex((element) => element.id === id);
@@ -726,6 +727,23 @@ export default function App() {
         colorPaletteRef.current.style.top = newY + "px";
     }, [colorPalette]);
 
+    useEffect(() => {
+        console.log("hello");
+        if (colorPalette === "fill") {
+            console.log("fill");
+            groupSelection.forEach((id) => {
+                console.log(elements.find((element) => element.id === id));
+                handleChange(id, { fill: colorClicked });
+            });
+        }
+        if (colorPalette === "stroke") {
+            groupSelection.forEach((id) => {
+                console.log(elements.find((element) => element.id === id));
+                handleChange(id, { stroke: colorClicked });
+            });
+        }
+    }, [colorClicked]);
+
     return (
         <div>
             <PanelsContainer>
@@ -885,9 +903,7 @@ export default function App() {
                                 return (
                                     <ColorCircle
                                         key={i}
-                                        onClick={() => {
-                                            console.log(color);
-                                        }}
+                                        onClick={() => setColorClicked(color)}
                                         style={{ backgroundColor: color }}
                                     />
                                 );
@@ -1045,6 +1061,7 @@ const ColorCircle = styled.div`
     width: 40px;
     height: 40px;
     border-radius: 50%;
+    border: 0.1px solid ${color.grey};
 `;
 
 const PlusCircle = styled.div`
