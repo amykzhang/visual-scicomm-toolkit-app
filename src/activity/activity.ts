@@ -56,6 +56,7 @@ export type Activity = {
         };
     };
     info: string;
+    color_palette: string[];
 };
 
 const activity_visual_strategies: Activity = {
@@ -91,30 +92,6 @@ const activity_visual_strategies: Activity = {
             </div>
         </div>
     `,
-    // task: [
-    //     {
-    //         container: "paragraph",
-    //         body: "You're a researcher who wants to describe the following process in a <b>visual diagram</b>. Can you design a communication piece using the elements provided in this activity?",
-    //     },
-    //     {
-    //         container: "focused_paragraph",
-    //         body: "The receptor Y is found in the cell membrane. The molecule X binds to the receptor. This triggers the release of proteins by an organelle in the cell.",
-    //     },
-    // ],
-    // instructions: [
-    //     {
-    //         step: "1. Understand the science",
-    //         body: "We start by researching the topic if we're unfamiliar with the science. This includes searching and referencing visuals, such as diagrams, created by others.",
-    //     },
-    //     {
-    //         step: "2. Design a communication piece",
-    //         body: "Once we have a good grasp of the science, we can communicate it to our target audience. We start considering the text that appears in the piece, the placement of visuals, and the balance between text and visuals.",
-    //     },
-    //     {
-    //         step: "3. Support your design choices",
-    //         body: "Place a comment next to different parts of your diagram and explain how you've made your design as effective as possible.",
-    //     },
-    // ],
     elements: {
         text: {
             heading: "Text",
@@ -418,8 +395,8 @@ const activity_visual_strategies: Activity = {
     },
     info: `
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque malesuada quis nulla a porta. Quisque aliquet eros at efficitur dictum. Morbi semper interdum hendrerit. Donec at leo ut augue fermentum pellentesque. Proin nec diam eu velit feugiat tempor. Proin placerat, odio fermentum fermentum ullamcorper, urna ante mattis erat, vel commodo quam dolor sit amet nulla. Donec neque quam, condimentum in tortor a, fermentum pellentesque lectus. Sed vitae lorem volutpat magna sagittis euismod.
-    
     `,
+    color_palette: ["#9b6bc4", "#7b94fb", " #e55a8a", "#f7b05a ", "#dddddd", "#737273 "],
 };
 
 export default activity_visual_strategies;

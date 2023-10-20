@@ -671,16 +671,28 @@ export default function App() {
     }, [groupSelection, elements]);
 
     useEffect(() => {
+        const margin = 70;
+        const padding = 10;
+
         if (showPrimaryMenu) {
             if (transformerRef.current !== null && primaryMenuRef.current !== null) {
                 const transformer = transformerRef.current;
                 const primaryMenu = primaryMenuRef.current;
+                const { width, height } = primaryMenu.getBoundingClientRect();
 
-                const x =
+                let x =
                     transformer.x() +
                     transformer.width() / 2 -
                     primaryMenu.getBoundingClientRect().width / 2;
-                const y = transformer.y() - 100;
+                let y = transformer.y() - 100;
+
+                // Check if menu is out of bounds
+                if (x < padding) x = padding;
+                if (x + width > window.innerWidth - padding)
+                    x = window.innerWidth - width - padding;
+                if (y < margin + padding) y = margin + padding;
+                if (y > window.innerHeight - height - margin - padding)
+                    y = window.innerHeight - height - margin - padding;
 
                 setPrimaryMenuPosition({
                     x: x,
@@ -763,7 +775,7 @@ export default function App() {
                         // reset wheeldelta
                         wheeldelta.x = 0;
                         wheeldelta.y = 0;
-                    }, 100);
+                    }, 250);
 
                     wheeldelta.x += e.evt.deltaX;
                     wheeldelta.y += e.evt.deltaY;
@@ -904,28 +916,28 @@ export default function App() {
 
 const Menu1 = styled.div`
     user-select: none;
-    z-index: 400;
     display: flex;
     flex-direction: row;
     position: absolute;
     top: 0;
     left: 0;
     border-radius: 5px;
-    background-color: ${color.lightBlue};
+    background: ${color.white};
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     padding: 5px;
     gap: 5px;
 `;
 
 const Menu2 = styled.div`
     user-select: none;
-    z-index: 401;
     display: flex;
     flex-direction: column;
     position: absolute;
     top: 0;
     left: 0;
     border-radius: 5px;
-    background-color: ${color.white};
+    background: ${color.white};
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     padding: 5px;
     gap: 5px;
 `;
@@ -952,4 +964,35 @@ const StyledInput = styled.input`
     height: 100%;
     color: ${color.black};
     background-color: ${color.white};
+`;
+
+const ColorPaletteContainer = styled.div`
+    width: 90px;
+    padding: 10px;
+    gap: 5px;
+    background: ${color.white};
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+`;
+
+const ColorCircle = styled.div`
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid ${color.black};
+    background-color: none;
+    margin: 5px;
+`;
+
+const PlusCircle = styled.div`
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid ${color.black};
+    background-color: none;
+    margin: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 `;
