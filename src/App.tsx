@@ -671,9 +671,6 @@ export default function App() {
     }, [groupSelection, elements]);
 
     useEffect(() => {
-        const margin = 70;
-        const padding = 10;
-
         if (showPrimaryMenu) {
             if (transformerRef.current !== null && primaryMenuRef.current !== null) {
                 const transformer = transformerRef.current;
@@ -686,17 +683,11 @@ export default function App() {
                     primaryMenu.getBoundingClientRect().width / 2;
                 let y = transformer.y() - 100;
 
-                // Check if menu is out of bounds
-                if (x < padding) x = padding;
-                if (x + width > window.innerWidth - padding)
-                    x = window.innerWidth - width - padding;
-                if (y < margin + padding) y = margin + padding;
-                if (y > window.innerHeight - height - margin - padding)
-                    y = window.innerHeight - height - margin - padding;
+                const [newX, newY] = fitInFrame(x, y, width, height);
 
                 setPrimaryMenuPosition({
-                    x: x,
-                    y: y,
+                    x: newX,
+                    y: newY,
                 });
             }
         } else setPrimaryMenuPosition({ x: -1000, y: -1000 });
@@ -996,3 +987,16 @@ const PlusCircle = styled.div`
     justify-content: center;
     align-items: center;
 `;
+
+function fitInFrame(x: number, y: number, width: number, height: number): [number, number] {
+    const margin = 70;
+    const padding = 10;
+    // Check if menu is out of bounds
+    if (x < padding) x = padding;
+    if (x + width > window.innerWidth - padding) x = window.innerWidth - width - padding;
+    if (y < margin + padding) y = margin + padding;
+    if (y > window.innerHeight - height - margin - padding)
+        y = window.innerHeight - height - margin - padding;
+
+    return [x, y];
+}
