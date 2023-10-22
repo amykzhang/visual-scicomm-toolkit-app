@@ -40,6 +40,7 @@ import typography from "./styles/typography";
 import constants from "./utils/constants";
 import { Tooltip } from "react-tooltip";
 import styled from "styled-components";
+import { v4 as uuid } from "uuid";
 
 interface ExitCommentStateProps {
     view: APP_VIEW;
@@ -183,16 +184,6 @@ export default function App() {
     const [colorPalette, setColorPalette] = useState<"stroke" | "fill" | null>(null);
     const [colorClicked, setColorClicked] = useState<string>("");
 
-    function bringForward(id: string) {
-        const index = elements.findIndex((element) => element.id === id);
-        if (index !== -1 && index !== elements.length - 1) {
-            setElements((elements) => {
-                [elements[index], elements[index + 1]] = [elements[index + 1], elements[index]];
-                return elements;
-            });
-        }
-    }
-
     const bringToFront = useCallback(
         (ids?: string[]) => {
             if (ids === undefined) {
@@ -210,16 +201,6 @@ export default function App() {
         [elements, groupSelection]
     );
 
-    function sendBackward(id: string) {
-        const index = elements.findIndex((element) => element.id === id);
-        if (index !== -1 && index !== 0) {
-            setElements((elements) => {
-                [elements[index], elements[index - 1]] = [elements[index - 1], elements[index]];
-                return elements;
-            });
-        }
-    }
-
     const sendToBack = useCallback(
         (ids?: string[]) => {
             if (ids === undefined) {
@@ -236,6 +217,24 @@ export default function App() {
         },
         [elements, groupSelection]
     );
+
+    const [clipboard, setClipboard] = useState<ElementProp[]>([]);
+
+    const copy = useCallback(() => {
+        setClipboard(elements.filter((element) => groupSelection.includes(element.id)));
+    }, [elements, groupSelection]);
+
+    const paste = useCallback(() => {
+        const newElements = clipboard.map((element) => {
+            const newElement = { ...element };
+            newElement.id = uuid();
+            newElement.x += 10;
+            newElement.y += 10;
+            return newElement;
+        });
+        setElements([...elements, ...newElements]);
+        setGroupSelection(newElements.map((element) => element.id));
+    }, [elements, clipboard]);
 
     // -- KEY PRESSES --
     const handleKeyDown = useCallback(
@@ -275,6 +274,12 @@ export default function App() {
                         break;
                     case "]":
                         bringToFront();
+                        break;
+                    case "c":
+                        if (e.metaKey) copy();
+                        break;
+                    case "v":
+                        if (e.metaKey) paste();
                         break;
                     default:
                         break;
@@ -346,6 +351,11 @@ export default function App() {
             setView,
             bringToFront,
             sendToBack,
+            copy,
+            paste,
+            zoomFit,
+            zoomIn,
+            zoomOut,
         ]
     );
 
@@ -448,10 +458,15 @@ export default function App() {
         e.evt.preventDefault();
         e.evt.stopPropagation();
 
-        if (e.target === stageRef.current || e.target === exportAreaRef.current) return;
-
-        setShowSecondaryMenu(true);
-        setSecondaryMenuPosition({ x: e.evt.clientX, y: e.evt.clientY });
+        if (view !== APP_VIEW.select) return;
+        const isNonEmpty = e.target !== stageRef.current && e.target !== exportAreaRef.current;
+        const isGroupSelection = groupSelection.includes(e.target.id());
+        console.log(e.target, isNonEmpty, isGroupSelection);
+        if (!isGroupSelection) selectElement(e.target.id());
+        if (isNonEmpty) {
+            setShowSecondaryMenu(true);
+            setSecondaryMenuPosition({ x: e.evt.clientX, y: e.evt.clientY });
+        }
     };
 
     const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
@@ -728,21 +743,17 @@ export default function App() {
     }, [colorPalette]);
 
     useEffect(() => {
-        console.log("hello");
         if (colorPalette === "fill") {
-            console.log("fill");
             groupSelection.forEach((id) => {
-                console.log(elements.find((element) => element.id === id));
                 handleChange(id, { fill: colorClicked });
             });
         }
         if (colorPalette === "stroke") {
             groupSelection.forEach((id) => {
-                console.log(elements.find((element) => element.id === id));
                 handleChange(id, { stroke: colorClicked });
             });
         }
-    }, [colorClicked]);
+    }, [colorClicked, colorPalette, groupSelection]);
 
     return (
         <div>
@@ -910,7 +921,7 @@ export default function App() {
                             })}
                             <PlusCircle
                                 onClick={() => {
-                                    console.log("add color");
+                                    console.log("Color Picker");
                                 }}
                             >
                                 +
@@ -976,14 +987,47 @@ export default function App() {
                         left: secondaryMenuPosition.x,
                     }}
                 >
-                    <Item>Copy</Item>
-                    <Item>Paste</Item>
-                    <Item>Delete</Item>
+                    <Item
+                        onClick={() => {
+                            copy();
+                            setShowSecondaryMenu(false);
+                        }}
+                    >
+                        Copy
+                    </Item>
+                    <Item
+                        onClick={() => {
+                            paste();
+                            setShowSecondaryMenu(false);
+                        }}
+                    >
+                        Paste
+                    </Item>
+                    <Item
+                        onClick={() => {
+                            deleteSelected();
+                            setShowSecondaryMenu(false);
+                        }}
+                    >
+                        Delete
+                    </Item>
                     <Separator />
-                    <Item>Bring Forward</Item>
-                    <Item>Send Backward</Item>
-                    <Item>Bring to Front</Item>
-                    <Item>Send to Back</Item>
+                    <Item
+                        onClick={() => {
+                            bringToFront(groupSelection);
+                            setShowSecondaryMenu(false);
+                        }}
+                    >
+                        Bring to Front
+                    </Item>
+                    <Item
+                        onClick={() => {
+                            sendToBack(groupSelection);
+                            setShowSecondaryMenu(false);
+                        }}
+                    >
+                        Send to Back
+                    </Item>
                 </Menu2>
             )}
         </div>
@@ -1029,10 +1073,6 @@ const Separator = styled.div`
     border: 1px solid #000000;
     border-radius: 5px;
     margin: 5px;
-`;
-
-const Submenu = styled.div`
-    background-color: red;
 `;
 
 const StyledInput = styled.input`
