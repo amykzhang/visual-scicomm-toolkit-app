@@ -21,7 +21,6 @@ const ShapeElement = ({ shape, draggable, handleChange }: ShapeElementProp) => {
             {...shape}
             ref={shapeRef as any}
             draggable={draggable}
-            strokeScaleEnabled={false}
             radius={shape.width / 2} // For Circle
             sides={3} // For Triangle
             // onDragStart={handleDragStart}
