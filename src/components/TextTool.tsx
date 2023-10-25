@@ -1,46 +1,33 @@
-import { useApp } from "@tldraw/tldraw";
-import "@tldraw/tldraw/editor.css";
-import { useEffect } from "react";
-import { track } from "signia-react";
 import styled from "styled-components";
+import color from "../styles/color";
 
-const StyledTextContainer = styled.div``;
+const StyledTextContainer = styled.div`
+    padding: 2px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
 
-const StyledTextButton = styled.button`
-    background: white;
-    border: 1px solid lightblue;
-    border-radius: 0px;
+    &:hover,
+    &[data-isactive="true"] {
+        background: ${color.lightBlue};
+    }
 `;
 
-export const TextTool = track(() => {
-    const app = useApp();
+const StyledTextButton = styled.button`
+    background: transparent;
+    border: 1.8px solid ${color.lightBlue};
+    cursor: pointer;
+`;
 
-    useEffect(() => {
-        const handleKeyUp = (e: KeyboardEvent) => {
-            switch (e.key) {
-                case "Delete":
-                case "Backspace": {
-                    app.deleteShapes();
-                }
-            }
-        };
+interface TextToolProps {
+    isTextMode: boolean;
+    toggleTextMode: () => void;
+}
 
-        window.addEventListener("keyup", handleKeyUp);
-        return () => {
-            window.removeEventListener("keyup", handleKeyUp);
-        };
-    });
-
+export const TextTool = ({ isTextMode, toggleTextMode }: TextToolProps) => {
     return (
-        <StyledTextContainer>
-            <StyledTextButton
-                data-isactive={app.currentToolId === "text"}
-                onClick={() =>
-                    app.setSelectedTool("text", { "data-font": "sans" })
-                }
-            >
-                Text Box
-            </StyledTextButton>
+        <StyledTextContainer data-isactive={isTextMode}>
+            <StyledTextButton onClick={toggleTextMode}>Text Box</StyledTextButton>
         </StyledTextContainer>
     );
-});
+};

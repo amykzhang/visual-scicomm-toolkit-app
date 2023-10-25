@@ -1,10 +1,29 @@
+const black = "#000000";
+const white = "#FFFFFF";
+const blue = "#3A89FF";
+const lightBlue = "#C0DDFF";
+const lighterBlue = "#EEF3F8";
+const yellow = "#FFF1D7";
+const darkerYellow = "#FFE142";
+const grey = "#D6D6D6";
+const lightGrey = "#ECECEC";
+const darkGrey = "#D9D9D9";
+const shapeGrey = "#737273";
+
 const color = {
-    primary: "#000000",
-    secondary: "#629FFC",
-    secondaryLight: "#D7E9FF",
-    tertiary: "#FFF6E3",
-    quaternary: "#D6D6D6",
-    background: "#FFFFFF",
+    black,
+    white,
+    blue,
+    lightBlue,
+    lighterBlue,
+    yellow,
+    darkerYellow,
+    grey,
+    lightGrey,
+    darkGrey,
+    shapeGrey,
+    canvasBackground: lightGrey,
+    commentViewBackground: darkGrey,
 };
 
 export default color;

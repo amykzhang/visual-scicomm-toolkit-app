@@ -1,31 +1,78 @@
-import React, { FC } from "react";
-import { useApp } from "@tldraw/tldraw";
+import { FC } from "react";
+import Konva from "konva";
 import styled from "styled-components";
-import { track } from "signia-react";
-
-interface IImageTool {
-    src: string;
-    name: string;
-}
+import { ElementProp, ImageProp } from "../utils/interfaces";
+import { v4 as uuid } from "uuid";
 
 const StyledImage = styled.img`
-    /* width: 40px;
-    height: 40px; */
+    cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+
+    &:active {
+        cursor: grabbing;
+        cursor: -moz-grabbing;
+        cursor: -webkit-grabbing;
+    }
 `;
 
-export const ImageTool: FC<IImageTool> = ({ src, name }) => {
-    const app = useApp();
+interface ImageToolProps {
+    src: string;
+    name: string;
+    dimensions: { width: number; height: number };
+    elements: ElementProp[];
+    setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>;
+    stageRef: React.MutableRefObject<Konva.Stage | null>;
+}
 
-    const handleImageClick = () => {
-        const imageShape = {
-            type: "image",
-            src: src,
-            // x: canvasState.cursor.x,
-            // y: canvasState.cursor.y,
-            width: 100, // Set your desired width
-            height: 100, // Set your desired height
-        };
+export const ImageTool: FC<ImageToolProps> = ({
+    src,
+    name,
+    dimensions,
+    elements,
+    setElements,
+    stageRef,
+}) => {
+    function addImage(x: number, y: number, offset: { x: number; y: number }) {
+        setElements([
+            ...elements,
+            {
+                id: uuid(),
+                type: "image",
+                x: x - offset.x,
+                y: y - offset.y,
+                width: dimensions.width,
+                height: dimensions.height,
+                src: src,
+                scaleX: 1,
+                scaleY: 1,
+                rotation: 0,
+                opacity: 1,
+            } as ImageProp,
+        ]);
+    }
+
+    const handleImageDragEnd = (e: React.DragEvent) => {
+        e.preventDefault();
+        if (stageRef.current !== null) {
+            const stage = stageRef.current;
+            const x = (e.clientX - stage.x()) / stage.scaleX();
+            const y = (e.clientY - stage.y()) / stage.scaleX();
+            addImage(x, y, {
+                x: dimensions.width / 2,
+                y: dimensions.height / 2,
+            });
+        }
     };
 
-    return <StyledImage src={src} title={name} />;
+    return (
+        <StyledImage
+            src={src}
+            title={name}
+            width={dimensions.width}
+            height={dimensions.height}
+            onDragEnd={handleImageDragEnd}
+        />
+    );
 };

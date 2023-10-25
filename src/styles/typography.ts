@@ -1,7 +1,8 @@
 import styled from "styled-components";
+import color from "./color";
 
 const LargeText = styled.p`
-    color: #000;
+    color: ${color.black};
     font-size: 20px;
     font-family: Quicksand;
     font-weight: 700;
@@ -10,7 +11,7 @@ const LargeText = styled.p`
 `;
 
 const MediumText = styled.p`
-    color: #000;
+    color: ${color.black};
     font-size: 17px;
     font-family: Roboto;
     margin: 0px;
@@ -22,7 +23,7 @@ const MediumText = styled.p`
 `;
 
 const BoldMediumText = styled.p`
-    color: #000;
+    color: ${color.black};
     font-size: 16px;
     font-family: Roboto-Medium;
     margin: 0px;
@@ -30,7 +31,7 @@ const BoldMediumText = styled.p`
 `;
 
 const SmallText = styled.p`
-    color: #000;
+    color: ${color.black};
     font-size: 14px;
     font-family: Roboto;
     margin: 0px;
