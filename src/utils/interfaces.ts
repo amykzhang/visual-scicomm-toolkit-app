@@ -31,6 +31,7 @@ interface BaseProp {
     scaleX: number;
     scaleY: number;
     rotation: number;
+    opacity: number;
 }
 
 export interface ImageProp extends BaseProp {

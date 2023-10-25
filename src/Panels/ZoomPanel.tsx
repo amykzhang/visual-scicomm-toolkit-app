@@ -58,7 +58,7 @@ export const ZoomPanel: React.FC<ZoomPanelProps> = ({
             <SquareButton
                 onClick={zoomFit}
                 {...constants.tooltip}
-                data-tooltip-content="Zoom to fit"
+                data-tooltip-content="Zoom to fit ⌘0"
             >
                 <FitToScreenIcon />
             </SquareButton>

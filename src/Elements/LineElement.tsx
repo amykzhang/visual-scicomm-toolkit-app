@@ -7,18 +7,11 @@ import constants from "../utils/constants";
 interface LineElementProp {
     line: LineProp;
     draggable: boolean;
-    handleSelect: () => void;
-    handleDragStart: () => void;
+    // handleDragStart: () => void;
     handleChange: (id: string, attributes: any) => void;
 }
 
-const LineElement = ({
-    line,
-    draggable,
-    handleSelect,
-    handleDragStart,
-    handleChange,
-}: LineElementProp) => {
+const LineElement = ({ line, draggable, handleChange }: LineElementProp) => {
     const lineRef = useRef<Konva.Line | null>(null);
 
     // Backdoor set line cap (Konva Bug, can't set linecap with string)
@@ -44,8 +37,7 @@ const LineElement = ({
             {...constants.line}
             ref={lineRef}
             draggable={draggable}
-            onClick={handleSelect}
-            onDragStart={handleDragStart}
+            // onDragStart={handleDragStart}
             onDragEnd={(e) =>
                 handleChange(line.id, {
                     x: e.target.x(),

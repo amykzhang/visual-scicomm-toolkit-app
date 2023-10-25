@@ -6,8 +6,7 @@ export const ExportArea: React.FC<{
     exportAreaRef: React.RefObject<Konva.Rect>;
     width: number;
     height: number;
-    onClick: (e: Konva.KonvaEventObject<MouseEvent>) => void;
-}> = ({ exportAreaRef, width, height, onClick }) => {
+}> = ({ exportAreaRef, width, height }) => {
     return (
         <Rect
             ref={exportAreaRef}
@@ -20,7 +19,6 @@ export const ExportArea: React.FC<{
             fill={color.white}
             stroke={color.darkGrey}
             strokeWidth={2}
-            onClick={onClick}
         />
     );
 };

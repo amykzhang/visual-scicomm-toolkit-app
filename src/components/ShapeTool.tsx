@@ -115,7 +115,7 @@ export const ShapeTool: FC<ShapeToolProps> = ({ shape, fill, elements, setElemen
                 rotation: 0,
                 fill: fill ? color.shapeGrey : "transparent",
                 stroke: fill ? "transparent" : color.shapeGrey,
-                strokeWidth: fill ? 0 : 2,
+                strokeWidth: 2,
                 shape: type,
             } as ShapeProp,
         ]);

@@ -11,7 +11,7 @@ import {
     CommentViewManager,
     DragSelectManager,
     DrawViewManager,
-} from "./managers";
+} from "./hooks";
 import {
     TitlePanel,
     ToolbarPanel,
@@ -39,6 +39,23 @@ import color from "./styles/color";
 import typography from "./styles/typography";
 import constants from "./utils/constants";
 import { Tooltip } from "react-tooltip";
+import styled from "styled-components";
+import { v4 as uuid } from "uuid";
+
+interface ExitCommentStateProps {
+    view: APP_VIEW;
+    setView: (view: APP_VIEW) => void;
+}
+
+const ExitCommentView: React.FC<ExitCommentStateProps> = ({ view, setView }) => {
+    const displayStyle = view === APP_VIEW.comment ? {} : { display: "none" };
+
+    return (
+        <ExitCommentViewButton style={displayStyle} onClick={() => setView(APP_VIEW.select)}>
+            <typography.LargeText>Exit Comment Mode</typography.LargeText>
+        </ExitCommentViewButton>
+    );
+};
 
 const activity = activity_visual_strategies;
 
@@ -58,6 +75,12 @@ let history: HistoryProp[] = [
 ];
 let historyStep = 0;
 
+let wheeldelta = {
+    x: 0,
+    y: 0,
+};
+let wheeling: any;
+
 export default function App() {
     const elementsLayerRef = useRef<Konva.Layer>(null);
     const exportAreaRef = useRef<Konva.Rect>(null);
@@ -65,7 +88,13 @@ export default function App() {
     const transformerRef = useRef<Konva.Transformer>(null);
     const lineRef = useRef<Konva.Line>(null);
 
+    const primaryMenuRef = useRef<HTMLDivElement | null>(null);
+    const fillRef = useRef<HTMLDivElement>(null);
+    const strokeRef = useRef<HTMLDivElement>(null);
+    const colorPaletteRef = useRef<HTMLDivElement | null>(null);
+
     const [shiftKey, setShiftKey] = useState(false);
+    const [isWheeling, setIsWheeling] = useState(false);
 
     // App State (stage position, zoom, view, panels)
     const [uiState, setUiState] = useState<UiStateProp>(initialUiState);
@@ -80,11 +109,6 @@ export default function App() {
         },
         [uiState]
     );
-
-    // Dragging Behaviour depending on View
-    const stageConstants = {
-        draggable: view === APP_VIEW.pan,
-    };
 
     // Stage View
     const { stageRef, handleWheel, zoomLevel, zoomIn, zoomOut, zoomFit, toggleFullscreen } =
@@ -101,10 +125,10 @@ export default function App() {
     // --- MANAGERS FOR VIEWS ---
 
     // Selection
-    const { handleSelect, handleDragStart, deleteSelected } = SelectionManager(
+    const { selectElement, deleteSelected } = SelectionManager(
         setElements,
-        view,
-        setView,
+        // view,
+        // setView,
         shiftKey,
         groupSelection,
         setGroupSelection
@@ -139,15 +163,40 @@ export default function App() {
         toggleDrawMode,
     } = DrawViewManager(view, setView, setElements, stageRef);
 
-    function bringForward(id: string) {
-        const index = elements.findIndex((element) => element.id === id);
-        if (index !== -1 && index !== elements.length - 1) {
-            setElements((elements) => {
-                [elements[index], elements[index + 1]] = [elements[index + 1], elements[index]];
-                return elements;
-            });
-        }
-    }
+    // --- CONTEXT MENU ---
+    const [showPrimaryMenu, setShowPrimaryMenu] = useState(false);
+    const [showSecondaryMenu, setShowSecondaryMenu] = useState(false);
+    const [secondaryMenuPosition, setSecondaryMenuPosition] = useState({ x: -1000, y: -1000 });
+    const [primaryMenuItems, setPrimaryMenuItems] = useState<{
+        stroke: boolean;
+        fill: boolean;
+        fontStyle: boolean;
+        opacity: boolean;
+        values: any;
+    }>({
+        stroke: true,
+        fill: true,
+        fontStyle: true,
+        opacity: true,
+        values: { opacity: 1 },
+    });
+    const [secondaryMenuItems, setSecondaryMenuItems] = useState<{
+        copy: boolean;
+        paste: boolean;
+        delete: boolean;
+        bringToFront: boolean;
+        sendToBack: boolean;
+    }>({
+        copy: true,
+        paste: true,
+        delete: true,
+        bringToFront: true,
+        sendToBack: true,
+    });
+    const [contextPointer, setContextPointer] = useState({ x: 0, y: 0 });
+
+    const [colorPalette, setColorPalette] = useState<"stroke" | "fill" | null>(null);
+    const [colorClicked, setColorClicked] = useState<string>("");
 
     const bringToFront = useCallback(
         (ids?: string[]) => {
@@ -166,16 +215,6 @@ export default function App() {
         [elements, groupSelection]
     );
 
-    function sendBackward(id: string) {
-        const index = elements.findIndex((element) => element.id === id);
-        if (index !== -1 && index !== 0) {
-            setElements((elements) => {
-                [elements[index], elements[index - 1]] = [elements[index - 1], elements[index]];
-                return elements;
-            });
-        }
-    }
-
     const sendToBack = useCallback(
         (ids?: string[]) => {
             if (ids === undefined) {
@@ -193,10 +232,54 @@ export default function App() {
         [elements, groupSelection]
     );
 
+    const [clipboard, setClipboard] = useState<ElementProp[]>([]);
+
+    const copy = useCallback(() => {
+        setClipboard(elements.filter((element) => groupSelection.includes(element.id)));
+    }, [elements, groupSelection]);
+
+    const paste = useCallback(
+        (x?: number, y?: number) => {
+            if (x === undefined || y === undefined) {
+                const newElements = clipboard.map((element) => {
+                    const newElement = { ...element };
+                    newElement.id = uuid();
+                    newElement.x += 10;
+                    newElement.y += 10;
+                    return newElement;
+                });
+
+                setElements([...elements, ...newElements]);
+                setGroupSelection(newElements.map((element) => element.id));
+            } else {
+                const relX = Math.min(...clipboard.map((element) => element.x));
+                const relY = Math.min(...clipboard.map((element) => element.y));
+
+                const newElements = clipboard.map((element) => {
+                    const newElement = { ...element };
+                    newElement.id = uuid();
+                    newElement.x = newElement.x - relX + x;
+                    newElement.y = newElement.y - relY + y;
+                    return newElement;
+                });
+
+                setElements([...elements, ...newElements]);
+                setGroupSelection(newElements.map((element) => element.id));
+            }
+        },
+        [elements, clipboard]
+    );
+
     // -- KEY PRESSES --
     const handleKeyDown = useCallback(
         (e: KeyboardEvent) => {
             if (e.key === "Shift") setShiftKey(true);
+            if (e.metaKey && (e.key === "=" || e.key === "-" || e.key === "0")) {
+                e.preventDefault();
+                if (e.key === "=") zoomIn();
+                if (e.key === "-") zoomOut();
+                if (e.key === "0") zoomFit();
+            }
 
             // SELECT VIEW
             if (view === APP_VIEW.select) {
@@ -225,6 +308,12 @@ export default function App() {
                         break;
                     case "]":
                         bringToFront();
+                        break;
+                    case "c":
+                        if (e.metaKey) copy();
+                        break;
+                    case "v":
+                        if (e.metaKey) paste();
                         break;
                     default:
                         break;
@@ -296,6 +385,11 @@ export default function App() {
             setView,
             bringToFront,
             sendToBack,
+            copy,
+            paste,
+            zoomFit,
+            zoomIn,
+            zoomOut,
         ]
     );
 
@@ -319,8 +413,7 @@ export default function App() {
                     key={image.id}
                     image={image}
                     draggable={draggable}
-                    handleSelect={handleSelect(image.id)}
-                    handleDragStart={handleDragStart(image.id)}
+                    // handleDragStart={handleDragStart(image.id)}
                     handleChange={handleChange}
                 />
             );
@@ -331,8 +424,7 @@ export default function App() {
                     key={shape.id}
                     shape={shape}
                     draggable={draggable}
-                    handleSelect={handleSelect(shape.id)}
-                    handleDragStart={handleDragStart(shape.id)}
+                    // handleDragStart={handleDragStart(shape.id)}
                     handleChange={handleChange}
                 />
             );
@@ -345,8 +437,7 @@ export default function App() {
                     draggable={draggable}
                     isJustCreated={justCreated === text.id}
                     isSelected={groupSelection.length === 1 && groupSelection.includes(text.id)}
-                    handleSelect={handleSelect(text.id)}
-                    handleDragStart={handleDragStart(text.id)}
+                    // handleDragStart={handleDragStart(text.id)}
                     handleChange={handleChange}
                     editText={editText}
                     transformerRef={transformerRef}
@@ -359,8 +450,7 @@ export default function App() {
                     key={line.id}
                     line={line}
                     draggable={draggable}
-                    handleSelect={handleSelect(line.id)}
-                    handleDragStart={handleDragStart(line.id)}
+                    // handleDragStart={handleDragStart(line.id)}
                     handleChange={handleChange}
                 />
             );
@@ -368,9 +458,17 @@ export default function App() {
     }
 
     // Handle click off stage for all views
-    function handleCanvasClick(e: Konva.KonvaEventObject<MouseEvent>) {
+    function handleStageClick(e: Konva.KonvaEventObject<MouseEvent>) {
+        if (e.evt.button !== 0) return; // Only handle left click
+        if (stageRef.current === null || exportAreaRef.current === null) return;
+
         switch (view) {
             case APP_VIEW.select:
+                if (e.target === stageRef.current || e.target === exportAreaRef.current) {
+                    setGroupSelection([]);
+                } else {
+                    selectElement(e.target.id());
+                }
                 break;
             case APP_VIEW.pan:
                 // do something for pan view
@@ -389,6 +487,45 @@ export default function App() {
         }
     }
 
+    const handleContextMenu = (e: Konva.KonvaEventObject<MouseEvent>) => {
+        e.evt.preventDefault();
+        e.evt.stopPropagation();
+
+        if (view !== APP_VIEW.select) return;
+        const isEmpty = e.target === stageRef.current || e.target === exportAreaRef.current;
+        const isGroupSelection = groupSelection.includes(e.target.id());
+
+        if (!isGroupSelection) selectElement(e.target.id());
+        if (!isEmpty) {
+            setSecondaryMenuItems({
+                copy: true,
+                paste: true,
+                delete: true,
+                bringToFront: true,
+                sendToBack: true,
+            });
+        } else {
+            setSecondaryMenuItems({
+                copy: false,
+                paste: true,
+                delete: false,
+                bringToFront: false,
+                sendToBack: false,
+            });
+        }
+
+        setShowSecondaryMenu(true);
+        setSecondaryMenuPosition({ x: e.evt.clientX, y: e.evt.clientY });
+
+        if (stageRef.current !== null) {
+            const stage = stageRef.current;
+            setContextPointer({
+                x: (e.evt.clientX - stage.x()) / stage.scaleX(),
+                y: (e.evt.clientY - stage.y()) / stage.scaleY(),
+            });
+        }
+    };
+
     const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
         if (view === APP_VIEW.select) {
             if (stageRef.current === null) return;
@@ -398,6 +535,8 @@ export default function App() {
             if (e.target === stage || e.target === exportAreaRef.current) {
                 handleDragSelectMouseDown(e);
             }
+
+            setShowSecondaryMenu(false);
         } else if (view === APP_VIEW.draw) {
             handleDrawMouseDown(e);
         }
@@ -412,18 +551,13 @@ export default function App() {
     };
 
     const handleMouseUp = (e: Konva.KonvaEventObject<MouseEvent>) => {
-        if (view === APP_VIEW.select && isSelectionMode) {
-            handleDragSelectMouseUp(e);
+        if (view === APP_VIEW.select) {
+            if (isSelectionMode) handleDragSelectMouseUp(e);
         }
         if (view === APP_VIEW.draw) {
             handleDrawMouseUp(e);
         }
     };
-
-    // Group Selection
-    useEffect(() => {
-        setGroupSelection(elementsWithinBounds);
-    }, [elementsWithinBounds]);
 
     // --- HISTORY ---
 
@@ -452,6 +586,11 @@ export default function App() {
     useEffect(() => {
         persistance.persistCanvasState(elements, comments);
     }, [elements, comments]);
+
+    // Group Selection
+    useEffect(() => {
+        setGroupSelection(elementsWithinBounds);
+    }, [elementsWithinBounds]);
 
     // Save UI state
     useEffect(() => {
@@ -543,6 +682,139 @@ export default function App() {
         }
     }, [groupSelection]);
 
+    useEffect(() => {
+        // Show primary menu if there is a selection
+        if (groupSelection.length > 0 && !isWheeling) {
+            setShowPrimaryMenu(true);
+        } else {
+            setShowPrimaryMenu(false);
+        }
+        setColorPalette(null);
+    }, [groupSelection, isWheeling]);
+
+    useEffect(() => {
+        // Setting primary menu items
+        const selectedElements = elements.filter((element) => groupSelection.includes(element.id));
+        let someImage = false;
+        let someShape = false;
+        let someText = false;
+        let someLine = false;
+        selectedElements.forEach((element) => {
+            if (element.type === "image") someImage = true;
+            else if (element.type === "shape") someShape = true;
+            else if (element.type === "text") someText = true;
+            else if (element.type === "line") someLine = true;
+        });
+
+        const showStroke = (someShape || someLine) && !someImage && !someText;
+        const showFill = someShape && !someLine && !someImage && !someText;
+        const showTextStyle = someText && !someShape && !someLine && !someImage;
+        const showOpacity = someShape || someImage || someLine || someText;
+
+        let stroke = {};
+        let fill = {};
+        let fontStyle = {};
+        let opacity = {};
+        if (showStroke) {
+            const shapesAndLines = selectedElements as (ShapeProp | LineProp)[];
+            const sameColor = shapesAndLines.every(
+                (element) => element.stroke === shapesAndLines[0].stroke
+            );
+            stroke = { stroke: sameColor ? shapesAndLines[0].stroke : "#000000" };
+        }
+        if (showFill) {
+            const shapes = selectedElements as ShapeProp[];
+            const sameColor = shapes.every((element) => element.fill === shapes[0].fill);
+            fill = { fill: sameColor ? shapes[0].fill : "#000000" };
+        }
+        if (showTextStyle) {
+            const texts = selectedElements as TextProp[];
+            const sameStyle = texts.every((element) => element.fontStyle === texts[0].fontStyle);
+            fontStyle = { fontStyle: sameStyle ? texts[0].fontStyle : "normal" };
+        }
+        if (showOpacity) {
+            const elements = selectedElements as (ShapeProp | ImageProp | LineProp | TextProp)[];
+            const sameOpacity = elements.every(
+                (element) => element.opacity === elements[0].opacity
+            );
+            opacity = { opacity: sameOpacity ? elements[0].opacity : 1 };
+        }
+
+        setPrimaryMenuItems({
+            stroke: showStroke,
+            fill: showFill,
+            fontStyle: showTextStyle,
+            opacity: showOpacity,
+            values: { ...stroke, ...fill, ...fontStyle, ...opacity },
+        });
+    }, [groupSelection, elements]);
+
+    useEffect(() => {
+        if (primaryMenuRef.current !== null && transformerRef.current !== null) {
+            const transformer = transformerRef.current;
+            const primaryMenu = primaryMenuRef.current;
+
+            if (showPrimaryMenu) {
+                const { width, height } = primaryMenu.getBoundingClientRect();
+
+                let x =
+                    transformer.x() +
+                    transformer.width() / 2 -
+                    primaryMenu.getBoundingClientRect().width / 2;
+                let y = transformer.y() - 100;
+
+                const [newX, newY] = fitInFrame(x, y, width, height, [10, 10]);
+
+                primaryMenu.style.left = newX + "px";
+                primaryMenu.style.top = newY + "px";
+            } else {
+                primaryMenu.style.left = "";
+                primaryMenu.style.top = "";
+            }
+        }
+    }, [groupSelection, showPrimaryMenu]);
+
+    useEffect(() => {
+        if (primaryMenuRef.current === null || colorPaletteRef.current === null) return;
+        const menu = primaryMenuRef.current.getBoundingClientRect();
+        const palette = colorPaletteRef.current.getBoundingClientRect();
+
+        let buttonX = 0;
+        let buttonW = 0;
+        if (colorPalette === "fill" && fillRef.current !== null) {
+            buttonX = fillRef.current.getBoundingClientRect().x;
+            buttonW = fillRef.current.getBoundingClientRect().width;
+        } else if (colorPalette === "stroke" && strokeRef.current !== null) {
+            buttonX = strokeRef.current.getBoundingClientRect().x;
+            buttonW = strokeRef.current.getBoundingClientRect().width;
+        }
+        let x = buttonX + buttonW / 2 - palette.width / 2;
+        let y = menu.y - palette.height;
+        const [newX, newY] = fitInFrame(x, y, palette.width, palette.height, [
+            10,
+            menu.height + 10,
+        ]);
+
+        colorPaletteRef.current.style.left = newX + "px";
+        colorPaletteRef.current.style.top = newY + "px";
+    }, [colorPalette]);
+
+    useEffect(() => {
+        if (colorClicked === "") return;
+
+        if (colorPalette === "fill") {
+            groupSelection.forEach((id) => {
+                handleChange(id, { fill: colorClicked });
+            });
+        }
+        if (colorPalette === "stroke") {
+            groupSelection.forEach((id) => {
+                handleChange(id, { stroke: colorClicked });
+            });
+        }
+        setColorClicked("");
+    }, [colorClicked, colorPalette, groupSelection]);
+
     return (
         <div>
             <PanelsContainer>
@@ -592,39 +864,38 @@ export default function App() {
                         toggleFullscreen={toggleFullscreen}
                     />
                 </BottomZone>
-                <Tooltip
-                    id="ui-tooltip"
-                    style={{
-                        borderRadius: "2px",
-                        fontSize: "12px",
-                        padding: "6px 10px",
-                    }}
-                />
+                <Tooltip id="ui-tooltip" />
             </PanelsContainer>
             <Stage
+                draggable={view === APP_VIEW.pan}
                 width={window.innerWidth}
                 height={window.innerHeight}
-                onWheel={handleWheel}
-                // handle unfocus/click on stage
-                onClick={(e) => {
-                    if (e.target === stageRef.current) handleCanvasClick(e);
+                onWheel={(e) => {
+                    setIsWheeling(true);
+                    handleWheel(e);
+
+                    clearTimeout(wheeling);
+                    wheeling = setTimeout(function () {
+                        setIsWheeling(false);
+                        wheeling = undefined;
+                        // reset wheeldelta
+                        wheeldelta.x = 0;
+                        wheeldelta.y = 0;
+                    }, 250);
+
+                    wheeldelta.x += e.evt.deltaX;
+                    wheeldelta.y += e.evt.deltaY;
                 }}
+                // handle unfocus/click on stage
+                onClick={handleStageClick}
+                onContextMenu={handleContextMenu}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
-                onContextMenu={(e) => {
-                    e.evt.preventDefault();
-                }}
                 ref={stageRef}
-                {...stageConstants}
             >
                 <Layer>
-                    <ExportArea
-                        exportAreaRef={exportAreaRef}
-                        {...activity.canvas_size}
-                        // handle unfocus/click on stage (for export area since it is a rect element technically)
-                        onClick={handleCanvasClick}
-                    />
+                    <ExportArea exportAreaRef={exportAreaRef} {...activity.canvas_size} />
                     <Rect // Selection Rectangle Bounding Box
                         visible={isSelectionMode && view === APP_VIEW.select}
                         ref={selectionRectRef}
@@ -637,7 +908,14 @@ export default function App() {
                         strokeWidth={2}
                         opacity={0.25}
                     />
-                    {isDrawing && <Line ref={lineRef} {...constants.line} points={points} />}
+                    {isDrawing && (
+                        <Line
+                            ref={lineRef}
+                            {...constants.line}
+                            stroke={color.black}
+                            points={points}
+                        />
+                    )}
                 </Layer>
                 <Layer ref={elementsLayerRef} id="elements-layer">
                     {elements.map((element, index) => elementToReactElement(element))}
@@ -655,6 +933,10 @@ export default function App() {
                             }
                             return newBox;
                         }}
+                        onDragStart={() => setShowPrimaryMenu(false)}
+                        onDragEnd={() => setShowPrimaryMenu(true)}
+                        onTransformStart={() => setShowPrimaryMenu(false)}
+                        onTransformEnd={() => setShowPrimaryMenu(true)}
                     />
                 </Layer>
                 <Layer id="comment-layer">
@@ -676,21 +958,251 @@ export default function App() {
                         })}
                 </Layer>
             </Stage>
+
+            {showPrimaryMenu && (
+                <div>
+                    {colorPalette && (
+                        <ColorPaletteContainer ref={colorPaletteRef}>
+                            {activity.color_palette.colors.map((color, i) => {
+                                return (
+                                    <ColorCircle
+                                        key={i}
+                                        onClick={() => setColorClicked(color)}
+                                        style={{ backgroundColor: color }}
+                                    />
+                                );
+                            })}
+                            <PlusCircle
+                                onClick={() => {
+                                    console.log("Color Picker");
+                                }}
+                            >
+                                +
+                            </PlusCircle>
+                        </ColorPaletteContainer>
+                    )}
+                    <Menu1 ref={primaryMenuRef}>
+                        {primaryMenuItems.fill && (
+                            <Item
+                                data-isactive={colorPalette === "fill"}
+                                ref={fillRef}
+                                onClick={() => {
+                                    setColorPalette(colorPalette !== "fill" ? "fill" : null);
+                                }}
+                            >
+                                Fill
+                            </Item>
+                        )}
+                        {primaryMenuItems.stroke && (
+                            <Item
+                                data-isactive={colorPalette === "stroke"}
+                                ref={strokeRef}
+                                onClick={() => {
+                                    setColorPalette(colorPalette !== "stroke" ? "stroke" : null);
+                                }}
+                            >
+                                Stroke
+                            </Item>
+                        )}
+                        {primaryMenuItems.stroke && primaryMenuItems.fontStyle && <Separator />}
+                        {primaryMenuItems.fontStyle && <Item>Text Style</Item>}
+                        {(primaryMenuItems.stroke ||
+                            primaryMenuItems.fill ||
+                            primaryMenuItems.fontStyle) &&
+                            primaryMenuItems.opacity && <Separator />}
+                        {primaryMenuItems.opacity && (
+                            <Item>
+                                Opacity:&nbsp;
+                                <StyledInput
+                                    type="range"
+                                    min="0"
+                                    max="1"
+                                    step="0.01"
+                                    value={primaryMenuItems.values.opacity}
+                                    onChange={(e) => {
+                                        const opacity = parseFloat(e.target.value);
+                                        setPrimaryMenuItems({
+                                            ...primaryMenuItems,
+                                            values: { ...primaryMenuItems.values, opacity },
+                                        });
+                                        groupSelection.forEach((id) => {
+                                            handleChange(id, { opacity });
+                                        });
+                                    }}
+                                />
+                            </Item>
+                        )}
+                    </Menu1>
+                </div>
+            )}
+            {showSecondaryMenu && (
+                <Menu2
+                    style={{
+                        top: secondaryMenuPosition.y,
+                        left: secondaryMenuPosition.x,
+                    }}
+                >
+                    {secondaryMenuItems.copy && (
+                        <Item
+                            onClick={() => {
+                                copy();
+                                setShowSecondaryMenu(false);
+                            }}
+                        >
+                            Copy
+                        </Item>
+                    )}
+                    {secondaryMenuItems.paste && (
+                        <Item
+                            onClick={() => {
+                                paste(contextPointer.x, contextPointer.y);
+                                setShowSecondaryMenu(false);
+                            }}
+                        >
+                            Paste
+                        </Item>
+                    )}
+                    {secondaryMenuItems.delete && (
+                        <Item
+                            onClick={() => {
+                                deleteSelected();
+                                setShowSecondaryMenu(false);
+                            }}
+                        >
+                            Delete
+                        </Item>
+                    )}
+                    {secondaryMenuItems.bringToFront && <Separator />}
+                    {secondaryMenuItems.bringToFront && (
+                        <Item
+                            onClick={() => {
+                                bringToFront(groupSelection);
+                                setShowSecondaryMenu(false);
+                            }}
+                        >
+                            Bring to Front
+                        </Item>
+                    )}
+                    {secondaryMenuItems.sendToBack && (
+                        <Item
+                            onClick={() => {
+                                sendToBack(groupSelection);
+                                setShowSecondaryMenu(false);
+                            }}
+                        >
+                            Send to Back
+                        </Item>
+                    )}
+                </Menu2>
+            )}
         </div>
     );
 }
 
-interface ExitCommentStateProps {
-    view: APP_VIEW;
-    setView: (view: APP_VIEW) => void;
+const Menu1 = styled.div`
+    user-select: none;
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 5px;
+    background: ${color.white};
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+    padding: 5px;
+    gap: 5px;
+`;
+
+const Menu2 = styled.div`
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 5px;
+    background: ${color.white};
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+    padding: 5px;
+    gap: 5px;
+`;
+
+const Item = styled.div`
+    cursor: pointer;
+    padding: 4px 10px;
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+
+    &:hover,
+    &[data-isactive="true"] {
+        background: ${color.lightBlue};
+    }
+`;
+
+const Separator = styled.span`
+    border: 1px solid ${color.grey};
+    border-radius: 5px;
+    margin: 5px;
+`;
+
+const StyledInput = styled.input`
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    color: ${color.black};
+    background-color: ${color.white};
+`;
+
+const ColorPaletteContainer = styled.div`
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 150px;
+    padding: 10px;
+    gap: 5px;
+    background: ${color.white};
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+`;
+
+const ColorCircle = styled.div`
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 0.1px solid ${color.grey};
+`;
+
+const PlusCircle = styled.div`
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 0.1px solid ${color.grey};
+    background-color: ${color.white};
+    text-align: center;
+    line-height: 35px;
+    font-size: 40px;
+    color: ${color.grey};
+`;
+
+function fitInFrame(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    padding: [number, number]
+): [number, number] {
+    const margin = 70;
+    // Check if menu is out of bounds
+    if (x < padding[0]) x = padding[0];
+    if (x + width > window.innerWidth - padding[0]) x = window.innerWidth - width - padding[0];
+    if (y < margin + padding[1]) y = margin + padding[1];
+    if (y > window.innerHeight - height - margin - padding[1])
+        y = window.innerHeight - height - margin - padding[1];
+
+    return [x, y];
 }
-
-const ExitCommentView: React.FC<ExitCommentStateProps> = ({ view, setView }) => {
-    const displayStyle = view === APP_VIEW.comment ? {} : { display: "none" };
-
-    return (
-        <ExitCommentViewButton style={displayStyle} onClick={() => setView(APP_VIEW.select)}>
-            <typography.LargeText>Exit Comment Mode</typography.LargeText>
-        </ExitCommentViewButton>
-    );
-};

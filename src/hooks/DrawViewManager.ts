@@ -41,8 +41,8 @@ export const DrawViewManager = (
     // ) => setElements((elements) => elements.filter((element) => element.id !== id));
 
     const handleDrawMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
-        setIsDrawing(true);
         if (stageRef.current !== null) {
+            setIsDrawing(true);
             const stage = stageRef.current;
             const x = (e.evt.clientX - stage.x()) / stage.scaleX();
             const y = (e.evt.clientY - stage.y()) / stage.scaleX();
