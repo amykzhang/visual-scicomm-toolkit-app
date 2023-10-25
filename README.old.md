@@ -117,61 +117,22 @@ DEADLINE:
 -   freehand draw (3h) ✅
 -   change group selection ✅
 -   tooltips✅
--   Add shortcuts for commands
--   Add support for chrome, safari, firefox, edge
--   contextmenu for copy paste change color etc.
-    -   left click:
-        -   shape, lines: stroke color (incl transparent, fill color (incl transparent), opacity)
-        -   text: fill color, style (bold, italic, underline, strikethrough), opacity
-        -   image: opacity,
-    -   right click: copy, paste, bring to front, send to back, delete
--   Landing Page in react App, rich text (html, css, js)
+-   Add shortcuts for commands✅
+-   contextmenu for copy paste change color etc.✅ - left click:✅ - shape, lines: stroke color (incl transparent, fill color (incl transparent), opacity) - text: fill color, style (bold, italic, underline, strikethrough), opacity - image: opacity, - right click: copy, paste, bring to front, send to back, delete✅
+<!-- -   Landing Page in react App, rich text (html, css, js) -->
 
+-   Add support for chrome, safari, firefox, edge
 -   pan: drag out sets view to select
 -   up down left right shortcut (shift in larget chunks)
+-   document code, how to deploy, how to run, how to test
+
+appearance fixes:
+
+-   pan: closed hand on mousedown, open hand on mouseup
+-   comment elements: just make aspect the same
 -   commment view: close sidebars
 
-Production and staging servers:
-document code, how to deploy, how to run, how to test
-comment: just make aspect the same
-little things:
-
--   overflow y
--   side effect on window vwvh change to update stage
--   pan: closed hand on mousedown, open hand on mouseup
-
-nice-to-haves:
-
--   elements: shift locks onto rails while dragging
--   shapes: shift to lock dimensions while resizing, lock onto dimensions
-
-October 6:: testing
-
-OCTOBER 8 :: APP DEADLINE
-
-OCTOBER 15 :: PAPER SUBMISSION DEADLINE
-
-buggies:
+bugs:
 
 -   fullscreen doesnt render stage when changing vw/vh
-
-context menu 1:
-
--   colour
--   stroke
-
-context menu 2:
-
--   text
-
-28 notes:
-
--   ContextMenu:
-    -   edit (text)
-    -   copy
-    -   paste
-    -   bring to front
-    -   send to back
-    -   delete
-    -   change color (shape)
-        ![ContextMenu](image.png)
+-   overflow y on sidebars

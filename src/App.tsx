@@ -180,6 +180,20 @@ export default function App() {
         opacity: true,
         values: { opacity: 1 },
     });
+    const [secondaryMenuItems, setSecondaryMenuItems] = useState<{
+        copy: boolean;
+        paste: boolean;
+        delete: boolean;
+        bringToFront: boolean;
+        sendToBack: boolean;
+    }>({
+        copy: true,
+        paste: true,
+        delete: true,
+        bringToFront: true,
+        sendToBack: true,
+    });
+    const [contextPointer, setContextPointer] = useState({ x: 0, y: 0 });
 
     const [colorPalette, setColorPalette] = useState<"stroke" | "fill" | null>(null);
     const [colorClicked, setColorClicked] = useState<string>("");
@@ -224,17 +238,37 @@ export default function App() {
         setClipboard(elements.filter((element) => groupSelection.includes(element.id)));
     }, [elements, groupSelection]);
 
-    const paste = useCallback(() => {
-        const newElements = clipboard.map((element) => {
-            const newElement = { ...element };
-            newElement.id = uuid();
-            newElement.x += 10;
-            newElement.y += 10;
-            return newElement;
-        });
-        setElements([...elements, ...newElements]);
-        setGroupSelection(newElements.map((element) => element.id));
-    }, [elements, clipboard]);
+    const paste = useCallback(
+        (x?: number, y?: number) => {
+            if (x === undefined || y === undefined) {
+                const newElements = clipboard.map((element) => {
+                    const newElement = { ...element };
+                    newElement.id = uuid();
+                    newElement.x += 10;
+                    newElement.y += 10;
+                    return newElement;
+                });
+
+                setElements([...elements, ...newElements]);
+                setGroupSelection(newElements.map((element) => element.id));
+            } else {
+                const relX = Math.min(...clipboard.map((element) => element.x));
+                const relY = Math.min(...clipboard.map((element) => element.y));
+
+                const newElements = clipboard.map((element) => {
+                    const newElement = { ...element };
+                    newElement.id = uuid();
+                    newElement.x = newElement.x - relX + x;
+                    newElement.y = newElement.y - relY + y;
+                    return newElement;
+                });
+
+                setElements([...elements, ...newElements]);
+                setGroupSelection(newElements.map((element) => element.id));
+            }
+        },
+        [elements, clipboard]
+    );
 
     // -- KEY PRESSES --
     const handleKeyDown = useCallback(
@@ -426,7 +460,6 @@ export default function App() {
     // Handle click off stage for all views
     function handleStageClick(e: Konva.KonvaEventObject<MouseEvent>) {
         if (e.evt.button !== 0) return; // Only handle left click
-
         if (stageRef.current === null || exportAreaRef.current === null) return;
 
         switch (view) {
@@ -459,13 +492,37 @@ export default function App() {
         e.evt.stopPropagation();
 
         if (view !== APP_VIEW.select) return;
-        const isNonEmpty = e.target !== stageRef.current && e.target !== exportAreaRef.current;
+        const isEmpty = e.target === stageRef.current || e.target === exportAreaRef.current;
         const isGroupSelection = groupSelection.includes(e.target.id());
-        console.log(e.target, isNonEmpty, isGroupSelection);
+
         if (!isGroupSelection) selectElement(e.target.id());
-        if (isNonEmpty) {
-            setShowSecondaryMenu(true);
-            setSecondaryMenuPosition({ x: e.evt.clientX, y: e.evt.clientY });
+        if (!isEmpty) {
+            setSecondaryMenuItems({
+                copy: true,
+                paste: true,
+                delete: true,
+                bringToFront: true,
+                sendToBack: true,
+            });
+        } else {
+            setSecondaryMenuItems({
+                copy: false,
+                paste: true,
+                delete: false,
+                bringToFront: false,
+                sendToBack: false,
+            });
+        }
+
+        setShowSecondaryMenu(true);
+        setSecondaryMenuPosition({ x: e.evt.clientX, y: e.evt.clientY });
+
+        if (stageRef.current !== null) {
+            const stage = stageRef.current;
+            setContextPointer({
+                x: (e.evt.clientX - stage.x()) / stage.scaleX(),
+                y: (e.evt.clientY - stage.y()) / stage.scaleY(),
+            });
         }
     };
 
@@ -927,6 +984,7 @@ export default function App() {
                     <Menu1 ref={primaryMenuRef}>
                         {primaryMenuItems.fill && (
                             <Item
+                                data-isactive={colorPalette === "fill"}
                                 ref={fillRef}
                                 onClick={() => {
                                     setColorPalette(colorPalette !== "fill" ? "fill" : null);
@@ -937,6 +995,7 @@ export default function App() {
                         )}
                         {primaryMenuItems.stroke && (
                             <Item
+                                data-isactive={colorPalette === "stroke"}
                                 ref={strokeRef}
                                 onClick={() => {
                                     setColorPalette(colorPalette !== "stroke" ? "stroke" : null);
@@ -983,47 +1042,57 @@ export default function App() {
                         left: secondaryMenuPosition.x,
                     }}
                 >
-                    <Item
-                        onClick={() => {
-                            copy();
-                            setShowSecondaryMenu(false);
-                        }}
-                    >
-                        Copy
-                    </Item>
-                    <Item
-                        onClick={() => {
-                            paste();
-                            setShowSecondaryMenu(false);
-                        }}
-                    >
-                        Paste
-                    </Item>
-                    <Item
-                        onClick={() => {
-                            deleteSelected();
-                            setShowSecondaryMenu(false);
-                        }}
-                    >
-                        Delete
-                    </Item>
-                    <Separator />
-                    <Item
-                        onClick={() => {
-                            bringToFront(groupSelection);
-                            setShowSecondaryMenu(false);
-                        }}
-                    >
-                        Bring to Front
-                    </Item>
-                    <Item
-                        onClick={() => {
-                            sendToBack(groupSelection);
-                            setShowSecondaryMenu(false);
-                        }}
-                    >
-                        Send to Back
-                    </Item>
+                    {secondaryMenuItems.copy && (
+                        <Item
+                            onClick={() => {
+                                copy();
+                                setShowSecondaryMenu(false);
+                            }}
+                        >
+                            Copy
+                        </Item>
+                    )}
+                    {secondaryMenuItems.paste && (
+                        <Item
+                            onClick={() => {
+                                paste(contextPointer.x, contextPointer.y);
+                                setShowSecondaryMenu(false);
+                            }}
+                        >
+                            Paste
+                        </Item>
+                    )}
+                    {secondaryMenuItems.delete && (
+                        <Item
+                            onClick={() => {
+                                deleteSelected();
+                                setShowSecondaryMenu(false);
+                            }}
+                        >
+                            Delete
+                        </Item>
+                    )}
+                    {secondaryMenuItems.bringToFront && <Separator />}
+                    {secondaryMenuItems.bringToFront && (
+                        <Item
+                            onClick={() => {
+                                bringToFront(groupSelection);
+                                setShowSecondaryMenu(false);
+                            }}
+                        >
+                            Bring to Front
+                        </Item>
+                    )}
+                    {secondaryMenuItems.sendToBack && (
+                        <Item
+                            onClick={() => {
+                                sendToBack(groupSelection);
+                                setShowSecondaryMenu(false);
+                            }}
+                        >
+                            Send to Back
+                        </Item>
+                    )}
                 </Menu2>
             )}
         </div>
@@ -1060,10 +1129,15 @@ const Menu2 = styled.div`
 
 const Item = styled.div`
     cursor: pointer;
-    background-color: ${color.lighterBlue};
     padding: 4px 10px;
     display: flex;
     align-items: center;
+    border-radius: 5px;
+
+    &:hover,
+    &[data-isactive="true"] {
+        background: ${color.lightBlue};
+    }
 `;
 
 const Separator = styled.span`
