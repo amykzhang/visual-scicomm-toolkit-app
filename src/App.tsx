@@ -743,6 +743,8 @@ export default function App() {
     }, [colorPalette]);
 
     useEffect(() => {
+        if (colorClicked === "") return;
+
         if (colorPalette === "fill") {
             groupSelection.forEach((id) => {
                 handleChange(id, { fill: colorClicked });
@@ -753,6 +755,7 @@ export default function App() {
                 handleChange(id, { stroke: colorClicked });
             });
         }
+        setColorClicked("");
     }, [colorClicked, colorPalette, groupSelection]);
 
     return (
@@ -804,14 +807,7 @@ export default function App() {
                         toggleFullscreen={toggleFullscreen}
                     />
                 </BottomZone>
-                <Tooltip
-                    id="ui-tooltip"
-                    // style={{
-                    //     borderRadius: "2px",
-                    //     fontSize: "12px",
-                    //     padding: "6px 10px",
-                    // }}
-                />
+                <Tooltip id="ui-tooltip" />
             </PanelsContainer>
             <Stage
                 draggable={view === APP_VIEW.pan}
@@ -932,9 +928,9 @@ export default function App() {
                         {primaryMenuItems.fill && (
                             <Item
                                 ref={fillRef}
-                                onClick={() =>
-                                    setColorPalette(colorPalette !== "fill" ? "fill" : null)
-                                }
+                                onClick={() => {
+                                    setColorPalette(colorPalette !== "fill" ? "fill" : null);
+                                }}
                             >
                                 Fill
                             </Item>
@@ -942,9 +938,9 @@ export default function App() {
                         {primaryMenuItems.stroke && (
                             <Item
                                 ref={strokeRef}
-                                onClick={() =>
-                                    setColorPalette(colorPalette !== "stroke" ? "stroke" : null)
-                                }
+                                onClick={() => {
+                                    setColorPalette(colorPalette !== "stroke" ? "stroke" : null);
+                                }}
                             >
                                 Stroke
                             </Item>
@@ -1063,19 +1059,21 @@ const Menu2 = styled.div`
 `;
 
 const Item = styled.div`
+    cursor: pointer;
     background-color: ${color.lighterBlue};
     padding: 4px 10px;
     display: flex;
     align-items: center;
 `;
 
-const Separator = styled.div`
-    border: 1px solid #000000;
+const Separator = styled.span`
+    border: 1px solid ${color.grey};
     border-radius: 5px;
     margin: 5px;
 `;
 
 const StyledInput = styled.input`
+    cursor: pointer;
     width: 100%;
     height: 100%;
     color: ${color.black};
