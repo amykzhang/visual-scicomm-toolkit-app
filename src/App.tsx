@@ -92,6 +92,8 @@ export default function App() {
     const fillRef = useRef<HTMLDivElement>(null);
     const strokeRef = useRef<HTMLDivElement>(null);
     const colorPaletteRef = useRef<HTMLDivElement | null>(null);
+    const styleRef = useRef<HTMLDivElement | null>(null);
+    const styleMenuRef = useRef<HTMLDivElement | null>(null);
 
     const [shiftKey, setShiftKey] = useState(false);
     const [isWheeling, setIsWheeling] = useState(false);
@@ -195,8 +197,15 @@ export default function App() {
     });
     const [contextPointer, setContextPointer] = useState({ x: 0, y: 0 });
 
-    const [colorPalette, setColorPalette] = useState<"stroke" | "fill" | null>(null);
-    const [colorClicked, setColorClicked] = useState<string>("");
+    const [submenuOption, setSubmenuOption] = useState<"stroke" | "fill" | "style" | null>(null);
+    const [colorSelected, setColorSelected] = useState<string | null>(null);
+    const [styleSelected, setStyleSelected] = useState<string | null>(null);
+    const [appliedStyles, setAppliedStyles] = useState({
+        bold: false,
+        italic: false,
+        underline: false,
+        strikethrough: false,
+    });
 
     const bringToFront = useCallback(
         (ids?: string[]) => {
@@ -689,7 +698,7 @@ export default function App() {
         } else {
             setShowPrimaryMenu(false);
         }
-        setColorPalette(null);
+        setSubmenuOption(null);
     }, [groupSelection, isWheeling]);
 
     useEffect(() => {
@@ -707,7 +716,7 @@ export default function App() {
         });
 
         const showStroke = (someShape || someLine) && !someImage && !someText;
-        const showFill = someShape && !someLine && !someImage && !someText;
+        const showFill = (someShape || someText) && !someLine && !someImage;
         const showTextStyle = someText && !someShape && !someLine && !someImage;
         const showOpacity = someShape || someImage || someLine || someText;
 
@@ -729,8 +738,24 @@ export default function App() {
         }
         if (showTextStyle) {
             const texts = selectedElements as TextProp[];
-            const sameStyle = texts.every((element) => element.fontStyle === texts[0].fontStyle);
-            fontStyle = { fontStyle: sameStyle ? texts[0].fontStyle : "normal" };
+            const sameStyle =
+                texts.every((element) => element.fontStyle === texts[0].fontStyle) &&
+                texts.every((element) => element.textDecoration === texts[0].textDecoration);
+            if (sameStyle) {
+                setAppliedStyles({
+                    bold: texts[0].fontStyle.includes("bold"),
+                    italic: texts[0].fontStyle.includes("italic"),
+                    underline: texts[0].textDecoration.includes("underline"),
+                    strikethrough: texts[0].textDecoration.includes("line-through"),
+                });
+            } else {
+                setAppliedStyles({
+                    bold: false,
+                    italic: false,
+                    underline: false,
+                    strikethrough: false,
+                });
+            }
         }
         if (showOpacity) {
             const elements = selectedElements as (ShapeProp | ImageProp | LineProp | TextProp)[];
@@ -775,16 +800,21 @@ export default function App() {
     }, [groupSelection, showPrimaryMenu]);
 
     useEffect(() => {
-        if (primaryMenuRef.current === null || colorPaletteRef.current === null) return;
+        if (
+            (submenuOption !== "fill" && submenuOption !== "stroke") ||
+            primaryMenuRef.current === null ||
+            colorPaletteRef.current === null
+        )
+            return;
         const menu = primaryMenuRef.current.getBoundingClientRect();
         const palette = colorPaletteRef.current.getBoundingClientRect();
 
         let buttonX = 0;
         let buttonW = 0;
-        if (colorPalette === "fill" && fillRef.current !== null) {
+        if (submenuOption === "fill" && fillRef.current !== null) {
             buttonX = fillRef.current.getBoundingClientRect().x;
             buttonW = fillRef.current.getBoundingClientRect().width;
-        } else if (colorPalette === "stroke" && strokeRef.current !== null) {
+        } else if (submenuOption === "stroke" && strokeRef.current !== null) {
             buttonX = strokeRef.current.getBoundingClientRect().x;
             buttonW = strokeRef.current.getBoundingClientRect().width;
         }
@@ -797,23 +827,79 @@ export default function App() {
 
         colorPaletteRef.current.style.left = newX + "px";
         colorPaletteRef.current.style.top = newY + "px";
-    }, [colorPalette]);
+    }, [submenuOption]);
 
     useEffect(() => {
-        if (colorClicked === "") return;
+        if (
+            submenuOption !== "style" ||
+            primaryMenuRef.current === null ||
+            styleMenuRef.current === null ||
+            styleRef.current === null
+        )
+            return;
 
-        if (colorPalette === "fill") {
+        const menu = primaryMenuRef.current.getBoundingClientRect();
+        const container = styleMenuRef.current.getBoundingClientRect();
+
+        const buttonX = styleRef.current.getBoundingClientRect().x;
+        const buttonW = styleRef.current.getBoundingClientRect().width;
+
+        let x = buttonX + buttonW / 2 - container.width / 2;
+        let y = menu.y - container.height - 5;
+        const [newX, newY] = fitInFrame(x, y, container.width, container.height, [
+            10,
+            menu.height + 10,
+        ]);
+
+        styleMenuRef.current.style.left = newX + "px";
+        styleMenuRef.current.style.top = newY + "px";
+    }, [submenuOption]);
+
+    useEffect(() => {
+        if (colorSelected === null) return;
+
+        if (submenuOption === "fill") {
             groupSelection.forEach((id) => {
-                handleChange(id, { fill: colorClicked });
+                handleChange(id, { fill: colorSelected });
             });
         }
-        if (colorPalette === "stroke") {
+        if (submenuOption === "stroke") {
             groupSelection.forEach((id) => {
-                handleChange(id, { stroke: colorClicked });
+                handleChange(id, { stroke: colorSelected });
             });
         }
-        setColorClicked("");
-    }, [colorClicked, colorPalette, groupSelection]);
+        setColorSelected(null);
+    }, [colorSelected, submenuOption, groupSelection]);
+
+    useEffect(() => {
+        if (styleSelected === null) return;
+
+        setAppliedStyles((appliedStyles) => {
+            let { bold, italic, underline, strikethrough } = appliedStyles;
+            if (styleSelected === "bold") bold = !bold;
+            if (styleSelected === "italic") italic = !italic;
+            if (styleSelected === "underline") underline = !underline;
+            if (styleSelected === "strikethrough") strikethrough = !strikethrough;
+
+            const fontStyle: string[] = [];
+            if (bold) fontStyle.push("bold");
+            if (italic) fontStyle.push("italic");
+            const textDecoration: string[] = [];
+            if (underline) textDecoration.push("underline");
+            if (strikethrough) textDecoration.push("line-through");
+
+            groupSelection.forEach((id) => handleChange(id, { fontStyle, textDecoration }));
+
+            return {
+                bold,
+                italic,
+                underline,
+                strikethrough,
+            };
+        });
+
+        setStyleSelected(null);
+    }, [styleSelected, groupSelection]);
 
     return (
         <div>
@@ -961,59 +1047,63 @@ export default function App() {
 
             {showPrimaryMenu && (
                 <div>
-                    {colorPalette && (
+                    {(submenuOption === "fill" || submenuOption === "stroke") && (
                         <ColorPaletteContainer ref={colorPaletteRef}>
                             {activity.color_palette.colors.map((color, i) => {
                                 return (
                                     <ColorCircle
                                         key={i}
-                                        onClick={() => setColorClicked(color)}
+                                        onClick={() => setColorSelected(color)}
                                         style={{ backgroundColor: color }}
                                     />
                                 );
                             })}
-                            <PlusCircle
-                                onClick={() => {
-                                    console.log("Color Picker");
-                                }}
-                            >
-                                +
-                            </PlusCircle>
+                            {activity.color_palette.color_picker && (
+                                <PlusCircle
+                                    onClick={(e) => {
+                                        setColorSelected("Enter a color");
+                                    }}
+                                >
+                                    +<ColorPicker type="color" />
+                                </PlusCircle>
+                            )}
                         </ColorPaletteContainer>
                     )}
-                    <Menu1 ref={primaryMenuRef}>
-                        {primaryMenuItems.fill && (
+
+                    {submenuOption === "style" && (
+                        <StyleContainer ref={styleMenuRef}>
                             <Item
-                                data-isactive={colorPalette === "fill"}
-                                ref={fillRef}
-                                onClick={() => {
-                                    setColorPalette(colorPalette !== "fill" ? "fill" : null);
-                                }}
+                                data-isactive={appliedStyles.bold}
+                                onClick={() => setStyleSelected("bold")}
                             >
-                                Fill
+                                Bold
                             </Item>
-                        )}
-                        {primaryMenuItems.stroke && (
                             <Item
-                                data-isactive={colorPalette === "stroke"}
-                                ref={strokeRef}
-                                onClick={() => {
-                                    setColorPalette(colorPalette !== "stroke" ? "stroke" : null);
-                                }}
+                                data-isactive={appliedStyles.italic}
+                                onClick={() => setStyleSelected("italic")}
                             >
-                                Stroke
+                                Italic
                             </Item>
-                        )}
-                        {primaryMenuItems.stroke && primaryMenuItems.fontStyle && <Separator />}
-                        {primaryMenuItems.fontStyle && <Item>Text Style</Item>}
-                        {(primaryMenuItems.stroke ||
-                            primaryMenuItems.fill ||
-                            primaryMenuItems.fontStyle) &&
-                            primaryMenuItems.opacity && <Separator />}
+                            <Item
+                                data-isactive={appliedStyles.underline}
+                                onClick={() => setStyleSelected("underline")}
+                            >
+                                Underline
+                            </Item>
+                            <Item
+                                data-isactive={appliedStyles.strikethrough}
+                                onClick={() => setStyleSelected("strikethrough")}
+                            >
+                                Strikethrough
+                            </Item>
+                        </StyleContainer>
+                    )}
+
+                    <HorizontalMenu ref={primaryMenuRef}>
                         {primaryMenuItems.opacity && (
                             <Item>
                                 Opacity:&nbsp;
-                                <StyledInput
+                                <StyledSlider
                                     type="range"
                                     min="0"
                                     max="1"
@@ -1032,11 +1122,51 @@ export default function App() {
                                 />
                             </Item>
                         )}
-                    </Menu1>
+                        {(primaryMenuItems.fontStyle ||
+                            primaryMenuItems.fill ||
+                            primaryMenuItems.stroke) && <Separator />}
+                        {primaryMenuItems.fontStyle && (
+                            <Item
+                                data-isactive={submenuOption === "style"}
+                                ref={styleRef}
+                                onClick={() =>
+                                    setSubmenuOption(submenuOption !== "style" ? "style" : null)
+                                }
+                            >
+                                <b>
+                                    <u>
+                                        <i>B</i>
+                                    </u>
+                                </b>
+                            </Item>
+                        )}
+                        {primaryMenuItems.fill && (
+                            <Item
+                                data-isactive={submenuOption === "fill"}
+                                ref={fillRef}
+                                onClick={() => {
+                                    setSubmenuOption(submenuOption !== "fill" ? "fill" : null);
+                                }}
+                            >
+                                Fill
+                            </Item>
+                        )}
+                        {primaryMenuItems.stroke && (
+                            <Item
+                                data-isactive={submenuOption === "stroke"}
+                                ref={strokeRef}
+                                onClick={() => {
+                                    setSubmenuOption(submenuOption !== "stroke" ? "stroke" : null);
+                                }}
+                            >
+                                Stroke
+                            </Item>
+                        )}
+                    </HorizontalMenu>
                 </div>
             )}
             {showSecondaryMenu && (
-                <Menu2
+                <VerticalMenu
                     style={{
                         top: secondaryMenuPosition.y,
                         left: secondaryMenuPosition.x,
@@ -1093,13 +1223,13 @@ export default function App() {
                             Send to Back
                         </Item>
                     )}
-                </Menu2>
+                </VerticalMenu>
             )}
         </div>
     );
 }
 
-const Menu1 = styled.div`
+const HorizontalMenu = styled.div`
     user-select: none;
     display: flex;
     flex-direction: row;
@@ -1113,7 +1243,7 @@ const Menu1 = styled.div`
     gap: 5px;
 `;
 
-const Menu2 = styled.div`
+const VerticalMenu = styled.div`
     user-select: none;
     display: flex;
     flex-direction: column;
@@ -1146,12 +1276,25 @@ const Separator = styled.span`
     margin: 5px;
 `;
 
-const StyledInput = styled.input`
+const StyledSlider = styled.input`
     cursor: pointer;
     width: 100%;
     height: 100%;
     color: ${color.black};
     background-color: ${color.white};
+`;
+
+const StyleContainer = styled.div`
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: row;
+    border-radius: 5px;
+    background: ${color.white};
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+    padding: 5px;
+    gap: 5px;
 `;
 
 const ColorPaletteContainer = styled.div`
@@ -1177,6 +1320,7 @@ const ColorCircle = styled.div`
 `;
 
 const PlusCircle = styled.div`
+    position: relative;
     cursor: pointer;
     width: 40px;
     height: 40px;
@@ -1187,6 +1331,17 @@ const PlusCircle = styled.div`
     line-height: 35px;
     font-size: 40px;
     color: ${color.grey};
+`;
+
+const ColorPicker = styled.input`
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
 `;
 
 function fitInFrame(
