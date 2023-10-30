@@ -119,7 +119,6 @@ DEADLINE:
 -   tooltips✅
 -   Add shortcuts for commands✅
 -   contextmenu for copy paste change color etc.✅ - left click:✅ - shape, lines: stroke color (incl transparent, fill color (incl transparent), opacity) - text: fill color, style (bold, italic, underline, strikethrough), opacity - image: opacity, - right click: copy, paste, bring to front, send to back, delete✅
-<!-- -   Landing Page in react App, rich text (html, css, js) -->
 
 -   Add support for chrome, safari, firefox, edge
 -   pan: drag out sets view to select

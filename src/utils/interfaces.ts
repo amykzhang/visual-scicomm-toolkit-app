@@ -49,7 +49,8 @@ export interface TextProp extends BaseProp {
     text: string;
     fontSize: number;
     fontFamily: string;
-    fontStyle: string;
+    fontStyle: string[];
+    textDecoration: string[];
     fill: string;
     align: "left" | "center" | "right";
 }

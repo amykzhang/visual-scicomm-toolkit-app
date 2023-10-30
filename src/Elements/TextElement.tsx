@@ -107,6 +107,8 @@ const TextElement = ({
     return (
         <Text
             {...text}
+            fontStyle={text.fontStyle.join(" ")}
+            textDecoration={text.textDecoration.join(" ")}
             ref={textRef}
             id={text.id}
             draggable={draggable}
