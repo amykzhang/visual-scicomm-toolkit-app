@@ -8,13 +8,6 @@ export type Activity = {
     elements: {
         text: {
             heading: string;
-            text: string[];
-            icons: string[];
-            srcs: string[];
-            sizes: {
-                width: number;
-                height: number;
-            }[];
         };
         draw: {
             heading: string;
@@ -71,7 +64,7 @@ const activity_visual_strategies: Activity = {
     activity_panel: `
         <div class="medium-text">You're a researcher who wants to describe the following process in a <span class="bold">visual diagram</span>. Can you design a communication piece using the elements provided in this activity?</div>
         <br/>
-        <div class="medium-text pad-medium yellow-background rounded bold">The receptor Y is found in the cell membrane. The molecule X binds to the receptor. This triggers the release of proteins by an organelle in the cell.</div>
+        <div class="medium-text pad-medium yw-background rounded bold">The receptor Y is found in the cell membrane. The molecule X binds to the receptor. This triggers the release of proteins by an organelle in the cell.</div>
         <br/>
         <br/>
         <br/>
@@ -81,15 +74,15 @@ const activity_visual_strategies: Activity = {
             Instructions
         </div>
         <div class="gap-large flex-column">
-            <div class="flex-column lightblue-background rounded gap-medium pad-small">
+            <div class="flex-column lightbl-background rounded gap-medium pad-small">
                 <div class="small-text bold">1. Understand the science</div>
                 <div class="small-text">We start by researching the topic if we're unfamiliar with the science. This includes searching and referencing visuals, such as diagrams, created by others.</div>
             </div>
-            <div class="flex-column lightblue-background rounded gap-medium pad-small">
+            <div class="flex-column lightbl-background rounded gap-medium pad-small">
                 <div class="small-text bold">2. Design a communication piece</div>
                 <div class="small-text">Once we have a good grasp of the science, we can communicate it to our target audience. We start considering the text that appears in the piece, the placement of visuals, and the balance between text and visuals.</div>
             </div>
-            <div class="flex-column lightblue-background rounded gap-medium pad-small">
+            <div class="flex-column lightbl-background rounded gap-medium pad-small">
                 <div class="small-text bold">3. Support your design choices</div>
                 <div class="small-text">Place a comment next to different parts of your diagram and explain how you've made your design as effective as possible.</div>
             </div>
@@ -98,40 +91,36 @@ const activity_visual_strategies: Activity = {
     elements: {
         text: {
             heading: "Text",
-            text: ["TextBox"],
-            icons: ["text_box"],
-            srcs: ["/activity/assets/text_box.png"],
-            sizes: [{ width: 78, height: 27 }],
         },
         lines: {
             heading: "Labels & Arrows",
             icons: [
-                "label_left_dot",
-                "label_right_dot",
-                "label_left_arrow",
-                "label_right_arrow",
-                "label_left_bent_dot",
-                "label_right_bent_dot",
-                "label_left_bent_arrow",
-                "label_right_bent_arrow",
-                "label_left_curve1_arrow",
-                "label_right_curve1_arrow",
-                "label_left_curve2_arrow",
-                "label_right_curve2_arrow",
+                "label_straight_left",
+                "label_straight_right",
+                "arrow_straight_left",
+                "arrow_straight_right",
+                "label_angle_left",
+                "label_angle_right",
+                "arrow_angle_left",
+                "arrow_angle_right",
+                "arrow_curve1_left",
+                "arrow_curve1_right",
+                "arrow_curve2_left",
+                "arrow_curve2_right",
             ],
             srcs: [
-                "/activity/assets/label_left_dot.png",
-                "/activity/assets/label_right_dot.png",
-                "/activity/assets/label_left_arrow.png",
-                "/activity/assets/label_right_arrow.png",
-                "/activity/assets/label_left_bent_dot.png",
-                "/activity/assets/label_right_bent_dot.png",
-                "/activity/assets/label_left_bent_arrow.png",
-                "/activity/assets/label_right_bent_arrow.png",
-                "/activity/assets/label_left_curve1_arrow.png",
-                "/activity/assets/label_right_curve1_arrow.png",
-                "/activity/assets/label_left_curve2_arrow.png",
-                "/activity/assets/label_right_curve2_arrow.png",
+                "/activity/assets/label_straight_left.png",
+                "/activity/assets/label_straight_right.png",
+                "/activity/assets/arrow_straight_left.png",
+                "/activity/assets/arrow_straight_right.png",
+                "/activity/assets/label_angle_left.png",
+                "/activity/assets/label_angle_right.png",
+                "/activity/assets/arrow_angle_left.png",
+                "/activity/assets/arrow_angle_right.png",
+                "/activity/assets/arrow_curve1_left.png",
+                "/activity/assets/arrow_curve1_right.png",
+                "/activity/assets/arrow_curve2_left.png",
+                "/activity/assets/arrow_curve2_right.png",
             ],
             sizes: [
                 { width: 65, height: 10 },
@@ -177,20 +166,20 @@ const activity_visual_strategies: Activity = {
                 {
                     subheading: "Molecule X",
                     icons: [
-                        "molecule_purple",
-                        "molecule_blue",
-                        "molecule_pink",
-                        "molecule_yellow",
-                        "molecule_white",
-                        "molecule_gray",
+                        "molecule_pu",
+                        "molecule_bl",
+                        "molecule_pk",
+                        "molecule_yw",
+                        "molecule_wh",
+                        "molecule_gr",
                     ],
                     srcs: [
-                        "/activity/assets/molecule_purple.png",
-                        "/activity/assets/molecule_blue.png",
-                        "/activity/assets/molecule_pink.png",
-                        "/activity/assets/molecule_yellow.png",
-                        "/activity/assets/molecule_white.png",
-                        "/activity/assets/molecule_gray.png",
+                        "/activity/assets/molecule_pu.png",
+                        "/activity/assets/molecule_bl.png",
+                        "/activity/assets/molecule_pk.png",
+                        "/activity/assets/molecule_yw.png",
+                        "/activity/assets/molecule_wh.png",
+                        "/activity/assets/molecule_gr.png",
                     ],
                     sizes: [
                         { width: 42, height: 42 },
@@ -204,20 +193,20 @@ const activity_visual_strategies: Activity = {
                 {
                     subheading: "Receptor Y",
                     icons: [
-                        "receptor_purple",
-                        "receptor_blue",
-                        "receptor_pink",
-                        "receptor_yellow",
-                        "receptor_white",
-                        "receptor_gray",
+                        "receptor_pu",
+                        "receptor_bl",
+                        "receptor_pk",
+                        "receptor_yw",
+                        "receptor_wh",
+                        "receptor_gr",
                     ],
                     srcs: [
-                        "/activity/assets/receptor_purple.png",
-                        "/activity/assets/receptor_blue.png",
-                        "/activity/assets/receptor_pink.png",
-                        "/activity/assets/receptor_yellow.png",
-                        "/activity/assets/receptor_white.png",
-                        "/activity/assets/receptor_gray.png",
+                        "/activity/assets/receptor_pu.png",
+                        "/activity/assets/receptor_bl.png",
+                        "/activity/assets/receptor_pk.png",
+                        "/activity/assets/receptor_yw.png",
+                        "/activity/assets/receptor_wh.png",
+                        "/activity/assets/receptor_gr.png",
                     ],
                     sizes: [
                         { width: 42, height: 82 },
@@ -231,20 +220,20 @@ const activity_visual_strategies: Activity = {
                 {
                     subheading: "Organelle",
                     icons: [
-                        "organelle_purple",
-                        "organelle_blue",
-                        "organelle_pink",
-                        "organelle_yellow",
-                        "organelle_white",
-                        "organelle_gray",
+                        "organelle_pu",
+                        "organelle_bl",
+                        "organelle_pk",
+                        "organelle_yw",
+                        "organelle_wh",
+                        "organelle_gr",
                     ],
                     srcs: [
-                        "/activity/assets/organelle_purple.png",
-                        "/activity/assets/organelle_blue.png",
-                        "/activity/assets/organelle_pink.png",
-                        "/activity/assets/organelle_yellow.png",
-                        "/activity/assets/organelle_white.png",
-                        "/activity/assets/organelle_gray.png",
+                        "/activity/assets/organelle_pu.png",
+                        "/activity/assets/organelle_bl.png",
+                        "/activity/assets/organelle_pk.png",
+                        "/activity/assets/organelle_yw.png",
+                        "/activity/assets/organelle_wh.png",
+                        "/activity/assets/organelle_gr.png",
                     ],
                     sizes: [
                         { width: 65, height: 72 },
@@ -258,20 +247,20 @@ const activity_visual_strategies: Activity = {
                 {
                     subheading: "Protein",
                     icons: [
-                        "protein_purple",
-                        "protein_blue",
-                        "protein_pink",
-                        "protein_yellow",
-                        "protein_white",
-                        "protein_gray",
+                        "protein_pu",
+                        "protein_bl",
+                        "protein_pk",
+                        "protein_yw",
+                        "protein_wh",
+                        "protein_gr",
                     ],
                     srcs: [
-                        "/activity/assets/protein_purple.png",
-                        "/activity/assets/protein_blue.png",
-                        "/activity/assets/protein_pink.png",
-                        "/activity/assets/protein_yellow.png",
-                        "/activity/assets/protein_white.png",
-                        "/activity/assets/protein_gray.png",
+                        "/activity/assets/protein_pu.png",
+                        "/activity/assets/protein_bl.png",
+                        "/activity/assets/protein_pk.png",
+                        "/activity/assets/protein_yw.png",
+                        "/activity/assets/protein_wh.png",
+                        "/activity/assets/protein_gr.png",
                     ],
                     sizes: [
                         { width: 28, height: 28 },
@@ -285,76 +274,76 @@ const activity_visual_strategies: Activity = {
                 {
                     subheading: "Cell membranes",
                     icons: [
-                        "membrane_1_purple",
-                        "membrane_1_blue",
-                        "membrane_1_pink",
-                        "membrane_1_yellow",
-                        "membrane_1_white",
-                        "membrane_1_gray",
+                        "membrane_1_pu",
+                        "membrane_1_bl",
+                        "membrane_1_pk",
+                        "membrane_1_yw",
+                        "membrane_1_wh",
+                        "membrane_1_gr",
 
-                        "membrane_2_purple",
-                        "membrane_2_blue",
-                        "membrane_2_pink",
-                        "membrane_2_yellow",
-                        "membrane_2_white",
-                        "membrane_2_gray",
+                        "membrane_2_pu",
+                        "membrane_2_bl",
+                        "membrane_2_pk",
+                        "membrane_2_yw",
+                        "membrane_2_wh",
+                        "membrane_2_gr",
 
-                        "membrane_3_purple",
-                        "membrane_3_blue",
-                        "membrane_3_pink",
-                        "membrane_3_yellow",
-                        "membrane_3_white",
-                        "membrane_3_gray",
+                        "membrane_3_pu",
+                        "membrane_3_bl",
+                        "membrane_3_pk",
+                        "membrane_3_yw",
+                        "membrane_3_wh",
+                        "membrane_3_gr",
 
-                        "membrane_4_purple",
-                        "membrane_4_blue",
-                        "membrane_4_pink",
-                        "membrane_4_yellow",
-                        "membrane_4_white",
-                        "membrane_4_gray",
+                        "membrane_4_pu",
+                        "membrane_4_bl",
+                        "membrane_4_pk",
+                        "membrane_4_yw",
+                        "membrane_4_wh",
+                        "membrane_4_gr",
 
-                        "membrane_5_purple",
-                        "membrane_5_blue",
-                        "membrane_5_pink",
-                        "membrane_5_yellow",
-                        "membrane_5_white",
-                        "membrane_5_gray",
+                        "membrane_5_pu",
+                        "membrane_5_bl",
+                        "membrane_5_pk",
+                        "membrane_5_yw",
+                        "membrane_5_wh",
+                        "membrane_5_gr",
                     ],
                     srcs: [
-                        "/activity/assets/membrane_1_purple.png",
-                        "/activity/assets/membrane_1_blue.png",
-                        "/activity/assets/membrane_1_pink.png",
-                        "/activity/assets/membrane_1_yellow.png",
-                        "/activity/assets/membrane_1_white.png",
-                        "/activity/assets/membrane_1_gray.png",
+                        "/activity/assets/membrane_1_pu.png",
+                        "/activity/assets/membrane_1_bl.png",
+                        "/activity/assets/membrane_1_pk.png",
+                        "/activity/assets/membrane_1_yw.png",
+                        "/activity/assets/membrane_1_wh.png",
+                        "/activity/assets/membrane_1_gr.png",
 
-                        "/activity/assets/membrane_2_purple.png",
-                        "/activity/assets/membrane_2_blue.png",
-                        "/activity/assets/membrane_2_pink.png",
-                        "/activity/assets/membrane_2_yellow.png",
-                        "/activity/assets/membrane_2_white.png",
-                        "/activity/assets/membrane_2_gray.png",
+                        "/activity/assets/membrane_2_pu.png",
+                        "/activity/assets/membrane_2_bl.png",
+                        "/activity/assets/membrane_2_pk.png",
+                        "/activity/assets/membrane_2_yw.png",
+                        "/activity/assets/membrane_2_wh.png",
+                        "/activity/assets/membrane_2_gr.png",
 
-                        "/activity/assets/membrane_3_purple.png",
-                        "/activity/assets/membrane_3_blue.png",
-                        "/activity/assets/membrane_3_pink.png",
-                        "/activity/assets/membrane_3_yellow.png",
-                        "/activity/assets/membrane_3_white.png",
-                        "/activity/assets/membrane_3_gray.png",
+                        "/activity/assets/membrane_3_pu.png",
+                        "/activity/assets/membrane_3_bl.png",
+                        "/activity/assets/membrane_3_pk.png",
+                        "/activity/assets/membrane_3_yw.png",
+                        "/activity/assets/membrane_3_wh.png",
+                        "/activity/assets/membrane_3_gr.png",
 
-                        "/activity/assets/membrane_4_purple.png",
-                        "/activity/assets/membrane_4_blue.png",
-                        "/activity/assets/membrane_4_pink.png",
-                        "/activity/assets/membrane_4_yellow.png",
-                        "/activity/assets/membrane_4_white.png",
-                        "/activity/assets/membrane_4_gray.png",
+                        "/activity/assets/membrane_4_pu.png",
+                        "/activity/assets/membrane_4_bl.png",
+                        "/activity/assets/membrane_4_pk.png",
+                        "/activity/assets/membrane_4_yw.png",
+                        "/activity/assets/membrane_4_wh.png",
+                        "/activity/assets/membrane_4_gr.png",
 
-                        "/activity/assets/membrane_5_purple.png",
-                        "/activity/assets/membrane_5_blue.png",
-                        "/activity/assets/membrane_5_pink.png",
-                        "/activity/assets/membrane_5_yellow.png",
-                        "/activity/assets/membrane_5_white.png",
-                        "/activity/assets/membrane_5_gray.png",
+                        "/activity/assets/membrane_5_pu.png",
+                        "/activity/assets/membrane_5_bl.png",
+                        "/activity/assets/membrane_5_pk.png",
+                        "/activity/assets/membrane_5_yw.png",
+                        "/activity/assets/membrane_5_wh.png",
+                        "/activity/assets/membrane_5_gr.png",
                     ],
                     sizes: [
                         { width: 92, height: 48 },
