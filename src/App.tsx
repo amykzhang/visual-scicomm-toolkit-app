@@ -1275,6 +1275,7 @@ const Item = styled.div`
 
     &[data-isactive="true"] {
         background: ${color.lightBlue};
+        transition: all 0.3s ease-in-out;
     }
 `;
 
@@ -1327,6 +1328,7 @@ const ColorCircle = styled.div`
     border: 1px solid ${color.lightGrey};
 
     &:hover {
+        transition: all 0.2s ease-in-out;
         border: 1px solid ${color.grey};
     }
 `;
