@@ -474,6 +474,7 @@ export default function App() {
         switch (view) {
             case APP_VIEW.select:
                 if (e.target === stageRef.current || e.target === exportAreaRef.current) {
+                    setShowPrimaryMenu(false);
                     setGroupSelection([]);
                 } else {
                     selectElement(e.target.id());
@@ -571,6 +572,7 @@ export default function App() {
     // --- HISTORY ---
 
     const handleUndo = () => {
+        setShowPrimaryMenu(false);
         if (historyStep > 0) {
             historyStep -= 1;
             setElements(history[historyStep].canvas.elements);
@@ -580,6 +582,7 @@ export default function App() {
     };
 
     const handleRedo = () => {
+        setShowPrimaryMenu(false);
         if (historyStep < history.length - 1) {
             historyStep += 1;
             setElements(history[historyStep].canvas.elements);
@@ -693,7 +696,7 @@ export default function App() {
 
     useEffect(() => {
         // Show primary menu if there is a selection
-        if (groupSelection.length > 0 && !isWheeling) {
+        if (groupSelection.length > 0 && !isWheeling && historyStep === history.length - 1) {
             setShowPrimaryMenu(true);
         } else {
             setShowPrimaryMenu(false);
@@ -780,8 +783,6 @@ export default function App() {
             const primaryMenu = primaryMenuRef.current;
 
             if (showPrimaryMenu) {
-                primaryMenu.style.left = "-100000px";
-                primaryMenu.style.top = "-100000px";
                 const { width, height } = primaryMenu.getBoundingClientRect();
 
                 let x =
