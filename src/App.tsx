@@ -780,6 +780,8 @@ export default function App() {
             const primaryMenu = primaryMenuRef.current;
 
             if (showPrimaryMenu) {
+                primaryMenu.style.left = "-100000px";
+                primaryMenu.style.top = "-100000px";
                 const { width, height } = primaryMenu.getBoundingClientRect();
 
                 let x =
@@ -1263,8 +1265,12 @@ const Item = styled.div`
     display: flex;
     align-items: center;
     border-radius: 5px;
+    border: 1px solid transparent;
 
-    &:hover,
+    &:hover {
+        border: 1px solid ${color.grey};
+    }
+
     &[data-isactive="true"] {
         background: ${color.lightBlue};
     }
@@ -1316,7 +1322,11 @@ const ColorCircle = styled.div`
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    border: 0.1px solid ${color.grey};
+    border: 1px solid ${color.lightGrey};
+
+    &:hover {
+        border: 1px solid ${color.grey};
+    }
 `;
 
 const PlusCircle = styled.div`
