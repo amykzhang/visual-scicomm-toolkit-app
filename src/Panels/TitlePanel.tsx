@@ -6,7 +6,6 @@ const TitlePanelContainer = styled.div`
     pointer-events: all;
     user-select: none;
     position: absolute;
-    width: 380px;
     height: 69px;
     left: 0px;
     top: 0px;
@@ -18,7 +17,7 @@ const TitlePanelContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 0px 20px;
+    padding: 0px 40px 0px 20px;
     gap: 24px;
 `;
 
