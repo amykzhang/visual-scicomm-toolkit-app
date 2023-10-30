@@ -700,6 +700,7 @@ export default function App() {
             setShowPrimaryMenu(true);
         } else {
             setShowPrimaryMenu(false);
+            setShowSecondaryMenu(false);
         }
         setSubmenuOption(null);
     }, [groupSelection, isWheeling]);
