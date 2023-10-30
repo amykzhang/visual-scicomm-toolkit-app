@@ -68,7 +68,7 @@ export const ImageTool: FC<ImageToolProps> = ({
 
     return (
         <StyledImage
-            src={src}
+            src={process.env.PUBLIC_URL + src}
             title={name}
             width={dimensions.width}
             height={dimensions.height}
