@@ -19,6 +19,8 @@ export const StageViewManager = (canvas_size: { width: number; height: number })
         }
     });
 
+    const [fullscreen, setFullscreen] = useState(document.fullscreenElement !== null);
+
     const stageRef = useRef<Konva.Stage>(null);
 
     function handleZoom(
@@ -157,13 +159,33 @@ export const StageViewManager = (canvas_size: { width: number; height: number })
 
     function toggleFullscreen() {
         if (document.fullscreenElement) {
-            document.exitFullscreen().catch((err) => {
-                alert(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
-            });
+            document
+                .exitFullscreen()
+                .then(() => setFullscreen(false))
+                .catch((err) => {
+                    alert(`Error attempting to exit fullscreen mode: ${err.message} (${err.name})`);
+                });
         } else {
-            document.body.requestFullscreen();
+            document.body
+                .requestFullscreen()
+                .then(() => setFullscreen(true))
+                .catch((err) => {
+                    alert(
+                        `Error attempting to enable fullscreen mode: ${err.message} (${err.name})`
+                    );
+                });
         }
     }
+
+    useEffect(() => {
+        if (stageRef.current !== null) {
+            const stage = stageRef.current;
+
+            stage.width(document.body.offsetWidth);
+            stage.height(document.body.offsetHeight);
+            stage.batchDraw();
+        }
+    }, [fullscreen]);
 
     // Load persisted stage state on initial load
     useEffect(() => {

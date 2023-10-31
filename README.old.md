@@ -133,5 +133,11 @@ appearance fixes:
 
 bugs:
 
--   fullscreen doesnt render stage when changing vw/vh
+-   fullscreen doesnt render stage when changing vw/vh ✅
 -   overflow y on sidebars
+
+Need from Amy:
+
+-   logo
+-   activity information rich text
+-   delete settings?
