@@ -71,7 +71,6 @@ const activity_visual_strategies: Activity = {
 
         <div class="large-text flex-row gap-small">
             <img src="/activity/notebook.svg">
-            <img src="/activity/molecule_pu.png">
             Instructions
         </div>
         <div class="gap-large flex-column">
