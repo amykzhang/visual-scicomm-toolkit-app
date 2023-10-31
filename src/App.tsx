@@ -279,6 +279,20 @@ export default function App() {
         [elements, clipboard]
     );
 
+    // move group selection by x and y
+    const shiftGroupSelection = useCallback(
+        (x: number, y: number) => {
+            elements.forEach((element) => {
+                if (groupSelection.includes(element.id)) {
+                    handleChange(element.id, { x: element.x + x, y: element.y + y });
+                }
+            });
+
+            setGroupSelection(groupSelection.splice(0));
+        },
+        [elements, groupSelection]
+    );
+
     // -- KEY PRESSES --
     const handleKeyDown = useCallback(
         (e: KeyboardEvent) => {
@@ -323,6 +337,18 @@ export default function App() {
                         break;
                     case "v":
                         if (e.metaKey) paste();
+                        break;
+                    case "ArrowUp":
+                        shiftGroupSelection(0, shiftKey ? -10 : -1);
+                        break;
+                    case "ArrowDown":
+                        shiftGroupSelection(0, shiftKey ? 10 : 1);
+                        break;
+                    case "ArrowLeft":
+                        shiftGroupSelection(shiftKey ? -10 : -1, 0);
+                        break;
+                    case "ArrowRight":
+                        shiftGroupSelection(shiftKey ? 10 : 1, 0);
                         break;
                     default:
                         break;
@@ -389,6 +415,7 @@ export default function App() {
             view,
             isEditingText,
             isEditingComment,
+            shiftKey,
             deleteSelected,
             setSelectedComment,
             setView,
@@ -399,6 +426,7 @@ export default function App() {
             zoomFit,
             zoomIn,
             zoomOut,
+            shiftGroupSelection,
         ]
     );
 

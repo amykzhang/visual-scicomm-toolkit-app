@@ -121,20 +121,20 @@ DEADLINE:
 -   contextmenu for copy paste change color etc.✅ - left click:✅ - shape, lines: stroke color (incl transparent, fill color (incl transparent), opacity) - text: fill color, style (bold, italic, underline, strikethrough), opacity - image: opacity, - right click: copy, paste, bring to front, send to back, delete✅
 
 -   Add support for chrome, safari, firefox, edge
--   pan: drag out sets view to select
--   up down left right shortcut (shift in larget chunks)
+-   up down left right shortcut (shift in larget chunks) ✅
 -   document code, how to deploy, how to run, how to test
 
 appearance fixes:
 
 -   pan: closed hand on mousedown, open hand on mouseup
 -   comment elements: just make aspect the same
--   commment view: close sidebars
+-   commment view: close sidebars ✅
 
 bugs:
 
 -   fullscreen doesnt render stage when changing vw/vh ✅
 -   overflow y on sidebars
+-   text and comment clicks
 
 Need from Amy:
 
