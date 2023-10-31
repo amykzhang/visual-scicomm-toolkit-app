@@ -32,10 +32,6 @@ export const SelectionManager = (
         }
     };
 
-    // const handleDragStart = (id: string) => () => {
-    //     // if (!groupSelection.includes(id)) setGroupSelection([id]);
-    // };
-
     const deleteSelected = useCallback(() => {
         setElements((elements) =>
             elements.filter((element) => !groupSelection.includes(element.id))

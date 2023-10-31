@@ -123,6 +123,7 @@ export default function App() {
 
     // Group Selection
     const [groupSelection, setGroupSelection] = useState<string[]>(history[0].selection);
+    const [isCornerTransform, setIsCornerTransform] = useState(false); // for transformer dragging corner
 
     // --- MANAGERS FOR VIEWS ---
 
@@ -279,6 +280,20 @@ export default function App() {
         [elements, clipboard]
     );
 
+    // move group selection by x and y
+    const shiftGroupSelection = useCallback(
+        (x: number, y: number) => {
+            elements.forEach((element) => {
+                if (groupSelection.includes(element.id)) {
+                    handleChange(element.id, { x: element.x + x, y: element.y + y });
+                }
+            });
+
+            setGroupSelection(groupSelection.splice(0));
+        },
+        [elements, groupSelection]
+    );
+
     // -- KEY PRESSES --
     const handleKeyDown = useCallback(
         (e: KeyboardEvent) => {
@@ -323,6 +338,18 @@ export default function App() {
                         break;
                     case "v":
                         if (e.metaKey) paste();
+                        break;
+                    case "ArrowUp":
+                        shiftGroupSelection(0, shiftKey ? -10 : -1);
+                        break;
+                    case "ArrowDown":
+                        shiftGroupSelection(0, shiftKey ? 10 : 1);
+                        break;
+                    case "ArrowLeft":
+                        shiftGroupSelection(shiftKey ? -10 : -1, 0);
+                        break;
+                    case "ArrowRight":
+                        shiftGroupSelection(shiftKey ? 10 : 1, 0);
                         break;
                     default:
                         break;
@@ -389,6 +416,7 @@ export default function App() {
             view,
             isEditingText,
             isEditingComment,
+            shiftKey,
             deleteSelected,
             setSelectedComment,
             setView,
@@ -399,6 +427,7 @@ export default function App() {
             zoomFit,
             zoomIn,
             zoomOut,
+            shiftGroupSelection,
         ]
     );
 
@@ -547,6 +576,8 @@ export default function App() {
             }
 
             setShowSecondaryMenu(false);
+        } else if (view === APP_VIEW.pan) {
+            document.body.style.cursor = "grabbing";
         } else if (view === APP_VIEW.draw) {
             handleDrawMouseDown(e);
         }
@@ -563,8 +594,9 @@ export default function App() {
     const handleMouseUp = (e: Konva.KonvaEventObject<MouseEvent>) => {
         if (view === APP_VIEW.select) {
             if (isSelectionMode) handleDragSelectMouseUp(e);
-        }
-        if (view === APP_VIEW.draw) {
+        } else if (view === APP_VIEW.pan) {
+            document.body.style.cursor = "grab";
+        } else if (view === APP_VIEW.draw) {
             handleDrawMouseUp(e);
         }
     };
@@ -702,8 +734,9 @@ export default function App() {
             setShowPrimaryMenu(true);
         } else {
             setShowPrimaryMenu(false);
-            setShowSecondaryMenu(false);
         }
+
+        if (isWheeling) setShowSecondaryMenu(false);
         setSubmenuOption(null);
     }, [groupSelection, isWheeling]);
 
@@ -923,7 +956,7 @@ export default function App() {
                 </TopZone>
                 <ActivityPanel
                     activity={activity}
-                    isOpen={uiState.isLeftPanelOpen}
+                    isOpen={uiState.isLeftPanelOpen && view !== APP_VIEW.comment}
                     handleToggle={() => {
                         setUiState({
                             ...uiState,
@@ -937,7 +970,7 @@ export default function App() {
                     elements={elements}
                     setElements={setElements}
                     stageRef={stageRef}
-                    isOpen={uiState.isRightPanelOpen}
+                    isOpen={uiState.isRightPanelOpen && view !== APP_VIEW.comment}
                     handleToggle={() => {
                         setUiState({
                             ...uiState,
@@ -1010,13 +1043,14 @@ export default function App() {
                     )}
                 </Layer>
                 <Layer ref={elementsLayerRef} id="elements-layer">
-                    {elements.map((element, index) => elementToReactElement(element))}
+                    {elements.map((element) => elementToReactElement(element))}
                     <Transformer
                         ref={transformerRef}
                         visible={!isExporting}
                         // shouldOverdrawWholeArea
                         borderStroke={constants.transformer.borderStroke}
                         keepRatio={false}
+                        centeredScaling={!isCornerTransform && shiftKey}
                         rotationSnaps={[0, 45, 90, 135, 180, 225, 270, 315]}
                         boundBoxFunc={(oldBox, newBox) => {
                             // limit resize
@@ -1027,7 +1061,15 @@ export default function App() {
                         }}
                         onDragStart={() => setShowPrimaryMenu(false)}
                         onDragEnd={() => setShowPrimaryMenu(true)}
-                        onTransformStart={() => setShowPrimaryMenu(false)}
+                        onTransformStart={() => {
+                            setShowPrimaryMenu(false);
+                            if (transformerRef.current !== null) {
+                                const isCorner = constants.resizeAnchors.includes(
+                                    transformerRef.current.getActiveAnchor()
+                                );
+                                setIsCornerTransform(isCorner);
+                            }
+                        }}
                         onTransformEnd={() => setShowPrimaryMenu(true)}
                     />
                 </Layer>
@@ -1083,25 +1125,25 @@ export default function App() {
                                 data-isactive={appliedStyles.bold}
                                 onClick={() => setStyleSelected("bold")}
                             >
-                                Bold
+                                <b>B</b>
                             </Item>
                             <Item
                                 data-isactive={appliedStyles.italic}
                                 onClick={() => setStyleSelected("italic")}
                             >
-                                Italic
+                                <i>I</i>
                             </Item>
                             <Item
                                 data-isactive={appliedStyles.underline}
                                 onClick={() => setStyleSelected("underline")}
                             >
-                                Underline
+                                <u>U</u>
                             </Item>
                             <Item
                                 data-isactive={appliedStyles.strikethrough}
                                 onClick={() => setStyleSelected("strikethrough")}
                             >
-                                Strikethrough
+                                <s>S</s>
                             </Item>
                         </StyleContainer>
                     )}
@@ -1265,6 +1307,7 @@ const VerticalMenu = styled.div`
 `;
 
 const Item = styled.div`
+    user-select: none;
     cursor: pointer;
     padding: 4px 10px;
     display: flex;

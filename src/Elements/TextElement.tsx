@@ -27,7 +27,8 @@ const TextElement = ({
 }: TextElementProp) => {
     const textRef = useRef<Konva.Text>(null);
 
-    const handleClick = (e: Konva.KonvaEventObject<Event>) => {
+    const handleClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
+        if (e.evt.button !== 0) return; // Only handle left click
         if (isSelected) editText(text, handleChange, textRef, transformerRef);
     };
 
