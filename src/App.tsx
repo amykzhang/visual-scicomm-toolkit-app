@@ -1083,25 +1083,25 @@ export default function App() {
                                 data-isactive={appliedStyles.bold}
                                 onClick={() => setStyleSelected("bold")}
                             >
-                                Bold
+                                <b>B</b>
                             </Item>
                             <Item
                                 data-isactive={appliedStyles.italic}
                                 onClick={() => setStyleSelected("italic")}
                             >
-                                Italic
+                                <i>I</i>
                             </Item>
                             <Item
                                 data-isactive={appliedStyles.underline}
                                 onClick={() => setStyleSelected("underline")}
                             >
-                                Underline
+                                <u>U</u>
                             </Item>
                             <Item
                                 data-isactive={appliedStyles.strikethrough}
                                 onClick={() => setStyleSelected("strikethrough")}
                             >
-                                Strikethrough
+                                <s>S</s>
                             </Item>
                         </StyleContainer>
                     )}
@@ -1265,6 +1265,7 @@ const VerticalMenu = styled.div`
 `;
 
 const Item = styled.div`
+    user-select: none;
     cursor: pointer;
     padding: 4px 10px;
     display: flex;
