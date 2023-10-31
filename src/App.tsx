@@ -924,7 +924,7 @@ export default function App() {
                 </TopZone>
                 <ActivityPanel
                     activity={activity}
-                    isOpen={uiState.isLeftPanelOpen}
+                    isOpen={uiState.isLeftPanelOpen && view !== APP_VIEW.comment}
                     handleToggle={() => {
                         setUiState({
                             ...uiState,
@@ -938,7 +938,7 @@ export default function App() {
                     elements={elements}
                     setElements={setElements}
                     stageRef={stageRef}
-                    isOpen={uiState.isRightPanelOpen}
+                    isOpen={uiState.isRightPanelOpen && view !== APP_VIEW.comment}
                     handleToggle={() => {
                         setUiState({
                             ...uiState,
