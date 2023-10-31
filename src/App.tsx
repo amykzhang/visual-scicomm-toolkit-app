@@ -1065,12 +1065,13 @@ export default function App() {
                                 );
                             })}
                             {activity.color_palette.color_picker && (
-                                <PlusCircle
-                                    onClick={(e) => {
-                                        setColorSelected("Enter a color");
-                                    }}
-                                >
-                                    +<ColorPicker type="color" />
+                                <PlusCircle>
+                                    +
+                                    <ColorPicker
+                                        type="color"
+                                        value={primaryMenuItems.values.fill}
+                                        onChange={(e) => setColorSelected(e.target.value)}
+                                    />
                                 </PlusCircle>
                             )}
                         </ColorPaletteContainer>
