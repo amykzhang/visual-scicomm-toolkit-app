@@ -576,6 +576,8 @@ export default function App() {
             }
 
             setShowSecondaryMenu(false);
+        } else if (view === APP_VIEW.pan) {
+            document.body.style.cursor = "grabbing";
         } else if (view === APP_VIEW.draw) {
             handleDrawMouseDown(e);
         }
@@ -592,8 +594,9 @@ export default function App() {
     const handleMouseUp = (e: Konva.KonvaEventObject<MouseEvent>) => {
         if (view === APP_VIEW.select) {
             if (isSelectionMode) handleDragSelectMouseUp(e);
-        }
-        if (view === APP_VIEW.draw) {
+        } else if (view === APP_VIEW.pan) {
+            document.body.style.cursor = "grab";
+        } else if (view === APP_VIEW.draw) {
             handleDrawMouseUp(e);
         }
     };
