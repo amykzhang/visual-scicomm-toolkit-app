@@ -646,8 +646,10 @@ export default function App() {
 
         if (view === APP_VIEW.comment) {
             stage.getContent().style.backgroundColor = color.commentViewBackground;
+            document.body.style.backgroundColor = color.commentViewBackground;
         } else {
             stage.getContent().style.backgroundColor = color.canvasBackground;
+            document.body.style.backgroundColor = color.canvasBackground;
         }
     }, [view, setView, stageRef]);
 
@@ -1063,12 +1065,13 @@ export default function App() {
                                 );
                             })}
                             {activity.color_palette.color_picker && (
-                                <PlusCircle
-                                    onClick={(e) => {
-                                        setColorSelected("Enter a color");
-                                    }}
-                                >
-                                    +<ColorPicker type="color" />
+                                <PlusCircle>
+                                    +
+                                    <ColorPicker
+                                        type="color"
+                                        value={primaryMenuItems.values.fill}
+                                        onChange={(e) => setColorSelected(e.target.value)}
+                                    />
                                 </PlusCircle>
                             )}
                         </ColorPaletteContainer>
@@ -1275,6 +1278,7 @@ const Item = styled.div`
 
     &[data-isactive="true"] {
         background: ${color.lightBlue};
+        transition: all 0.3s ease-in-out;
     }
 `;
 
@@ -1327,6 +1331,7 @@ const ColorCircle = styled.div`
     border: 1px solid ${color.lightGrey};
 
     &:hover {
+        transition: all 0.2s ease-in-out;
         border: 1px solid ${color.grey};
     }
 `;
