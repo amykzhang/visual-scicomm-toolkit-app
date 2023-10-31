@@ -121,8 +121,8 @@ DEADLINE:
 -   contextmenu for copy paste change color etc.✅ - left click:✅ - shape, lines: stroke color (incl transparent, fill color (incl transparent), opacity) - text: fill color, style (bold, italic, underline, strikethrough), opacity - image: opacity, - right click: copy, paste, bring to front, send to back, delete✅
 
 -   Add support for chrome, safari, firefox, edge
--   up down left right shortcut (shift in larget chunks) ✅
 -   document code, how to deploy, how to run, how to test
+-   up down left right shortcut (shift in larget chunks) ✅
 
 appearance fixes:
 

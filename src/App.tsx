@@ -123,6 +123,7 @@ export default function App() {
 
     // Group Selection
     const [groupSelection, setGroupSelection] = useState<string[]>(history[0].selection);
+    const [isCornerTransform, setIsCornerTransform] = useState(false); // for transformer dragging corner
 
     // --- MANAGERS FOR VIEWS ---
 
@@ -1039,13 +1040,14 @@ export default function App() {
                     )}
                 </Layer>
                 <Layer ref={elementsLayerRef} id="elements-layer">
-                    {elements.map((element, index) => elementToReactElement(element))}
+                    {elements.map((element) => elementToReactElement(element))}
                     <Transformer
                         ref={transformerRef}
                         visible={!isExporting}
                         // shouldOverdrawWholeArea
                         borderStroke={constants.transformer.borderStroke}
                         keepRatio={false}
+                        centeredScaling={!isCornerTransform && shiftKey}
                         rotationSnaps={[0, 45, 90, 135, 180, 225, 270, 315]}
                         boundBoxFunc={(oldBox, newBox) => {
                             // limit resize
@@ -1056,7 +1058,15 @@ export default function App() {
                         }}
                         onDragStart={() => setShowPrimaryMenu(false)}
                         onDragEnd={() => setShowPrimaryMenu(true)}
-                        onTransformStart={() => setShowPrimaryMenu(false)}
+                        onTransformStart={() => {
+                            setShowPrimaryMenu(false);
+                            if (transformerRef.current !== null) {
+                                const isCorner = constants.resizeAnchors.includes(
+                                    transformerRef.current.getActiveAnchor()
+                                );
+                                setIsCornerTransform(isCorner);
+                            }
+                        }}
                         onTransformEnd={() => setShowPrimaryMenu(true)}
                     />
                 </Layer>
