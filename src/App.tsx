@@ -646,8 +646,10 @@ export default function App() {
 
         if (view === APP_VIEW.comment) {
             stage.getContent().style.backgroundColor = color.commentViewBackground;
+            document.body.style.backgroundColor = color.commentViewBackground;
         } else {
             stage.getContent().style.backgroundColor = color.canvasBackground;
+            document.body.style.backgroundColor = color.canvasBackground;
         }
     }, [view, setView, stageRef]);
 
