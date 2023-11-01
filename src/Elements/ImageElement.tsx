@@ -22,7 +22,6 @@ const ImageElement = ({ image, draggable, handleChange }: ImageElementProp) => {
             image={imageElement}
             ref={imageRef}
             draggable={draggable}
-            // onDragStart={handleDragStart}
             onDragEnd={(e) =>
                 handleChange(image.id, {
                     x: e.target.x(),

@@ -114,7 +114,6 @@ const TextElement = ({
             id={text.id}
             draggable={draggable}
             onClick={handleClick}
-            // onDragStart={handleDragStart}
             onDragEnd={(e) => {
                 handleChange(text.id, {
                     x: e.target.x(),

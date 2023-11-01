@@ -23,7 +23,7 @@ const ShapeElement = ({ shape, draggable, handleChange }: ShapeElementProp) => {
             draggable={draggable}
             radius={shape.width / 2} // For Circle
             sides={3} // For Triangle
-            // onDragStart={handleDragStart}
+            strokeScaleEnabled={false}
             onDragEnd={(e) =>
                 handleChange(shape.id, {
                     x: e.target.x(),

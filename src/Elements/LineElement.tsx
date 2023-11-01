@@ -37,7 +37,6 @@ const LineElement = ({ line, draggable, handleChange }: LineElementProp) => {
             {...constants.line}
             ref={lineRef}
             draggable={draggable}
-            // onDragStart={handleDragStart}
             onDragEnd={(e) =>
                 handleChange(line.id, {
                     x: e.target.x(),
