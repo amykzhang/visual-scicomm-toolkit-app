@@ -118,6 +118,7 @@ export const TextViewManager = (
             textarea.style.transformOrigin = "left top";
             textarea.style.textAlign = textNode.align();
             textarea.style.color = textNode.fill();
+            textarea.style.background = "transparent";
             textarea.style.zIndex = "100";
             textarea.wrap = "off";
 
@@ -169,23 +170,20 @@ export const TextViewManager = (
                 const newText = textarea.value;
 
                 if (newText === "") {
-                    // removeComment
                     setElements((elements) => elements.filter((element) => element.id !== text.id));
-
-                    removeTextarea();
-                    return;
+                } else {
+                    textNode.setAttrs({
+                        width: width / scale,
+                        height: height / scale,
+                    });
+                    handleChange(text.id, {
+                        text: newText,
+                        width: textNode.width(),
+                        height: textNode.height(),
+                        scaleX: textNode.scaleX(),
+                    });
                 }
 
-                textNode.setAttrs({
-                    width: width / scale,
-                    height: height / scale,
-                });
-                handleChange(text.id, {
-                    text: newText,
-                    width: textNode.width(),
-                    height: textNode.height(),
-                    scaleX: textNode.scaleX(),
-                });
                 removeTextarea();
             };
 
