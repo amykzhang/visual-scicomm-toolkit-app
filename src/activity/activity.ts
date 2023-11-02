@@ -64,7 +64,7 @@ const activity_visual_strategies: Activity = {
     activity_panel: `
         <div class="medium-text">You're a researcher who wants to describe the following process in a <span class="bold">visual diagram</span>. Can you design a communication piece using the elements provided in this activity?</div>
         <br/>
-        <div class="medium-text pad-medium yw-background rounded bold">The receptor Y is found in the cell membrane. The molecule X binds to the receptor. This triggers the release of proteins by an organelle in the cell.</div>
+        <div class="medium-text pad-medium yellow-background rounded bold">The receptor Y is found in the cell membrane. The molecule X binds to the receptor. This triggers the release of proteins by an organelle in the cell.</div>
         <br/>
         <br/>
         <br/>
@@ -74,15 +74,15 @@ const activity_visual_strategies: Activity = {
             Instructions
         </div>
         <div class="gap-large flex-column">
-            <div class="flex-column lightbl-background rounded gap-medium pad-small">
+            <div class="flex-column lightblue-background rounded gap-medium pad-small">
                 <div class="small-text bold">1. Understand the science</div>
                 <div class="small-text">We start by researching the topic if we're unfamiliar with the science. This includes searching and referencing visuals, such as diagrams, created by others.</div>
             </div>
-            <div class="flex-column lightbl-background rounded gap-medium pad-small">
+            <div class="flex-column lightblue-background rounded gap-medium pad-small">
                 <div class="small-text bold">2. Design a communication piece</div>
                 <div class="small-text">Once we have a good grasp of the science, we can communicate it to our target audience. We start considering the text that appears in the piece, the placement of visuals, and the balance between text and visuals.</div>
             </div>
-            <div class="flex-column lightbl-background rounded gap-medium pad-small">
+            <div class="flex-column lightblue-background rounded gap-medium pad-small">
                 <div class="small-text bold">3. Support your design choices</div>
                 <div class="small-text">Place a comment next to different parts of your diagram and explain how you've made your design as effective as possible.</div>
             </div>
