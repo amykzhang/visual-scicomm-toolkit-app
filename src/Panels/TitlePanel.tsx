@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import typography from "../styles/typography";
 import color from "../styles/color";
+import { ReactComponent as ToolkitLogo } from "../assets/ToolkitLogo.svg";
 
 const TitlePanelContainer = styled.div`
     pointer-events: all;
@@ -21,17 +22,9 @@ const TitlePanelContainer = styled.div`
     gap: 24px;
 `;
 
-const Logo = styled.div`
-    padding: 9px 8px;
-    text-align: center;
-    gap: 10px;
-
-    width: 62px;
-    height: 38px;
-
-    background: ${color.black};
-    color: ${color.white};
-    border-radius: 5px;
+const Logo = styled(ToolkitLogo)`
+    width: 40px;
+    height: 40px;
 `;
 
 const StyledName = styled.div`
@@ -45,7 +38,7 @@ interface TitlePanelProps {
 export const TitlePanel: React.FC<TitlePanelProps> = ({ name }) => {
     return (
         <TitlePanelContainer>
-            <Logo>LOGO</Logo>
+            <Logo />
             <StyledName>
                 <typography.LargeText>{name}</typography.LargeText>
             </StyledName>

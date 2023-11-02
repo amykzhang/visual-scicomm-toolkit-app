@@ -5,7 +5,7 @@ import { ReactComponent as UploadIcon } from "../assets/upload.svg";
 import { Activity } from "../activity/activity";
 import typography from "../styles/typography";
 import color from "../styles/color";
-import { SettingTool } from "../components/SettingTool";
+// import { SettingTool } from "../components/SettingTool";
 
 const ExportPanelContainer = styled.div`
     pointer-events: all;
@@ -64,7 +64,7 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({ activity, startExportP
     return (
         <ExportPanelContainer>
             <InformationTool content={activity.info} />
-            <SettingTool />
+            {/* <SettingTool /> */}
             <ExportButton data-isactive={isExportOptionsOpen} onClick={toggleExportOptions}>
                 <UploadIcon />
                 <ExportText>Export</ExportText>
