@@ -1347,12 +1347,14 @@ const Item = styled.div`
 `;
 
 const Separator = styled.span`
+    user-select: none;
     border: 1px solid ${color.grey};
     border-radius: 5px;
     margin: 5px;
 `;
 
 const StyledSlider = styled.input`
+    user-select: none;
     cursor: pointer;
     width: 100%;
     height: 100%;
@@ -1361,6 +1363,7 @@ const StyledSlider = styled.input`
 `;
 
 const StyleContainer = styled.div`
+    user-select: none;
     position: absolute;
     top: 0;
     left: 0;
@@ -1374,6 +1377,7 @@ const StyleContainer = styled.div`
 `;
 
 const ColorPaletteContainer = styled.div`
+    user-select: none;
     position: absolute;
     top: 0;
     left: 0;
@@ -1388,6 +1392,7 @@ const ColorPaletteContainer = styled.div`
 `;
 
 const ColorCircle = styled.div`
+    user-select: none;
     cursor: pointer;
     width: 40px;
     height: 40px;
@@ -1401,6 +1406,7 @@ const ColorCircle = styled.div`
 `;
 
 const PlusCircle = styled.div`
+    user-select: none;
     position: relative;
     cursor: pointer;
     width: 40px;
@@ -1415,6 +1421,7 @@ const PlusCircle = styled.div`
 `;
 
 const ColorPicker = styled.input`
+    user-select: none;
     position: absolute;
     cursor: pointer;
     top: 0;
