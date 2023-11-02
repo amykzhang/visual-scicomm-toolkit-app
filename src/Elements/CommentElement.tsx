@@ -12,7 +12,6 @@ interface CommentElementProp {
     draggable: boolean;
     isSelected: boolean;
     stageRef: React.MutableRefObject<Konva.Stage | null>;
-    handleSelect: () => void;
     editComment: editCommentProp;
 }
 
@@ -23,7 +22,6 @@ const CommentElement = ({
     draggable,
     isSelected,
     stageRef,
-    handleSelect,
     editComment,
 }: CommentElementProp) => {
     const textRef = React.useRef<Konva.Text | null>(null);
@@ -35,8 +33,6 @@ const CommentElement = ({
     function handleClick(e: Konva.KonvaEventObject<MouseEvent>) {
         if (isSelected) {
             editComment(textRef, rectRef, transformerRef, comment);
-        } else {
-            handleSelect();
         }
     }
 
@@ -194,6 +190,7 @@ const CommentElement = ({
                 />
                 <Text
                     type="comment"
+                    id={comment.id}
                     ref={textRef}
                     text={comment.text}
                     x={comment.x}

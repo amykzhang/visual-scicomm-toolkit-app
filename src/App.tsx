@@ -131,8 +131,6 @@ export default function App() {
     // Selection
     const { selectElement, deleteSelected } = SelectionManager(
         setElements,
-        // view,
-        // setView,
         shiftKey,
         groupSelection,
         setGroupSelection
@@ -140,13 +138,13 @@ export default function App() {
 
     const {
         selectedComment,
+        isEditingComment,
         setSelectedComment,
         handleCommentViewClickOff,
         editComment,
-        isEditingComment,
     } = CommentViewManager(setComments, stageRef);
 
-    const { toggleTextMode, handleTextClick, editText, isEditingText, editId, setEditId } =
+    const { isEditingText, editTextId, toggleTextMode, handleTextClick, editText } =
         TextViewManager(view, setView, setElements, stageRef, setGroupSelection);
 
     const {
@@ -370,6 +368,7 @@ export default function App() {
                 }
                 // TEXT VIEW
             } else if (view === APP_VIEW.text) {
+                if (isEditingText) return;
                 switch (e.key) {
                     case "Escape":
                         setView(APP_VIEW.select);
@@ -395,9 +394,7 @@ export default function App() {
                 }
                 // COMMENT VIEW
             } else if (view === APP_VIEW.comment) {
-                if (isEditingComment) {
-                    return;
-                }
+                if (isEditingComment) return;
                 switch (e.key) {
                     case "Delete":
                     case "Backspace":
@@ -475,8 +472,7 @@ export default function App() {
                     key={text.id}
                     text={text}
                     draggable={draggable || view === APP_VIEW.text}
-                    editId={editId}
-                    setEditId={setEditId}
+                    editId={editTextId}
                     isSelected={groupSelection.length === 1 && groupSelection.includes(text.id)}
                     handleChange={handleChange}
                     editText={editText}
@@ -1111,7 +1107,6 @@ export default function App() {
                                     comments={comments}
                                     setComments={setComments}
                                     stageRef={stageRef}
-                                    handleSelect={() => setSelectedComment(comment.id)}
                                     editComment={editComment}
                                 />
                             );

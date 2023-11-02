@@ -9,7 +9,8 @@ export const CommentViewManager = (
     stageRef: React.RefObject<Konva.Stage>
 ) => {
     const [selectedComment, setSelectedComment] = useState<string | null>(null);
-    const [isEditingComment, setIsEditing] = useState<boolean>(false);
+    const [canAddComment, setCanAddComment] = useState<boolean>(true);
+    const [isEditingComment, setIsEditingComment] = useState<boolean>(false);
 
     function addComment(x: number, y: number) {
         const id = uuid();
@@ -31,22 +32,26 @@ export const CommentViewManager = (
 
     // handle stage click in comment mode
     // 1) check for click on any are not a 'comment'
-    // 2) if isEditingComment is true, just blurred off a textarea, do nothing
-    // 3) if isEditingComment is false, add a comment
+    // 2) if canAddComment is true, just blurred off a textarea, do nothing
+    // 3) if canAddComment is false, add a comment
     function handleCommentViewClickOff(e: Konva.KonvaEventObject<MouseEvent>) {
-        if (e.target.getAttrs().type !== "comment") {
-            if (isEditingComment) {
-                setIsEditing(false);
-                setSelectedComment(null);
-            } else {
-                setIsEditing(false);
+        if (e.target.getAttrs().type === "comment") {
+            setSelectedComment(e.target.id());
+            setCanAddComment(false);
+        } else {
+            if (canAddComment) {
                 if (stageRef.current !== null) {
                     const stage = stageRef.current;
                     const x = (e.evt.clientX - stage.x()) / stage.scaleX();
                     const y = (e.evt.clientY - stage.y()) / stage.scaleX();
                     const id = addComment(x, y);
+
                     setSelectedComment(id);
+                    setCanAddComment(false);
                 }
+            } else {
+                setCanAddComment(true);
+                setSelectedComment(null);
             }
         }
     }
@@ -65,8 +70,7 @@ export const CommentViewManager = (
             rectRef.current !== null &&
             transformerRef.current !== null
         ) {
-            setIsEditing(true);
-
+            setIsEditingComment(true);
             const textNode = textRef.current;
             const rectNode = rectRef.current;
             const tr = transformerRef.current;
@@ -172,12 +176,13 @@ export const CommentViewManager = (
             };
 
             const handleBlur = (e: FocusEvent) => {
+                e.stopPropagation();
+                setIsEditingComment(false);
                 const newText = textarea.value;
 
                 if (newText === "") {
                     removeComment(comment.id);
                     removeTextarea();
-                    setIsEditing(false);
                     return;
                 }
 
@@ -210,7 +215,6 @@ export const CommentViewManager = (
                 );
 
                 removeTextarea();
-                setIsEditing(false);
             };
 
             const handleWheel = (e: WheelEvent) => {
@@ -249,10 +253,10 @@ export const CommentViewManager = (
 
     return {
         selectedComment,
+        isEditingComment,
         setSelectedComment,
         handleCommentViewClickOff,
         editComment,
         removeComment,
-        isEditingComment,
     };
 };
