@@ -126,15 +126,16 @@ DEADLINE:
 
 appearance fixes:
 
--   pan: closed hand on mousedown, open hand on mouseup
+-   pan: closed hand on mousedown, open hand on mouseup ✅
 -   comment elements: just make aspect the same
 -   commment view: close sidebars ✅
 
 bugs:
 
 -   fullscreen doesnt render stage when changing vw/vh ✅
--   overflow y on sidebars
+-   overflow y on sidebars (?)
 -   text and comment clicks
+-   Reposition submenus when not enough space
 
 Need from Amy:
 

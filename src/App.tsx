@@ -826,10 +826,16 @@ export default function App() {
                     primaryMenu.getBoundingClientRect().width / 2;
                 let y = transformer.y() - 100;
 
-                const [newX, newY] = fitInFrame(x, y, width, height, [10, 10]);
+                // reposition menu if it goes out of bounds
+                const margin = 70;
+                if (x < 10) x = 10;
+                if (x + width > window.innerWidth - 10) x = window.innerWidth - width - 10;
+                if (y < margin + 10) y = margin + 10;
+                if (y + height > window.innerHeight - margin - 10)
+                    y = window.innerHeight - height - margin - 10;
 
-                primaryMenu.style.left = newX + "px";
-                primaryMenu.style.top = newY + "px";
+                primaryMenu.style.left = x + "px";
+                primaryMenu.style.top = y + "px";
             } else {
                 primaryMenu.style.left = "";
                 primaryMenu.style.top = "";
@@ -857,14 +863,17 @@ export default function App() {
             buttonW = strokeRef.current.getBoundingClientRect().width;
         }
         let x = buttonX + buttonW / 2 - palette.width / 2;
-        let y = menu.y - palette.height;
-        const [newX, newY] = fitInFrame(x, y, palette.width, palette.height, [
-            10,
-            menu.height + 10,
-        ]);
+        let y = menu.y - palette.height - 5;
 
-        colorPaletteRef.current.style.left = newX + "px";
-        colorPaletteRef.current.style.top = newY + "px";
+        // reposition menu if it goes out of bounds
+        const margin = 70;
+        if (x < 10) x = 10;
+        if (x + palette.width > window.innerWidth - 10) x = window.innerWidth - palette.width - 10;
+        if (y < margin + 10) y = menu.y + menu.height + 5;
+        if (y + palette.height > window.innerHeight - margin - 10) y = menu.y - palette.height - 5;
+
+        colorPaletteRef.current.style.left = x + "px";
+        colorPaletteRef.current.style.top = y + "px";
 
         if (submenuOption === "fill") {
             if (colorPickerRef.current !== null) colorPickerRef.current.value = fill;
@@ -890,13 +899,18 @@ export default function App() {
 
         let x = buttonX + buttonW / 2 - container.width / 2;
         let y = menu.y - container.height - 5;
-        const [newX, newY] = fitInFrame(x, y, container.width, container.height, [
-            10,
-            menu.height + 10,
-        ]);
 
-        styleMenuRef.current.style.left = newX + "px";
-        styleMenuRef.current.style.top = newY + "px";
+        // reposition menu if it goes out of bounds
+        const margin = 70;
+        if (x < 10) x = 10;
+        if (x + container.width > window.innerWidth - 10)
+            x = window.innerWidth - container.width - 10;
+        if (y < margin + 10) y = menu.y + menu.height + 5;
+        if (y + container.height > window.innerHeight - margin - 10)
+            y = menu.y - container.height - 5;
+
+        styleMenuRef.current.style.left = x + "px";
+        styleMenuRef.current.style.top = y + "px";
     }, [submenuOption]);
 
     useEffect(() => {
@@ -1418,21 +1432,3 @@ const ColorPicker = styled.input`
     height: 100%;
     opacity: 0;
 `;
-
-function fitInFrame(
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    padding: [number, number]
-): [number, number] {
-    const margin = 70;
-    // Check if menu is out of bounds
-    if (x < padding[0]) x = padding[0];
-    if (x + width > window.innerWidth - padding[0]) x = window.innerWidth - width - padding[0];
-    if (y < margin + padding[1]) y = margin + padding[1];
-    if (y > window.innerHeight - height - margin - padding[1])
-        y = window.innerHeight - height - margin - padding[1];
-
-    return [x, y];
-}
