@@ -6,7 +6,6 @@ import { ShapeProp } from "../utils/interfaces";
 interface ShapeElementProp {
     shape: ShapeProp;
     draggable: boolean;
-    // handleDragStart: () => void;
     handleChange: (id: string, attributes: any) => void;
 }
 

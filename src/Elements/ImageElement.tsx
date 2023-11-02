@@ -6,7 +6,6 @@ import { ImageProp } from "../utils/interfaces";
 interface ImageElementProp {
     image: ImageProp;
     draggable: boolean;
-    // handleDragStart: () => void;
     handleChange: (id: string, attributes: any) => void;
 }
 

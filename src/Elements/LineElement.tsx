@@ -7,7 +7,6 @@ import constants from "../utils/constants";
 interface LineElementProp {
     line: LineProp;
     draggable: boolean;
-    // handleDragStart: () => void;
     handleChange: (id: string, attributes: any) => void;
 }
 
