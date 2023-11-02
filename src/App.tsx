@@ -146,7 +146,7 @@ export default function App() {
         isEditingComment,
     } = CommentViewManager(setComments, stageRef);
 
-    const { toggleTextMode, handleTextClick, editText, isEditingText, justCreated } =
+    const { toggleTextMode, handleTextClick, editText, isEditingText, editId, setEditId } =
         TextViewManager(view, setView, setElements, stageRef, setGroupSelection);
 
     const {
@@ -475,7 +475,8 @@ export default function App() {
                     key={text.id}
                     text={text}
                     draggable={draggable || view === APP_VIEW.text}
-                    isJustCreated={justCreated === text.id}
+                    editId={editId}
+                    setEditId={setEditId}
                     isSelected={groupSelection.length === 1 && groupSelection.includes(text.id)}
                     handleChange={handleChange}
                     editText={editText}

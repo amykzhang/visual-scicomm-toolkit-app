@@ -13,7 +13,7 @@ export const TextViewManager = (
     setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>
 ) => {
     const [isEditingText, setIsEditing] = useState<boolean>(false);
-    const [justCreated, setJustCreated] = useState<string | null>(null);
+    const [editId, setEditId] = useState<string | null>(null);
 
     function toggleTextMode() {
         if (view === APP_VIEW.text) setView(APP_VIEW.select);
@@ -41,28 +41,24 @@ export const TextViewManager = (
     // 3) if isEditingText is false, add a textbox
     function handleTextClick(e: Konva.KonvaEventObject<MouseEvent>) {
         if (e.target.getAttrs().type !== "text") {
-            console.log("0");
             if (isEditingText) {
-                console.log("1");
                 setIsEditing(false);
                 setGroupSelection([]);
             } else {
-                console.log("2");
                 if (stageRef.current !== null && e.target.getAttrs().type !== "text") {
                     const stage = stageRef.current;
                     const x = (e.evt.clientX - stage.x()) / stage.scaleX();
                     const y = (e.evt.clientY - stage.y()) / stage.scaleX();
                     const id = addTextBox(x, y);
-                    // set justCreated for side effect to enter edit mode
-                    setJustCreated(id);
-                    setGroupSelection([id]);
+
                     setIsEditing(true);
+                    setEditId(id);
+                    setGroupSelection([id]);
                 }
             }
         } else {
-            // const id = e.target.id();
-            // setGroupSelection([id]);
-            // e.target.fire("click");
+            setIsEditing(true);
+            setEditId(e.target.id());
         }
     }
 
@@ -192,14 +188,10 @@ export const TextViewManager = (
                     scaleX: textNode.scaleX(),
                 });
                 removeTextarea();
-
-                // reset selection and justCreated for next textbox
-                setJustCreated(null);
             };
 
             const handleWheel = (e: WheelEvent) => {
                 textarea.blur();
-                setIsEditing(false);
             };
 
             const handleResize = () => {
@@ -243,6 +235,7 @@ export const TextViewManager = (
         handleTextClick,
         editText,
         isEditingText,
-        justCreated,
+        editId,
+        setEditId,
     };
 };

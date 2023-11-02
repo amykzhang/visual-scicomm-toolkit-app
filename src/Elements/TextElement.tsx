@@ -7,10 +7,10 @@ import constants from "../utils/constants";
 interface TextElementProp {
     text: TextProp;
     draggable: boolean;
-    // handleDragStart: () => void;
     handleChange: (id: string, attributes: any) => void;
-    isJustCreated: boolean;
     isSelected: boolean;
+    editId: string | null;
+    setEditId: React.Dispatch<React.SetStateAction<string | null>>;
     editText: editTextProp;
     transformerRef: React.MutableRefObject<Konva.Transformer | null>;
 }
@@ -18,10 +18,10 @@ interface TextElementProp {
 const TextElement = ({
     text,
     draggable,
-    // handleDragStart,
     handleChange,
     isSelected,
-    isJustCreated,
+    editId,
+    setEditId,
     editText,
     transformerRef,
 }: TextElementProp) => {
@@ -100,11 +100,11 @@ const TextElement = ({
 
     // Enter edit mode when first added
     useEffect(() => {
-        if (isJustCreated) {
+        if (editId === text.id) {
             editText(text, handleChange, textRef, transformerRef);
+            setEditId(null);
         }
-        // eslint-disable-next-line
-    }, []);
+    }, [editId]);
 
     return (
         <Text
