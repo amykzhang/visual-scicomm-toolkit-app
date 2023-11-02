@@ -7,10 +7,10 @@ import constants from "../utils/constants";
 interface TextElementProp {
     text: TextProp;
     draggable: boolean;
-    // handleDragStart: () => void;
     handleChange: (id: string, attributes: any) => void;
-    isJustCreated: boolean;
     isSelected: boolean;
+    editId: string | null;
+    setEditId: React.Dispatch<React.SetStateAction<string | null>>;
     editText: editTextProp;
     transformerRef: React.MutableRefObject<Konva.Transformer | null>;
 }
@@ -18,17 +18,18 @@ interface TextElementProp {
 const TextElement = ({
     text,
     draggable,
-    // handleDragStart,
     handleChange,
     isSelected,
-    isJustCreated,
+    editId,
+    setEditId,
     editText,
     transformerRef,
 }: TextElementProp) => {
     const textRef = useRef<Konva.Text>(null);
 
     const handleClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
-        if (e.evt.button !== 0) return; // Only handle left click
+        console.log("textClick", "isSelected:", isSelected);
+        if (e.evt && e.evt.button !== 0) return; // Only handle left click
         if (isSelected) editText(text, handleChange, textRef, transformerRef);
     };
 
@@ -99,11 +100,11 @@ const TextElement = ({
 
     // Enter edit mode when first added
     useEffect(() => {
-        if (isJustCreated) {
+        if (editId === text.id) {
             editText(text, handleChange, textRef, transformerRef);
+            setEditId(null);
         }
-        // eslint-disable-next-line
-    }, []);
+    }, [editId]);
 
     return (
         <Text
@@ -114,7 +115,6 @@ const TextElement = ({
             id={text.id}
             draggable={draggable}
             onClick={handleClick}
-            // onDragStart={handleDragStart}
             onDragEnd={(e) => {
                 handleChange(text.id, {
                     x: e.target.x(),

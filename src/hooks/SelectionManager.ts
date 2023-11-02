@@ -41,7 +41,6 @@ export const SelectionManager = (
 
     return {
         selectElement,
-        // handleDragStart,
         deleteSelected,
     };
 };

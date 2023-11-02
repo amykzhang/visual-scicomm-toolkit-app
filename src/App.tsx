@@ -92,6 +92,7 @@ export default function App() {
     const fillRef = useRef<HTMLDivElement>(null);
     const strokeRef = useRef<HTMLDivElement>(null);
     const colorPaletteRef = useRef<HTMLDivElement | null>(null);
+    const colorPickerRef = useRef<HTMLInputElement | null>(null);
     const styleRef = useRef<HTMLDivElement | null>(null);
     const styleMenuRef = useRef<HTMLDivElement | null>(null);
 
@@ -145,7 +146,7 @@ export default function App() {
         isEditingComment,
     } = CommentViewManager(setComments, stageRef);
 
-    const { toggleTextMode, handleTextClick, editText, isEditingText, justCreated } =
+    const { toggleTextMode, handleTextClick, editText, isEditingText, editId, setEditId } =
         TextViewManager(view, setView, setElements, stageRef, setGroupSelection);
 
     const {
@@ -175,13 +176,11 @@ export default function App() {
         fill: boolean;
         fontStyle: boolean;
         opacity: boolean;
-        values: any;
     }>({
         stroke: true,
         fill: true,
         fontStyle: true,
         opacity: true,
-        values: { opacity: 1 },
     });
     const [secondaryMenuItems, setSecondaryMenuItems] = useState<{
         copy: boolean;
@@ -199,6 +198,9 @@ export default function App() {
     const [contextPointer, setContextPointer] = useState({ x: 0, y: 0 });
 
     const [submenuOption, setSubmenuOption] = useState<"stroke" | "fill" | "style" | null>(null);
+    const [opacity, setOpacity] = useState(1);
+    const [stroke, setStroke] = useState("#000000");
+    const [fill, setFill] = useState("#000000");
     const [colorSelected, setColorSelected] = useState<string | null>(null);
     const [styleSelected, setStyleSelected] = useState<string | null>(null);
     const [appliedStyles, setAppliedStyles] = useState({
@@ -283,15 +285,17 @@ export default function App() {
     // move group selection by x and y
     const shiftGroupSelection = useCallback(
         (x: number, y: number) => {
-            elements.forEach((element) => {
-                if (groupSelection.includes(element.id)) {
-                    handleChange(element.id, { x: element.x + x, y: element.y + y });
-                }
-            });
+            setElements((elements) =>
+                elements.map((element) =>
+                    groupSelection.includes(element.id)
+                        ? { ...element, x: element.x + x, y: element.y + y }
+                        : element
+                )
+            );
 
             setGroupSelection(groupSelection.splice(0));
         },
-        [elements, groupSelection]
+        [groupSelection]
     );
 
     // -- KEY PRESSES --
@@ -451,7 +455,6 @@ export default function App() {
                     key={image.id}
                     image={image}
                     draggable={draggable}
-                    // handleDragStart={handleDragStart(image.id)}
                     handleChange={handleChange}
                 />
             );
@@ -462,7 +465,6 @@ export default function App() {
                     key={shape.id}
                     shape={shape}
                     draggable={draggable}
-                    // handleDragStart={handleDragStart(shape.id)}
                     handleChange={handleChange}
                 />
             );
@@ -472,10 +474,10 @@ export default function App() {
                 <TextElement
                     key={text.id}
                     text={text}
-                    draggable={draggable}
-                    isJustCreated={justCreated === text.id}
+                    draggable={draggable || view === APP_VIEW.text}
+                    editId={editId}
+                    setEditId={setEditId}
                     isSelected={groupSelection.length === 1 && groupSelection.includes(text.id)}
-                    // handleDragStart={handleDragStart(text.id)}
                     handleChange={handleChange}
                     editText={editText}
                     transformerRef={transformerRef}
@@ -488,7 +490,6 @@ export default function App() {
                     key={line.id}
                     line={line}
                     draggable={draggable}
-                    // handleDragStart={handleDragStart(line.id)}
                     handleChange={handleChange}
                 />
             );
@@ -759,21 +760,17 @@ export default function App() {
         const showTextStyle = someText && !someShape && !someLine && !someImage;
         const showOpacity = someShape || someImage || someLine || someText;
 
-        let stroke = {};
-        let fill = {};
-        let fontStyle = {};
-        let opacity = {};
         if (showStroke) {
             const shapesAndLines = selectedElements as (ShapeProp | LineProp)[];
             const sameColor = shapesAndLines.every(
                 (element) => element.stroke === shapesAndLines[0].stroke
             );
-            stroke = { stroke: sameColor ? shapesAndLines[0].stroke : "#000000" };
+            setStroke(sameColor ? shapesAndLines[0].stroke : "#000000");
         }
         if (showFill) {
             const shapes = selectedElements as ShapeProp[];
             const sameColor = shapes.every((element) => element.fill === shapes[0].fill);
-            fill = { fill: sameColor ? shapes[0].fill : "#000000" };
+            setFill(sameColor ? shapes[0].fill : "#000000");
         }
         if (showTextStyle) {
             const texts = selectedElements as TextProp[];
@@ -801,7 +798,7 @@ export default function App() {
             const sameOpacity = elements.every(
                 (element) => element.opacity === elements[0].opacity
             );
-            opacity = { opacity: sameOpacity ? elements[0].opacity : 1 };
+            setOpacity(sameOpacity ? elements[0].opacity : 1);
         }
 
         setPrimaryMenuItems({
@@ -809,7 +806,6 @@ export default function App() {
             fill: showFill,
             fontStyle: showTextStyle,
             opacity: showOpacity,
-            values: { ...stroke, ...fill, ...fontStyle, ...opacity },
         });
     }, [groupSelection, elements]);
 
@@ -827,10 +823,16 @@ export default function App() {
                     primaryMenu.getBoundingClientRect().width / 2;
                 let y = transformer.y() - 100;
 
-                const [newX, newY] = fitInFrame(x, y, width, height, [10, 10]);
+                // reposition menu if it goes out of bounds
+                const margin = 70;
+                if (x < 10) x = 10;
+                if (x + width > window.innerWidth - 10) x = window.innerWidth - width - 10;
+                if (y < margin + 10) y = margin + 10;
+                if (y + height > window.innerHeight - margin - 10)
+                    y = window.innerHeight - height - margin - 10;
 
-                primaryMenu.style.left = newX + "px";
-                primaryMenu.style.top = newY + "px";
+                primaryMenu.style.left = x + "px";
+                primaryMenu.style.top = y + "px";
             } else {
                 primaryMenu.style.left = "";
                 primaryMenu.style.top = "";
@@ -858,15 +860,24 @@ export default function App() {
             buttonW = strokeRef.current.getBoundingClientRect().width;
         }
         let x = buttonX + buttonW / 2 - palette.width / 2;
-        let y = menu.y - palette.height;
-        const [newX, newY] = fitInFrame(x, y, palette.width, palette.height, [
-            10,
-            menu.height + 10,
-        ]);
+        let y = menu.y - palette.height - 5;
 
-        colorPaletteRef.current.style.left = newX + "px";
-        colorPaletteRef.current.style.top = newY + "px";
-    }, [submenuOption]);
+        // reposition menu if it goes out of bounds
+        const margin = 70;
+        if (x < 10) x = 10;
+        if (x + palette.width > window.innerWidth - 10) x = window.innerWidth - palette.width - 10;
+        if (y < margin + 10) y = menu.y + menu.height + 5;
+        if (y + palette.height > window.innerHeight - margin - 10) y = menu.y - palette.height - 5;
+
+        colorPaletteRef.current.style.left = x + "px";
+        colorPaletteRef.current.style.top = y + "px";
+
+        if (submenuOption === "fill") {
+            if (colorPickerRef.current !== null) colorPickerRef.current.value = fill;
+        } else if (submenuOption === "stroke") {
+            if (colorPickerRef.current !== null) colorPickerRef.current.value = stroke;
+        }
+    }, [submenuOption, fill, stroke]);
 
     useEffect(() => {
         if (
@@ -885,30 +896,45 @@ export default function App() {
 
         let x = buttonX + buttonW / 2 - container.width / 2;
         let y = menu.y - container.height - 5;
-        const [newX, newY] = fitInFrame(x, y, container.width, container.height, [
-            10,
-            menu.height + 10,
-        ]);
 
-        styleMenuRef.current.style.left = newX + "px";
-        styleMenuRef.current.style.top = newY + "px";
+        // reposition menu if it goes out of bounds
+        const margin = 70;
+        if (x < 10) x = 10;
+        if (x + container.width > window.innerWidth - 10)
+            x = window.innerWidth - container.width - 10;
+        if (y < margin + 10) y = menu.y + menu.height + 5;
+        if (y + container.height > window.innerHeight - margin - 10)
+            y = menu.y - container.height - 5;
+
+        styleMenuRef.current.style.left = x + "px";
+        styleMenuRef.current.style.top = y + "px";
     }, [submenuOption]);
 
     useEffect(() => {
         if (colorSelected === null) return;
 
         if (submenuOption === "fill") {
-            groupSelection.forEach((id) => {
-                handleChange(id, { fill: colorSelected });
-            });
+            setElements((elements) =>
+                elements.map((element) =>
+                    groupSelection.includes(element.id)
+                        ? { ...element, fill: colorSelected }
+                        : element
+                )
+            );
+            setFill(colorSelected);
+        } else if (submenuOption === "stroke") {
+            setElements((elements) =>
+                elements.map((element) =>
+                    groupSelection.includes(element.id)
+                        ? { ...element, stroke: colorSelected }
+                        : element
+                )
+            );
+            setStroke(colorSelected);
         }
-        if (submenuOption === "stroke") {
-            groupSelection.forEach((id) => {
-                handleChange(id, { stroke: colorSelected });
-            });
-        }
+
         setColorSelected(null);
-    }, [colorSelected, submenuOption, groupSelection]);
+    }, [colorSelected, groupSelection, submenuOption]);
 
     useEffect(() => {
         if (styleSelected === null) return;
@@ -1110,8 +1136,8 @@ export default function App() {
                                 <PlusCircle>
                                     +
                                     <ColorPicker
+                                        ref={colorPickerRef}
                                         type="color"
-                                        value={primaryMenuItems.values.fill}
                                         onChange={(e) => setColorSelected(e.target.value)}
                                     />
                                 </PlusCircle>
@@ -1157,16 +1183,16 @@ export default function App() {
                                     min="0"
                                     max="1"
                                     step="0.01"
-                                    value={primaryMenuItems.values.opacity}
+                                    defaultValue={opacity}
                                     onChange={(e) => {
                                         const opacity = parseFloat(e.target.value);
-                                        setPrimaryMenuItems({
-                                            ...primaryMenuItems,
-                                            values: { ...primaryMenuItems.values, opacity },
-                                        });
-                                        groupSelection.forEach((id) => {
-                                            handleChange(id, { opacity });
-                                        });
+                                        setElements((elements) =>
+                                            elements.map((element) =>
+                                                groupSelection.includes(element.id)
+                                                    ? { ...element, opacity: opacity }
+                                                    : element
+                                            )
+                                        );
                                     }}
                                 />
                             </Item>
@@ -1403,21 +1429,3 @@ const ColorPicker = styled.input`
     height: 100%;
     opacity: 0;
 `;
-
-function fitInFrame(
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    padding: [number, number]
-): [number, number] {
-    const margin = 70;
-    // Check if menu is out of bounds
-    if (x < padding[0]) x = padding[0];
-    if (x + width > window.innerWidth - padding[0]) x = window.innerWidth - width - padding[0];
-    if (y < margin + padding[1]) y = margin + padding[1];
-    if (y > window.innerHeight - height - margin - padding[1])
-        y = window.innerHeight - height - margin - padding[1];
-
-    return [x, y];
-}

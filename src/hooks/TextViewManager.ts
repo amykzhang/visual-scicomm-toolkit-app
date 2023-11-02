@@ -13,7 +13,7 @@ export const TextViewManager = (
     setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>
 ) => {
     const [isEditingText, setIsEditing] = useState<boolean>(false);
-    const [justCreated, setJustCreated] = useState<string | null>(null);
+    const [editId, setEditId] = useState<string | null>(null);
 
     function toggleTextMode() {
         if (view === APP_VIEW.text) setView(APP_VIEW.select);
@@ -45,18 +45,20 @@ export const TextViewManager = (
                 setIsEditing(false);
                 setGroupSelection([]);
             } else {
-                setIsEditing(false);
                 if (stageRef.current !== null && e.target.getAttrs().type !== "text") {
                     const stage = stageRef.current;
                     const x = (e.evt.clientX - stage.x()) / stage.scaleX();
                     const y = (e.evt.clientY - stage.y()) / stage.scaleX();
                     const id = addTextBox(x, y);
 
-                    // set justCreated for side effect to enter edit mode
-                    setJustCreated(id);
+                    setIsEditing(true);
+                    setEditId(id);
                     setGroupSelection([id]);
                 }
             }
+        } else {
+            setIsEditing(true);
+            setEditId(e.target.id());
         }
     }
 
@@ -68,8 +70,6 @@ export const TextViewManager = (
             transformerRef.current !== null &&
             stageRef.current !== null
         ) {
-            setIsEditing(true);
-
             const textNode = textRef.current;
             const transformerNode = transformerRef.current;
             const stage = stageRef.current;
@@ -165,6 +165,8 @@ export const TextViewManager = (
 
             const handleBlur = (e: FocusEvent) => {
                 e.stopPropagation();
+                setGroupSelection([]);
+
                 const newText = textarea.value;
 
                 if (newText === "") {
@@ -186,11 +188,6 @@ export const TextViewManager = (
                     scaleX: textNode.scaleX(),
                 });
                 removeTextarea();
-
-                // reset selection and justCreated for next textbox
-                setJustCreated(null);
-                setGroupSelection([]);
-                setIsEditing(false);
             };
 
             const handleWheel = (e: WheelEvent) => {
@@ -238,6 +235,7 @@ export const TextViewManager = (
         handleTextClick,
         editText,
         isEditingText,
-        justCreated,
+        editId,
+        setEditId,
     };
 };

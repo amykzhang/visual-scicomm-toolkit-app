@@ -6,7 +6,6 @@ import { ImageProp } from "../utils/interfaces";
 interface ImageElementProp {
     image: ImageProp;
     draggable: boolean;
-    // handleDragStart: () => void;
     handleChange: (id: string, attributes: any) => void;
 }
 
@@ -22,7 +21,6 @@ const ImageElement = ({ image, draggable, handleChange }: ImageElementProp) => {
             image={imageElement}
             ref={imageRef}
             draggable={draggable}
-            // onDragStart={handleDragStart}
             onDragEnd={(e) =>
                 handleChange(image.id, {
                     x: e.target.x(),

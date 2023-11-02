@@ -6,7 +6,6 @@ import { ShapeProp } from "../utils/interfaces";
 interface ShapeElementProp {
     shape: ShapeProp;
     draggable: boolean;
-    // handleDragStart: () => void;
     handleChange: (id: string, attributes: any) => void;
 }
 
@@ -23,23 +22,31 @@ const ShapeElement = ({ shape, draggable, handleChange }: ShapeElementProp) => {
             draggable={draggable}
             radius={shape.width / 2} // For Circle
             sides={3} // For Triangle
-            // onDragStart={handleDragStart}
             onDragEnd={(e) =>
                 handleChange(shape.id, {
                     x: e.target.x(),
                     y: e.target.y(),
                 })
             }
+            onTransform={(e) => {
+                if (shapeRef.current !== null) {
+                    const node = shapeRef.current;
+                    node.width(node.width() * node.scaleX());
+                    node.height(node.height() * node.scaleY());
+                    node.scaleX(1);
+                    node.scaleY(1);
+                }
+            }}
             onTransformEnd={(e) => {
                 if (shapeRef.current !== null) {
                     const node = shapeRef.current;
                     handleChange(shape.id, {
                         x: node.x(),
                         y: node.y(),
-                        width: node.width(),
-                        height: node.height(),
-                        scaleX: node.scaleX(),
-                        scaleY: node.scaleY(),
+                        width: node.width() * node.scaleX(),
+                        height: node.height() * node.scaleY(),
+                        scaleX: 1,
+                        scaleY: 1,
                         rotation: node.rotation(),
                     });
                 }
