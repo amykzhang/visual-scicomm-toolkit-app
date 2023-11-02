@@ -97,7 +97,7 @@ export const CommentViewManager = (
             const scale = stage.scaleX() * comment.scale;
             const cornerRadius = constants.comment.cornerRadius;
             let width: number = textNode.width() * scale;
-            let height: number = 0;
+            let height: number = textNode.height() * scale;
 
             // apply many styles to match text on canvas as close as possible
             // remember that text rendering on canvas and on the textarea can be different
@@ -110,9 +110,7 @@ export const CommentViewManager = (
             textarea.style.height = height + "px";
             textarea.style.fontSize = textNode.fontSize() * scale + "px";
             textarea.style.border = "none";
-            textarea.style.padding = `${(textNode.padding() - 1.3) * scale}px ${
-                textNode.padding() * scale
-            }px `;
+            textarea.style.padding = `${textNode.padding() * scale}px`;
             textarea.style.overflow = "hidden";
             textarea.style.background = constants.comment.background;
             textarea.style.borderRadius = `${cornerRadius * scale}px ${cornerRadius * scale}px ${
@@ -129,7 +127,6 @@ export const CommentViewManager = (
                 rectNode.shadowOffsetY() * scale
             }px ${rectNode.shadowBlur() * scale}px 0px rgba(0,0,0,${rectNode.shadowOpacity()})`;
             textarea.style.zIndex = "100";
-            textarea.wrap = "off";
 
             let px = 0;
             // also we need to slightly move textarea on firefox
@@ -142,11 +139,6 @@ export const CommentViewManager = (
             const transform = `translateY(-${px}px)`;
             textarea.style.transform = transform;
 
-            // reset height
-            textarea.style.height = "0";
-            // after browsers resized it we can set actual value
-            height = textarea.scrollHeight + 4 * scale;
-            textarea.style.height = height + "px";
             textarea.focus();
 
             // const setTextareaWidth = (newWidth: number) => {
@@ -163,10 +155,26 @@ export const CommentViewManager = (
             //     textarea.style.width = newWidth + "px";
             // };
 
+            //const handleResize = () => {
+            //     textarea.style.width = "0";
+            //     textarea.style.height = "0";
+
+            //     width =
+            //         (Math.max(
+            //             constants.comment.minWidth,
+            //             textarea.scrollWidth / scale + constants.comment.padding
+            //         ) +
+            //             2) *
+            //         scale;
+            //     height = textarea.scrollHeight + 4;
+
+            //     textarea.style.width = width + "px";
+            //     textarea.style.height = height + "px";
+            // };
+
             const removeTextarea = () => {
                 textarea.removeEventListener("keydown", handleKeyPress);
                 textarea.removeEventListener("click", handleBlur);
-                textarea.removeEventListener("input", handleResize);
                 window.removeEventListener("wheel", handleWheel);
                 textarea.remove();
 
@@ -176,66 +184,44 @@ export const CommentViewManager = (
             };
 
             const handleBlur = (e: FocusEvent) => {
-                e.stopPropagation();
                 setIsEditingComment(false);
                 const newText = textarea.value;
 
-                if (newText === "") {
+                if (newText === "" || !newText.replace(/\s/g, "").length) {
                     removeComment(comment.id);
-                    removeTextarea();
-                    return;
+                } else {
+                    textNode.setAttrs({
+                        width: width / scale,
+                        height: height / scale,
+                    });
+                    rectNode.setAttrs({
+                        width: width / scale,
+                        height: height / scale,
+                    });
+
+                    // update Comment props
+                    setComments((comments) =>
+                        comments.map((comment_i) => {
+                            if (comment.id === comment_i.id) {
+                                return {
+                                    ...comment_i,
+                                    text: newText,
+                                    width: textNode.width(),
+                                    height: textNode.height(),
+                                    scale: textNode.scaleX(),
+                                };
+                            } else {
+                                return comment_i;
+                            }
+                        })
+                    );
                 }
-
-                handleResize();
-
-                textNode.setAttrs({
-                    width: width / scale,
-                    height: height / scale,
-                });
-                rectNode.setAttrs({
-                    width: width / scale,
-                    height: height / scale,
-                });
-
-                // update Comment props
-                setComments((comments) =>
-                    comments.map((comment_i) => {
-                        if (comment.id === comment_i.id) {
-                            return {
-                                ...comment_i,
-                                text: newText,
-                                width: textNode.width(),
-                                height: textNode.height(),
-                                scale: textNode.scaleX(),
-                            };
-                        } else {
-                            return comment_i;
-                        }
-                    })
-                );
 
                 removeTextarea();
             };
 
             const handleWheel = (e: WheelEvent) => {
                 textarea.blur();
-            };
-
-            const handleResize = () => {
-                textarea.style.width = "0";
-                textarea.style.height = "0";
-
-                width =
-                    (Math.max(
-                        constants.comment.minWidth,
-                        textarea.scrollWidth / scale + constants.comment.padding
-                    ) +
-                        2) *
-                    scale;
-                height = textarea.scrollHeight + 4;
-
-                textarea.style.width = width + "px";
-                textarea.style.height = height + "px";
             };
 
             const handleKeyPress = (e: KeyboardEvent) => {
@@ -245,7 +231,6 @@ export const CommentViewManager = (
             };
 
             textarea.addEventListener("keydown", handleKeyPress);
-            textarea.addEventListener("input", handleResize);
             textarea.addEventListener("blur", handleBlur);
             window.addEventListener("wheel", handleWheel);
         }
