@@ -135,7 +135,7 @@ bugs:
 -   fullscreen doesnt render stage when changing vw/vh ✅
 -   overflow y on sidebars (?)
 -   text and comment clicks
--   Reposition submenus when not enough space
+-   Reposition submenus when not enough space ✅
 
 Need from Amy:
 

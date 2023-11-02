@@ -41,22 +41,28 @@ export const TextViewManager = (
     // 3) if isEditingText is false, add a textbox
     function handleTextClick(e: Konva.KonvaEventObject<MouseEvent>) {
         if (e.target.getAttrs().type !== "text") {
+            console.log("0");
             if (isEditingText) {
+                console.log("1");
                 setIsEditing(false);
                 setGroupSelection([]);
             } else {
-                setIsEditing(false);
+                console.log("2");
                 if (stageRef.current !== null && e.target.getAttrs().type !== "text") {
                     const stage = stageRef.current;
                     const x = (e.evt.clientX - stage.x()) / stage.scaleX();
                     const y = (e.evt.clientY - stage.y()) / stage.scaleX();
                     const id = addTextBox(x, y);
-
                     // set justCreated for side effect to enter edit mode
                     setJustCreated(id);
                     setGroupSelection([id]);
+                    setIsEditing(true);
                 }
             }
+        } else {
+            // const id = e.target.id();
+            // setGroupSelection([id]);
+            // e.target.fire("click");
         }
     }
 
@@ -68,8 +74,6 @@ export const TextViewManager = (
             transformerRef.current !== null &&
             stageRef.current !== null
         ) {
-            setIsEditing(true);
-
             const textNode = textRef.current;
             const transformerNode = transformerRef.current;
             const stage = stageRef.current;
@@ -165,6 +169,8 @@ export const TextViewManager = (
 
             const handleBlur = (e: FocusEvent) => {
                 e.stopPropagation();
+                setGroupSelection([]);
+
                 const newText = textarea.value;
 
                 if (newText === "") {
@@ -189,12 +195,11 @@ export const TextViewManager = (
 
                 // reset selection and justCreated for next textbox
                 setJustCreated(null);
-                setGroupSelection([]);
-                setIsEditing(false);
             };
 
             const handleWheel = (e: WheelEvent) => {
                 textarea.blur();
+                setIsEditing(false);
             };
 
             const handleResize = () => {

@@ -455,7 +455,6 @@ export default function App() {
                     key={image.id}
                     image={image}
                     draggable={draggable}
-                    // handleDragStart={handleDragStart(image.id)}
                     handleChange={handleChange}
                 />
             );
@@ -466,7 +465,6 @@ export default function App() {
                     key={shape.id}
                     shape={shape}
                     draggable={draggable}
-                    // handleDragStart={handleDragStart(shape.id)}
                     handleChange={handleChange}
                 />
             );
@@ -476,10 +474,9 @@ export default function App() {
                 <TextElement
                     key={text.id}
                     text={text}
-                    draggable={draggable}
+                    draggable={draggable || view === APP_VIEW.text}
                     isJustCreated={justCreated === text.id}
                     isSelected={groupSelection.length === 1 && groupSelection.includes(text.id)}
-                    // handleDragStart={handleDragStart(text.id)}
                     handleChange={handleChange}
                     editText={editText}
                     transformerRef={transformerRef}
@@ -492,7 +489,6 @@ export default function App() {
                     key={line.id}
                     line={line}
                     draggable={draggable}
-                    // handleDragStart={handleDragStart(line.id)}
                     handleChange={handleChange}
                 />
             );
