@@ -92,6 +92,7 @@ export default function App() {
     const fillRef = useRef<HTMLDivElement>(null);
     const strokeRef = useRef<HTMLDivElement>(null);
     const colorPaletteRef = useRef<HTMLDivElement | null>(null);
+    const colorPickerRef = useRef<HTMLInputElement | null>(null);
     const styleRef = useRef<HTMLDivElement | null>(null);
     const styleMenuRef = useRef<HTMLDivElement | null>(null);
 
@@ -175,13 +176,11 @@ export default function App() {
         fill: boolean;
         fontStyle: boolean;
         opacity: boolean;
-        values: any;
     }>({
         stroke: true,
         fill: true,
         fontStyle: true,
         opacity: true,
-        values: { opacity: 1 },
     });
     const [secondaryMenuItems, setSecondaryMenuItems] = useState<{
         copy: boolean;
@@ -199,6 +198,9 @@ export default function App() {
     const [contextPointer, setContextPointer] = useState({ x: 0, y: 0 });
 
     const [submenuOption, setSubmenuOption] = useState<"stroke" | "fill" | "style" | null>(null);
+    const [opacity, setOpacity] = useState(1);
+    const [stroke, setStroke] = useState("#000000");
+    const [fill, setFill] = useState("#000000");
     const [colorSelected, setColorSelected] = useState<string | null>(null);
     const [styleSelected, setStyleSelected] = useState<string | null>(null);
     const [appliedStyles, setAppliedStyles] = useState({
@@ -283,15 +285,17 @@ export default function App() {
     // move group selection by x and y
     const shiftGroupSelection = useCallback(
         (x: number, y: number) => {
-            elements.forEach((element) => {
-                if (groupSelection.includes(element.id)) {
-                    handleChange(element.id, { x: element.x + x, y: element.y + y });
-                }
-            });
+            setElements((elements) =>
+                elements.map((element) =>
+                    groupSelection.includes(element.id)
+                        ? { ...element, x: element.x + x, y: element.y + y }
+                        : element
+                )
+            );
 
             setGroupSelection(groupSelection.splice(0));
         },
-        [elements, groupSelection]
+        [groupSelection]
     );
 
     // -- KEY PRESSES --
@@ -759,21 +763,17 @@ export default function App() {
         const showTextStyle = someText && !someShape && !someLine && !someImage;
         const showOpacity = someShape || someImage || someLine || someText;
 
-        let stroke = {};
-        let fill = {};
-        let fontStyle = {};
-        let opacity = {};
         if (showStroke) {
             const shapesAndLines = selectedElements as (ShapeProp | LineProp)[];
             const sameColor = shapesAndLines.every(
                 (element) => element.stroke === shapesAndLines[0].stroke
             );
-            stroke = { stroke: sameColor ? shapesAndLines[0].stroke : "#000000" };
+            setStroke(sameColor ? shapesAndLines[0].stroke : "#000000");
         }
         if (showFill) {
             const shapes = selectedElements as ShapeProp[];
             const sameColor = shapes.every((element) => element.fill === shapes[0].fill);
-            fill = { fill: sameColor ? shapes[0].fill : "#000000" };
+            setFill(sameColor ? shapes[0].fill : "#000000");
         }
         if (showTextStyle) {
             const texts = selectedElements as TextProp[];
@@ -801,7 +801,7 @@ export default function App() {
             const sameOpacity = elements.every(
                 (element) => element.opacity === elements[0].opacity
             );
-            opacity = { opacity: sameOpacity ? elements[0].opacity : 1 };
+            setOpacity(sameOpacity ? elements[0].opacity : 1);
         }
 
         setPrimaryMenuItems({
@@ -809,7 +809,6 @@ export default function App() {
             fill: showFill,
             fontStyle: showTextStyle,
             opacity: showOpacity,
-            values: { ...stroke, ...fill, ...fontStyle, ...opacity },
         });
     }, [groupSelection, elements]);
 
@@ -866,7 +865,13 @@ export default function App() {
 
         colorPaletteRef.current.style.left = newX + "px";
         colorPaletteRef.current.style.top = newY + "px";
-    }, [submenuOption]);
+
+        if (submenuOption === "fill") {
+            if (colorPickerRef.current !== null) colorPickerRef.current.value = fill;
+        } else if (submenuOption === "stroke") {
+            if (colorPickerRef.current !== null) colorPickerRef.current.value = stroke;
+        }
+    }, [submenuOption, fill, stroke]);
 
     useEffect(() => {
         if (
@@ -898,17 +903,27 @@ export default function App() {
         if (colorSelected === null) return;
 
         if (submenuOption === "fill") {
-            groupSelection.forEach((id) => {
-                handleChange(id, { fill: colorSelected });
-            });
+            setElements((elements) =>
+                elements.map((element) =>
+                    groupSelection.includes(element.id)
+                        ? { ...element, fill: colorSelected }
+                        : element
+                )
+            );
+            setFill(colorSelected);
+        } else if (submenuOption === "stroke") {
+            setElements((elements) =>
+                elements.map((element) =>
+                    groupSelection.includes(element.id)
+                        ? { ...element, stroke: colorSelected }
+                        : element
+                )
+            );
+            setStroke(colorSelected);
         }
-        if (submenuOption === "stroke") {
-            groupSelection.forEach((id) => {
-                handleChange(id, { stroke: colorSelected });
-            });
-        }
+
         setColorSelected(null);
-    }, [colorSelected, submenuOption, groupSelection]);
+    }, [colorSelected, groupSelection, submenuOption]);
 
     useEffect(() => {
         if (styleSelected === null) return;
@@ -1110,8 +1125,8 @@ export default function App() {
                                 <PlusCircle>
                                     +
                                     <ColorPicker
+                                        ref={colorPickerRef}
                                         type="color"
-                                        value={primaryMenuItems.values.fill}
                                         onChange={(e) => setColorSelected(e.target.value)}
                                     />
                                 </PlusCircle>
@@ -1157,16 +1172,16 @@ export default function App() {
                                     min="0"
                                     max="1"
                                     step="0.01"
-                                    value={primaryMenuItems.values.opacity}
+                                    defaultValue={opacity}
                                     onChange={(e) => {
                                         const opacity = parseFloat(e.target.value);
-                                        setPrimaryMenuItems({
-                                            ...primaryMenuItems,
-                                            values: { ...primaryMenuItems.values, opacity },
-                                        });
-                                        groupSelection.forEach((id) => {
-                                            handleChange(id, { opacity });
-                                        });
+                                        setElements((elements) =>
+                                            elements.map((element) =>
+                                                groupSelection.includes(element.id)
+                                                    ? { ...element, opacity: opacity }
+                                                    : element
+                                            )
+                                        );
                                     }}
                                 />
                             </Item>
