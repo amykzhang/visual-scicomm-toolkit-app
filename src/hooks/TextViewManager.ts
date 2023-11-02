@@ -12,7 +12,8 @@ export const TextViewManager = (
     stageRef: React.RefObject<Konva.Stage>,
     setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>
 ) => {
-    const [isEditingText, setIsEditing] = useState<boolean>(false);
+    const [canAddText, setCanAddText] = useState<boolean>(true);
+    const [isEditingText, setIsEditingText] = useState<boolean>(false);
     const [editId, setEditId] = useState<string | null>(null);
 
     function toggleTextMode() {
@@ -37,28 +38,26 @@ export const TextViewManager = (
 
     // handle stage click in text mode
     // 1) check for click on any are not a 'text'
-    // 2) if isEditingText is true, just blurred off a textarea, do nothing
-    // 3) if isEditingText is false, add a textbox
+    // 2) if canAddText is true, just blurred off a textarea, do nothing
+    // 3) if canAddText is false, add a textbox
     function handleTextClick(e: Konva.KonvaEventObject<MouseEvent>) {
-        if (e.target.getAttrs().type !== "text") {
-            if (isEditingText) {
-                setIsEditing(false);
-                setGroupSelection([]);
-            } else {
+        if (e.target.getAttrs().type === "text") {
+            setEditId(e.target.id());
+            setCanAddText(false);
+        } else {
+            if (canAddText) {
                 if (stageRef.current !== null && e.target.getAttrs().type !== "text") {
                     const stage = stageRef.current;
                     const x = (e.evt.clientX - stage.x()) / stage.scaleX();
                     const y = (e.evt.clientY - stage.y()) / stage.scaleX();
                     const id = addTextBox(x, y);
 
-                    setIsEditing(true);
                     setEditId(id);
-                    setGroupSelection([id]);
+                    setCanAddText(false);
                 }
+            } else {
+                setCanAddText(true);
             }
-        } else {
-            setIsEditing(true);
-            setEditId(e.target.id());
         }
     }
 
@@ -70,6 +69,7 @@ export const TextViewManager = (
             transformerRef.current !== null &&
             stageRef.current !== null
         ) {
+            setIsEditingText(true);
             const textNode = textRef.current;
             const transformerNode = transformerRef.current;
             const stage = stageRef.current;
@@ -118,6 +118,7 @@ export const TextViewManager = (
             textarea.style.transformOrigin = "left top";
             textarea.style.textAlign = textNode.align();
             textarea.style.color = textNode.fill();
+            textarea.style.background = "transparent";
             textarea.style.zIndex = "100";
             textarea.wrap = "off";
 
@@ -164,29 +165,25 @@ export const TextViewManager = (
             };
 
             const handleBlur = (e: FocusEvent) => {
-                e.stopPropagation();
                 setGroupSelection([]);
-
+                setIsEditingText(false);
                 const newText = textarea.value;
 
                 if (newText === "") {
-                    // removeComment
                     setElements((elements) => elements.filter((element) => element.id !== text.id));
-
-                    removeTextarea();
-                    return;
+                } else {
+                    textNode.setAttrs({
+                        width: width / scale,
+                        height: height / scale,
+                    });
+                    handleChange(text.id, {
+                        text: newText,
+                        width: textNode.width(),
+                        height: textNode.height(),
+                        scaleX: textNode.scaleX(),
+                    });
                 }
 
-                textNode.setAttrs({
-                    width: width / scale,
-                    height: height / scale,
-                });
-                handleChange(text.id, {
-                    text: newText,
-                    width: textNode.width(),
-                    height: textNode.height(),
-                    scaleX: textNode.scaleX(),
-                });
                 removeTextarea();
             };
 
@@ -235,7 +232,7 @@ export const TextViewManager = (
         handleTextClick,
         editText,
         isEditingText,
-        editId,
+        editTextId: editId,
         setEditId,
     };
 };

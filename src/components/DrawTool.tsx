@@ -10,6 +10,7 @@ const StyledDrawButton = styled.button`
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
+    background: transparent;
 
     &:hover,
     &[data-isactive="true"] {

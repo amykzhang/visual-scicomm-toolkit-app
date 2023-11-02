@@ -2,14 +2,12 @@ import color from "../styles/color";
 
 const constants = {
     comment: {
-        minWidth: 200,
-        minHeight: 50,
         background: color.darkerYellow,
         cornerRadius: 20,
         padding: 20,
         initialComment: {
             width: 200,
-            height: 50,
+            height: 100,
             scale: 1,
             text: "",
         },

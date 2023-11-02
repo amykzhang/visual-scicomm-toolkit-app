@@ -10,7 +10,6 @@ interface TextElementProp {
     handleChange: (id: string, attributes: any) => void;
     isSelected: boolean;
     editId: string | null;
-    setEditId: React.Dispatch<React.SetStateAction<string | null>>;
     editText: editTextProp;
     transformerRef: React.MutableRefObject<Konva.Transformer | null>;
 }
@@ -21,14 +20,12 @@ const TextElement = ({
     handleChange,
     isSelected,
     editId,
-    setEditId,
     editText,
     transformerRef,
 }: TextElementProp) => {
     const textRef = useRef<Konva.Text>(null);
 
     const handleClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
-        console.log("textClick", "isSelected:", isSelected);
         if (e.evt && e.evt.button !== 0) return; // Only handle left click
         if (isSelected) editText(text, handleChange, textRef, transformerRef);
     };
@@ -102,8 +99,8 @@ const TextElement = ({
     useEffect(() => {
         if (editId === text.id) {
             editText(text, handleChange, textRef, transformerRef);
-            setEditId(null);
         }
+        // eslint-disable-next-line
     }, [editId]);
 
     return (

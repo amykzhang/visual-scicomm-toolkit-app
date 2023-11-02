@@ -34,6 +34,7 @@ export const ImageTool: FC<ImageToolProps> = ({
     setElements,
     stageRef,
 }) => {
+    const scalingFactor = 1.5;
     function addImage(x: number, y: number, offset: { x: number; y: number }) {
         setElements([
             ...elements,
@@ -42,8 +43,8 @@ export const ImageTool: FC<ImageToolProps> = ({
                 type: "image",
                 x: x - offset.x,
                 y: y - offset.y,
-                width: dimensions.width,
-                height: dimensions.height,
+                width: dimensions.width * scalingFactor,
+                height: dimensions.height * scalingFactor,
                 src: src,
                 scaleX: 1,
                 scaleY: 1,
