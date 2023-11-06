@@ -1,26 +1,24 @@
 import { useEffect } from "react";
-import { CanvasStateProp, CommentProp, ElementProp } from "../utils/interfaces";
+import { CommentProp, ElementProp } from "../utils/interfaces";
 
 interface HistoryProp {
-    canvas: CanvasStateProp;
+    elements: ElementProp[];
     selection: string[];
 }
 
 let history: HistoryProp[] = [
     {
-        canvas: { elements: [], comments: [] },
+        elements: [],
         selection: [],
     },
 ];
 
 let historyStep = 0;
-const historyLimit = 100;
+const maxHistoryStackSize = 100;
 
 export const HistoryManager = (
     elements: ElementProp[],
     setElements: React.Dispatch<React.SetStateAction<ElementProp[]>>,
-    comments: CommentProp[],
-    setComments: React.Dispatch<React.SetStateAction<CommentProp[]>>,
     groupSelection: string[],
     setGroupSelection: React.Dispatch<React.SetStateAction<string[]>>,
     initialCanvasState: { elements: ElementProp[]; comments: CommentProp[] }
@@ -28,8 +26,7 @@ export const HistoryManager = (
     const handleUndo = () => {
         if (historyStep > 0) {
             historyStep -= 1;
-            setElements(history[historyStep].canvas.elements);
-            setComments(history[historyStep].canvas.comments);
+            setElements(history[historyStep].elements);
             setGroupSelection(history[historyStep].selection);
         }
     };
@@ -37,8 +34,7 @@ export const HistoryManager = (
     const handleRedo = () => {
         if (historyStep < history.length - 1) {
             historyStep += 1;
-            setElements(history[historyStep].canvas.elements);
-            setComments(history[historyStep].canvas.comments);
+            setElements(history[historyStep].elements);
             setGroupSelection(history[historyStep].selection);
         }
     };
@@ -46,13 +42,13 @@ export const HistoryManager = (
     // Save history
     useEffect(() => {
         // Save only last  actions
-        if (history.length > historyLimit) {
+        if (history.length > maxHistoryStackSize) {
             history = history.slice(1);
             historyStep -= 1;
         }
 
         const newState = {
-            canvas: { elements, comments },
+            elements,
             selection: groupSelection,
         };
 
@@ -60,11 +56,16 @@ export const HistoryManager = (
             history = [...history.slice(0, historyStep + 1), newState];
             historyStep += 1;
         }
-    }, [elements, comments, groupSelection]);
+    }, [elements, groupSelection]);
 
     // Set previously saved state on initial load
     useEffect(() => {
-        history = [{ canvas: initialCanvasState, selection: [] }];
+        history = [
+            {
+                elements: initialCanvasState.elements,
+                selection: [],
+            },
+        ];
         historyStep = 0;
         // eslint-disable-next-line
     }, []);

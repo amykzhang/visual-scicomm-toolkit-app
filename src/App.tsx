@@ -118,8 +118,6 @@ export default function App() {
     const { history, historyStep, handleUndo, handleRedo } = HistoryManager(
         elements,
         setElements,
-        comments,
-        setComments,
         groupSelection,
         setGroupSelection,
         initialCanvasState
