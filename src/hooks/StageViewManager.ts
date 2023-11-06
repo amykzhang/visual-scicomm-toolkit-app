@@ -4,7 +4,7 @@ import { persistance } from "../utils/persistance";
 
 const zoomScale = 1.1;
 const zoomConstants = [
-    2, 3, 6, 13, 25, 50, 100, 200, 300, 400, 800, 1600, 3200, 6400, 12800, 25600,
+    10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200,
 ];
 
 const stageState = persistance.retrieveStageState();
