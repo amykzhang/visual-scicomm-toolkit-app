@@ -113,17 +113,18 @@ export default function App() {
     const [groupSelection, setGroupSelection] = useState<string[]>([]);
     const [isCornerTransform, setIsCornerTransform] = useState(false); // for transformer dragging corner
 
-    // --- MANAGERS FOR VIEWS ---
-    // History
+    // --- Hooks ---
     const { history, historyStep, handleUndo, handleRedo } = HistoryManager(
+        view,
         elements,
         setElements,
+        comments,
+        setComments,
         groupSelection,
         setGroupSelection,
         initialCanvasState
     );
 
-    // Selection
     const { selectElement, deleteSelected } = SelectionManager(
         setElements,
         shiftKey,
