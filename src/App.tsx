@@ -11,6 +11,7 @@ import {
     CommentViewManager,
     DragSelectManager,
     DrawViewManager,
+    HistoryManager,
 } from "./hooks";
 import {
     TitlePanel,
@@ -21,10 +22,9 @@ import {
     ExportPanel,
 } from "./Panels";
 import { APP_VIEW } from "./utils/enums";
-import { ExportArea } from "./components/ExportArea";
+import { ExportArea } from "./Elements/ExportArea";
 import { ExitCommentViewButton } from "./components/Components";
 import {
-    CanvasStateProp,
     CommentProp,
     ElementProp,
     ImageProp,
@@ -61,19 +61,6 @@ const activity = activity_visual_strategies;
 
 const initialCanvasState = persistance.retrieveCanvasState();
 const initialUiState = persistance.retrieveUiState();
-
-interface HistoryProp {
-    canvas: CanvasStateProp;
-    selection: string[];
-}
-
-let history: HistoryProp[] = [
-    {
-        canvas: initialCanvasState,
-        selection: [],
-    },
-];
-let historyStep = 0;
 
 let wheeldelta = {
     x: 0,
@@ -119,16 +106,25 @@ export default function App() {
 
     // --- CANVAS STATE ---
 
-    const [elements, setElements] = useState<ElementProp[]>(history[0].canvas.elements);
-    const [comments, setComments] = useState<CommentProp[]>(history[0].canvas.comments);
+    const [elements, setElements] = useState<ElementProp[]>(initialCanvasState.elements);
+    const [comments, setComments] = useState<CommentProp[]>(initialCanvasState.comments);
 
     // Group Selection
-    const [groupSelection, setGroupSelection] = useState<string[]>(history[0].selection);
+    const [groupSelection, setGroupSelection] = useState<string[]>([]);
     const [isCornerTransform, setIsCornerTransform] = useState(false); // for transformer dragging corner
 
-    // --- MANAGERS FOR VIEWS ---
+    // --- Hooks ---
+    const { history, historyStep, handleUndo, handleRedo } = HistoryManager(
+        view,
+        elements,
+        setElements,
+        comments,
+        setComments,
+        groupSelection,
+        setGroupSelection,
+        initialCanvasState
+    );
 
-    // Selection
     const { selectElement, deleteSelected } = SelectionManager(
         setElements,
         shiftKey,
@@ -326,8 +322,13 @@ export default function App() {
                         deleteSelected();
                         break;
                     case "z":
-                        if (e.shiftKey && e.metaKey) handleRedo();
-                        else if (e.metaKey) handleUndo();
+                        if (e.shiftKey && e.metaKey) {
+                            setShowPrimaryMenu(false);
+                            handleRedo();
+                        } else if (e.metaKey) {
+                            setShowPrimaryMenu(false);
+                            handleUndo();
+                        }
                         break;
                     case "[":
                         sendToBack();
@@ -374,8 +375,13 @@ export default function App() {
                         setView(APP_VIEW.select);
                         break;
                     case "z":
-                        if (e.shiftKey && e.metaKey) handleRedo();
-                        else if (e.metaKey) handleUndo();
+                        if (e.shiftKey && e.metaKey) {
+                            setShowPrimaryMenu(false);
+                            handleRedo();
+                        } else if (e.metaKey) {
+                            setShowPrimaryMenu(false);
+                            handleUndo();
+                        }
                         break;
                     default:
                         break;
@@ -386,8 +392,13 @@ export default function App() {
                         setView(APP_VIEW.select);
                         break;
                     case "z":
-                        if (e.shiftKey && e.metaKey) handleRedo();
-                        else if (e.metaKey) handleUndo();
+                        if (e.shiftKey && e.metaKey) {
+                            setShowPrimaryMenu(false);
+                            handleRedo();
+                        } else if (e.metaKey) {
+                            setShowPrimaryMenu(false);
+                            handleUndo();
+                        }
                         break;
                     default:
                         break;
@@ -429,6 +440,8 @@ export default function App() {
             zoomIn,
             zoomOut,
             shiftGroupSelection,
+            handleRedo,
+            handleUndo,
         ]
     );
 
@@ -598,28 +611,6 @@ export default function App() {
         }
     };
 
-    // --- HISTORY ---
-
-    const handleUndo = () => {
-        setShowPrimaryMenu(false);
-        if (historyStep > 0) {
-            historyStep -= 1;
-            setElements(history[historyStep].canvas.elements);
-            setComments(history[historyStep].canvas.comments);
-            setGroupSelection(history[historyStep].selection);
-        }
-    };
-
-    const handleRedo = () => {
-        setShowPrimaryMenu(false);
-        if (historyStep < history.length - 1) {
-            historyStep += 1;
-            setElements(history[historyStep].canvas.elements);
-            setComments(history[historyStep].canvas.comments);
-            setGroupSelection(history[historyStep].selection);
-        }
-    };
-
     // Export
     const { isExporting, startExportProcess } = ExportManager(activity, stageRef);
 
@@ -637,25 +628,6 @@ export default function App() {
     useEffect(() => {
         persistance.persistUiState(uiState);
     }, [uiState]);
-
-    // Save history
-    useEffect(() => {
-        // Save only last  actions
-        if (history.length > 200) {
-            history = history.slice(1);
-            historyStep -= 1;
-        }
-
-        const newState = {
-            canvas: { elements, comments },
-            selection: groupSelection,
-        };
-
-        if (JSON.stringify(newState) !== JSON.stringify(history[historyStep])) {
-            history = [...history.slice(0, historyStep + 1), newState];
-            historyStep += 1;
-        }
-    }, [elements, comments, groupSelection]);
 
     // Handle key presses
     useEffect(() => {
@@ -735,7 +707,7 @@ export default function App() {
 
         if (isWheeling) setShowSecondaryMenu(false);
         setSubmenuOption(null);
-    }, [groupSelection, isWheeling]);
+    }, [groupSelection, isWheeling, history.length, historyStep]);
 
     useEffect(() => {
         // Setting primary menu items

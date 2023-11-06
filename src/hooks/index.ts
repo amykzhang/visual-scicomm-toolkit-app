@@ -5,3 +5,4 @@ export { SelectionManager } from "./SelectionManager";
 export { TextViewManager } from "./TextViewManager";
 export { DragSelectManager } from "./DragSelectManager";
 export { DrawViewManager } from "./DrawViewManager";
+export { HistoryManager } from "./HistoryManager";
