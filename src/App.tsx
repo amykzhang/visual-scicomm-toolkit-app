@@ -21,7 +21,7 @@ import {
     ExportPanel,
 } from "./Panels";
 import { APP_VIEW } from "./utils/enums";
-import { ExportArea } from "./components/ExportArea";
+import { ExportArea } from "./Elements/ExportArea";
 import { ExitCommentViewButton } from "./components/Components";
 import {
     CanvasStateProp,
