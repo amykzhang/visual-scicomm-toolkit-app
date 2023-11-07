@@ -114,7 +114,7 @@ export default function App() {
     const [isCornerTransform, setIsCornerTransform] = useState(false); // for transformer dragging corner
 
     // --- Hooks ---
-    const { history, historyStep, handleUndo, handleRedo } = HistoryManager(
+    const { handleUndo, handleRedo } = HistoryManager(
         view,
         elements,
         setElements,
@@ -699,7 +699,7 @@ export default function App() {
 
     useEffect(() => {
         // Show primary menu if there is a selection
-        if (groupSelection.length > 0 && !isWheeling && historyStep === history.length - 1) {
+        if (groupSelection.length > 0 && !isWheeling) {
             setShowPrimaryMenu(true);
         } else {
             setShowPrimaryMenu(false);
@@ -707,7 +707,7 @@ export default function App() {
 
         if (isWheeling) setShowSecondaryMenu(false);
         setSubmenuOption(null);
-    }, [groupSelection, isWheeling, history.length, historyStep]);
+    }, [groupSelection, isWheeling]);
 
     useEffect(() => {
         // Setting primary menu items
