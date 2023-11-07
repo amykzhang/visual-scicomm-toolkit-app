@@ -1074,7 +1074,7 @@ export default function App() {
                                 <CommentElement
                                     draggable
                                     key={i}
-                                    isSelected={selectedComment === comment.id}
+                                    isSelected={selectedComment === comment.id && !isExporting}
                                     comment={comment}
                                     comments={comments}
                                     setComments={setComments}
