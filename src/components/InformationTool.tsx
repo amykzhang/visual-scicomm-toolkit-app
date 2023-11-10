@@ -5,9 +5,12 @@ import { ReactComponent as CrossIcon } from "../assets/cross.svg";
 import color from "../styles/color";
 import { SquareButton } from "./Components";
 import constants from "../utils/constants";
+import { persistance } from "../utils/persistance";
+
+const isNewVisitor = persistance.isNewVisitor();
 
 export const InformationTool = ({ content }: { content: string }) => {
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [isPopupOpen, setIsPopupOpen] = useState(isNewVisitor);
 
     const toggleInformationPopup = () => {
         setIsPopupOpen(!isPopupOpen);
@@ -30,7 +33,11 @@ export const InformationTool = ({ content }: { content: string }) => {
                         <InformationHeader>
                             <StyledCrossIcon onClick={toggleInformationPopup} />
                         </InformationHeader>
-                        <InformationContent>{content}</InformationContent>
+                        <InformationContent
+                            dangerouslySetInnerHTML={{
+                                __html: content,
+                            }}
+                        ></InformationContent>
                     </InformationPopup>
                 </>
             )}

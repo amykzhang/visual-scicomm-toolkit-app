@@ -10,6 +10,16 @@ import {
 const LOCALSTORAGE_CANVAS_STATE_KEY = "visual-toolkit-canvas";
 const LOCALSTORAGE_UI_STATE_KEY = "visual-toolkit-ui";
 const LOCALSTORAGE_STAGE_STATE_KEY = "visual-toolkit-stage";
+const LOCALSTORAGE_NEW_VISITOR_KEY = "visual-toolkit-new-visitor";
+
+function isNewVisitor(): boolean {
+    const saved = window.localStorage.getItem(LOCALSTORAGE_NEW_VISITOR_KEY);
+    if (saved !== null) {
+        return false;
+    }
+    window.localStorage.setItem(LOCALSTORAGE_NEW_VISITOR_KEY, "false");
+    return true;
+}
 
 // Saves each canvas layer/group as string, then stringify canvasState and save to local storage
 function persistCanvasState(elements: ElementProp[], comments: CommentProp[]) {
@@ -76,4 +86,5 @@ export const persistance = {
     retrieveUiState,
     persistStageState,
     retrieveStageState,
+    isNewVisitor,
 };
