@@ -697,6 +697,7 @@ export default function App() {
         }
     }, [groupSelection]);
 
+    // Show primary menu or secondary menu if there is a selection/wheeling
     useEffect(() => {
         // Show primary menu if there is a selection
         if (groupSelection.length > 0 && !isWheeling) {
@@ -709,6 +710,7 @@ export default function App() {
         setSubmenuOption(null);
     }, [groupSelection, isWheeling]);
 
+    // Determine which primary menu items and values to show
     useEffect(() => {
         // Setting primary menu items
         const selectedElements = elements.filter((element) => groupSelection.includes(element.id));
@@ -777,27 +779,32 @@ export default function App() {
         });
     }, [groupSelection, elements]);
 
+    // Calculate primary menu position
     useEffect(() => {
         if (primaryMenuRef.current !== null && transformerRef.current !== null) {
-            const transformer = transformerRef.current;
+            const tr = transformerRef.current;
             const primaryMenu = primaryMenuRef.current;
 
             if (showPrimaryMenu) {
-                const { width, height } = primaryMenu.getBoundingClientRect();
-
-                let x =
-                    transformer.x() +
-                    transformer.width() / 2 -
-                    primaryMenu.getBoundingClientRect().width / 2;
-                let y = transformer.y() - 100;
+                // find top (min y bound) of transformer
+                let { x, y } = tr.getClientRect();
+                let w = tr.getClientRect().width;
 
                 // reposition menu if it goes out of bounds
-                const margin = 70;
-                if (x < 10) x = 10;
-                if (x + width > window.innerWidth - 10) x = window.innerWidth - width - 10;
-                if (y < margin + 10) y = margin + 10;
-                if (y + height > window.innerHeight - margin - 10)
-                    y = window.innerHeight - height - margin - 10;
+                const uiMargin = 70;
+                const padding = 10;
+                const { width, height } = primaryMenu.getBoundingClientRect();
+
+                x = x + w / 2 - width / 2;
+
+                y = y - height - 20;
+
+                if (x < padding) x = padding;
+                if (x + width > window.innerWidth - padding)
+                    x = window.innerWidth - width - padding;
+                if (y < uiMargin + padding) y = uiMargin + padding;
+                if (y + height > window.innerHeight - uiMargin - padding)
+                    y = window.innerHeight - height - uiMargin - padding;
 
                 primaryMenu.style.left = x + "px";
                 primaryMenu.style.top = y + "px";
@@ -808,6 +815,7 @@ export default function App() {
         }
     }, [groupSelection, showPrimaryMenu]);
 
+    // Calculate primary menu style submenu position
     useEffect(() => {
         if (
             (submenuOption !== "fill" && submenuOption !== "stroke") ||
@@ -831,11 +839,14 @@ export default function App() {
         let y = menu.y - palette.height - 5;
 
         // reposition menu if it goes out of bounds
-        const margin = 70;
-        if (x < 10) x = 10;
-        if (x + palette.width > window.innerWidth - 10) x = window.innerWidth - palette.width - 10;
-        if (y < margin + 10) y = menu.y + menu.height + 5;
-        if (y + palette.height > window.innerHeight - margin - 10) y = menu.y - palette.height - 5;
+        const uiMargin = 70;
+        const padding = 10;
+        if (x < padding) x = padding;
+        if (x + palette.width > window.innerWidth - padding)
+            x = window.innerWidth - palette.width - padding;
+        if (y < uiMargin + padding) y = menu.y + menu.height + 5;
+        if (y + palette.height > window.innerHeight - uiMargin - padding)
+            y = menu.y - palette.height - 5;
 
         colorPaletteRef.current.style.left = x + "px";
         colorPaletteRef.current.style.top = y + "px";
@@ -847,6 +858,7 @@ export default function App() {
         }
     }, [submenuOption, fill, stroke]);
 
+    // Calculate primary menu fill or stroke submenu position
     useEffect(() => {
         if (
             submenuOption !== "style" ||
@@ -866,18 +878,19 @@ export default function App() {
         let y = menu.y - container.height - 5;
 
         // reposition menu if it goes out of bounds
-        const margin = 70;
+        const uiMargin = 70;
         if (x < 10) x = 10;
         if (x + container.width > window.innerWidth - 10)
             x = window.innerWidth - container.width - 10;
-        if (y < margin + 10) y = menu.y + menu.height + 5;
-        if (y + container.height > window.innerHeight - margin - 10)
+        if (y < uiMargin + 10) y = menu.y + menu.height + 5;
+        if (y + container.height > window.innerHeight - uiMargin - 10)
             y = menu.y - container.height - 5;
 
         styleMenuRef.current.style.left = x + "px";
         styleMenuRef.current.style.top = y + "px";
     }, [submenuOption]);
 
+    // Modify elements based on color selected through primary menu
     useEffect(() => {
         if (colorSelected === null) return;
 
@@ -904,6 +917,7 @@ export default function App() {
         setColorSelected(null);
     }, [colorSelected, groupSelection, submenuOption]);
 
+    // Modify elements based on style selected through primary menu
     useEffect(() => {
         if (styleSelected === null) return;
 
@@ -1322,7 +1336,7 @@ const Separator = styled.span`
     user-select: none;
     border: 1px solid ${color.grey};
     border-radius: 5px;
-    margin: 5px;
+    uimargin: 5px;
 `;
 
 const StyledSlider = styled.input`
