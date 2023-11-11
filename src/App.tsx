@@ -782,25 +782,29 @@ export default function App() {
     // Calculate primary menu position
     useEffect(() => {
         if (primaryMenuRef.current !== null && transformerRef.current !== null) {
-            const transformer = transformerRef.current;
+            const tr = transformerRef.current;
             const primaryMenu = primaryMenuRef.current;
 
             if (showPrimaryMenu) {
-                const { width, height } = primaryMenu.getBoundingClientRect();
-
-                let x =
-                    transformer.x() +
-                    transformer.width() / 2 -
-                    primaryMenu.getBoundingClientRect().width / 2;
-                let y = transformer.y() - 100;
+                // find top (min y bound) of transformer
+                let { x, y } = tr.getClientRect();
+                let w = tr.getClientRect().width;
 
                 // reposition menu if it goes out of bounds
-                const margin = 70;
-                if (x < 10) x = 10;
-                if (x + width > window.innerWidth - 10) x = window.innerWidth - width - 10;
-                if (y < margin + 10) y = margin + 10;
-                if (y + height > window.innerHeight - margin - 10)
-                    y = window.innerHeight - height - margin - 10;
+                const uiMargin = 70;
+                const padding = 10;
+                const { width, height } = primaryMenu.getBoundingClientRect();
+
+                x = x + w / 2 - width / 2;
+
+                y = y - height - 20;
+
+                if (x < padding) x = padding;
+                if (x + width > window.innerWidth - padding)
+                    x = window.innerWidth - width - padding;
+                if (y < uiMargin + padding) y = uiMargin + padding;
+                if (y + height > window.innerHeight - uiMargin - padding)
+                    y = window.innerHeight - height - uiMargin - padding;
 
                 primaryMenu.style.left = x + "px";
                 primaryMenu.style.top = y + "px";
@@ -835,11 +839,14 @@ export default function App() {
         let y = menu.y - palette.height - 5;
 
         // reposition menu if it goes out of bounds
-        const margin = 70;
-        if (x < 10) x = 10;
-        if (x + palette.width > window.innerWidth - 10) x = window.innerWidth - palette.width - 10;
-        if (y < margin + 10) y = menu.y + menu.height + 5;
-        if (y + palette.height > window.innerHeight - margin - 10) y = menu.y - palette.height - 5;
+        const uiMargin = 70;
+        const padding = 10;
+        if (x < padding) x = padding;
+        if (x + palette.width > window.innerWidth - padding)
+            x = window.innerWidth - palette.width - padding;
+        if (y < uiMargin + padding) y = menu.y + menu.height + 5;
+        if (y + palette.height > window.innerHeight - uiMargin - padding)
+            y = menu.y - palette.height - 5;
 
         colorPaletteRef.current.style.left = x + "px";
         colorPaletteRef.current.style.top = y + "px";
@@ -871,12 +878,12 @@ export default function App() {
         let y = menu.y - container.height - 5;
 
         // reposition menu if it goes out of bounds
-        const margin = 70;
+        const uiMargin = 70;
         if (x < 10) x = 10;
         if (x + container.width > window.innerWidth - 10)
             x = window.innerWidth - container.width - 10;
-        if (y < margin + 10) y = menu.y + menu.height + 5;
-        if (y + container.height > window.innerHeight - margin - 10)
+        if (y < uiMargin + 10) y = menu.y + menu.height + 5;
+        if (y + container.height > window.innerHeight - uiMargin - 10)
             y = menu.y - container.height - 5;
 
         styleMenuRef.current.style.left = x + "px";
@@ -1329,7 +1336,7 @@ const Separator = styled.span`
     user-select: none;
     border: 1px solid ${color.grey};
     border-radius: 5px;
-    margin: 5px;
+    uimargin: 5px;
 `;
 
 const StyledSlider = styled.input`
