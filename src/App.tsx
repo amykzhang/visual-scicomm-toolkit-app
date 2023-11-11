@@ -697,6 +697,7 @@ export default function App() {
         }
     }, [groupSelection]);
 
+    // Show primary menu or secondary menu if there is a selection/wheeling
     useEffect(() => {
         // Show primary menu if there is a selection
         if (groupSelection.length > 0 && !isWheeling) {
@@ -709,6 +710,7 @@ export default function App() {
         setSubmenuOption(null);
     }, [groupSelection, isWheeling]);
 
+    // Determine which primary menu items and values to show
     useEffect(() => {
         // Setting primary menu items
         const selectedElements = elements.filter((element) => groupSelection.includes(element.id));
@@ -777,6 +779,7 @@ export default function App() {
         });
     }, [groupSelection, elements]);
 
+    // Calculate primary menu position
     useEffect(() => {
         if (primaryMenuRef.current !== null && transformerRef.current !== null) {
             const transformer = transformerRef.current;
@@ -808,6 +811,7 @@ export default function App() {
         }
     }, [groupSelection, showPrimaryMenu]);
 
+    // Calculate primary menu style submenu position
     useEffect(() => {
         if (
             (submenuOption !== "fill" && submenuOption !== "stroke") ||
@@ -847,6 +851,7 @@ export default function App() {
         }
     }, [submenuOption, fill, stroke]);
 
+    // Calculate primary menu fill or stroke submenu position
     useEffect(() => {
         if (
             submenuOption !== "style" ||
@@ -878,6 +883,7 @@ export default function App() {
         styleMenuRef.current.style.top = y + "px";
     }, [submenuOption]);
 
+    // Modify elements based on color selected through primary menu
     useEffect(() => {
         if (colorSelected === null) return;
 
@@ -904,6 +910,7 @@ export default function App() {
         setColorSelected(null);
     }, [colorSelected, groupSelection, submenuOption]);
 
+    // Modify elements based on style selected through primary menu
     useEffect(() => {
         if (styleSelected === null) return;
 
