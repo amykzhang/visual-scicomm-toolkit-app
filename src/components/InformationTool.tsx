@@ -28,67 +28,58 @@ export const InformationTool = ({ content }: { content: string }) => {
             </SquareButton>
             {isPopupOpen && (
                 <>
-                    <DarkenBackground onClick={toggleInformationPopup} />
-                    <InformationPopup>
-                        <InformationHeader>
-                            <StyledCrossIcon onClick={toggleInformationPopup} />
-                        </InformationHeader>
-                        <InformationContent
-                            dangerouslySetInnerHTML={{
-                                __html: content,
-                            }}
-                        ></InformationContent>
-                    </InformationPopup>
+                    <Background onClick={toggleInformationPopup}>
+                        <PopupContainer>
+                            <CloseContainer>
+                                <StyledCrossIcon onClick={toggleInformationPopup} />
+                            </CloseContainer>
+                            <InformationContent
+                                dangerouslySetInnerHTML={{
+                                    __html: content,
+                                }}
+                            ></InformationContent>
+                        </PopupContainer>
+                    </Background>
                 </>
             )}
         </>
     );
 };
-
-const DarkenBackground = styled.div`
+const Background = styled.div`
     position: fixed;
     width: 100vw;
     height: 100vh;
     inset: 0px;
     background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     z-index: 400;
 `;
 
-const InformationPopup = styled.div`
-    position: fixed;
+const PopupContainer = styled.div`
     width: 70vw;
-    height: 50vh;
-    left: calc(15vw);
-    top: calc(25vh);
-
+    height: 70vh;
     background-color: ${color.white};
     border-radius: 5px;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 10px;
-
-    z-index: 401;
+    padding: 50px 0 50px 0;
 `;
 
-const InformationHeader = styled.div`
-    position: relative;
-    width: 100%;
-    height: 10%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+const CloseContainer = styled.div`
+    position: fixed;
+    right: calc(50% - 35vw + 20px);
+    top: calc(50% - 35vh + 20px);
 `;
 
 const InformationContent = styled.div`
-    user-select: none;
-    position: relative;
     width: 100%;
-    height: 90%;
-    padding: 30px;
-    overflow-y: scroll;
+    height: 100%;
+    padding: 0 100px 0px 100px;
+    overflow: auto;
 `;
 
 const StyledCrossIcon = styled(CrossIcon)`
