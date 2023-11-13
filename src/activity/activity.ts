@@ -389,9 +389,9 @@ const activity_visual_strategies: Activity = {
     info: `
     <h1>Welcome to the Visual Strategies activity!</h1>
     <br/>
-    This tutorial and tips page is under construction. While we're working on it, how about having a go at the activity? :)
+    This tutorial/tips page is under construction. While we're working on it, how about having a go at the activity?
     <br/>
-    <div align="center"><img src="https://raw.githubusercontent.com/amykzhang/visual-scicomm-toolkit-app/d4ce1d4d4fbf78f37f6048403f66d2dab4609e5c/public/tutorial/abstrakt-design-136.png?token=GHSAT0AAAAAACJHL6P5F3N35ANDGJZMGP7EZKSW5OA" height="500"></div>
+    <div align="center"><img src="https://raw.githubusercontent.com/amykzhang/visual-scicomm-toolkit-app/d4ce1d4d4fbf78f37f6048403f66d2dab4609e5c/public/tutorial/abstrakt-design-136.png?token=GHSAT0AAAAAACJHL6P5F3N35ANDGJZMGP7EZKSW5OA" height="400"></div>
     
     `,
     color_palette: {
