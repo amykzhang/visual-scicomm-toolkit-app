@@ -389,46 +389,10 @@ const activity_visual_strategies: Activity = {
     info: `
     <h1>Welcome to the Visual Strategies activity!</h1>
     <br/>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque malesuada quis nulla a porta. Quisque aliquet eros at efficitur dictum. Morbi semper interdum hendrerit. Donec at leo ut augue fermentum pellentesque. Proin nec diam eu velit feugiat tempor. Proin placerat, odio fermentum fermentum ullamcorper, urna ante mattis erat, vel commodo quam dolor sit amet nulla. 
+    This tutorial/tips page is under construction. While we're working on it, how about having a go at the activity?
     <br/>
-    <br/>
-    Donec neque quam, condimentum in tortor a, fermentum pellentesque lectus. Sed vitae lorem volutpat magna sagittis euismod.
-    <br/>
-
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque malesuada quis nulla a porta. Quisque aliquet eros at efficitur dictum. Morbi semper interdum hendrerit. Donec at leo ut augue fermentum pellentesque. Proin nec diam eu velit feugiat tempor. Proin placerat, odio fermentum fermentum ullamcorper, urna ante mattis erat, vel commodo quam dolor sit amet nulla. 
-    <br/>
-    <br/>
-    Donec neque quam, condimentum in tortor a, fermentum pellentesque lectus. Sed vitae lorem volutpat magna sagittis euismod.
-
-
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque malesuada quis nulla a porta. Quisque aliquet eros at efficitur dictum. Morbi semper interdum hendrerit. Donec at leo ut augue fermentum pellentesque. Proin nec diam eu velit feugiat tempor. Proin placerat, odio fermentum fermentum ullamcorper, urna ante mattis erat, vel commodo quam dolor sit amet nulla. 
-    <br/>
-    <br/>
-    Donec neque quam, condimentum in tortor a, fermentum pellentesque lectus. Sed vitae lorem volutpat magna sagittis euismod.
-    <br/>
-    Donec neque quam, condimentum in tortor a, fermentum pellentesque lectus. Sed vitae lorem volutpat magna sagittis euismod.
-
-
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque malesuada quis nulla a porta. Quisque aliquet eros at efficitur dictum. Morbi semper interdum hendrerit. Donec at leo ut augue fermentum pellentesque. Proin nec diam eu velit feugiat tempor. Proin placerat, odio fermentum fermentum ullamcorper, urna ante mattis erat, vel commodo quam dolor sit amet nulla. 
-    <br/>
-    <br/>
-    Donec neque quam, condimentum in tortor a, fermentum pellentesque lectus. Sed vitae lorem volutpat magna sagittis euismod.
-    <br/>
-    Donec neque quam, condimentum in tortor a, fermentum pellentesque lectus. Sed vitae lorem volutpat magna sagittis euismod.
-
-
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque malesuada quis nulla a porta. Quisque aliquet eros at efficitur dictum. Morbi semper interdum hendrerit. Donec at leo ut augue fermentum pellentesque. Proin nec diam eu velit feugiat tempor. Proin placerat, odio fermentum fermentum ullamcorper, urna ante mattis erat, vel commodo quam dolor sit amet nulla. 
-    <br/>
-    <br/>
-    Donec neque quam, condimentum in tortor a, fermentum pellentesque lectus. Sed vitae lorem volutpat magna sagittis euismod.
-    <br/>
-    Donec neque quam, condimentum in tortor a, fermentum pellentesque lectus. Sed vitae lorem volutpat magna sagittis euismod.
-
-
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque malesuada quis nulla a porta. Quisque aliquet eros at efficitur dictum. Morbi semper interdum hendrerit. Donec at leo ut augue fermentum pellentesque. Proin nec diam eu velit feugiat tempor. Proin placerat, odio fermentum fermentum ullamcorper, urna ante mattis erat, vel commodo quam dolor sit amet nulla. 
-    <br/>
-    <br/>
-    Donec neque quam, condimentum in tortor a, fermentum pellentesque lectus. Sed vitae lorem volutpat magna sagittis euismod.
+    <div align="center"><img src="https://raw.githubusercontent.com/amykzhang/visual-scicomm-toolkit-app/d4ce1d4d4fbf78f37f6048403f66d2dab4609e5c/public/tutorial/abstrakt-design-136.png?token=GHSAT0AAAAAACJHL6P5F3N35ANDGJZMGP7EZKSW5OA" height="400"></div>
+    
     `,
     color_palette: {
         colors: ["transparent", "#9b6bc4", "#7b94fb", " #e55a8a", "#f7b05a", "#dddddd", "#737273 "],
