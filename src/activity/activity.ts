@@ -391,7 +391,7 @@ const activity_visual_strategies: Activity = {
     <br/>
     This tutorial and tips page is under construction. While we're working on it, how about having a go at the activity? :)
     <br/>
-    <img src="https://img.freepik.com/premium-vector/website-construction_25880-31.jpg?w=2000" height="200">
+    <div align="center"><img src="https://img.freepik.com/premium-vector/website-construction_25880-31.jpg?w=2000" height="500"></div>
     
     `,
     color_palette: {
