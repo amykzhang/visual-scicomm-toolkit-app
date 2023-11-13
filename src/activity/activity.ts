@@ -391,7 +391,7 @@ const activity_visual_strategies: Activity = {
     <br/>
     This tutorial/tips page is under construction. While we're working on it, how about having a go at the activity?
     <br/>
-    <div align="center"><img src="https://raw.githubusercontent.com/amykzhang/visual-scicomm-toolkit-app/d4ce1d4d4fbf78f37f6048403f66d2dab4609e5c/public/tutorial/abstrakt-design-136.png?token=GHSAT0AAAAAACJHL6P5F3N35ANDGJZMGP7EZKSW5OA" height="400"></div>
+    <div align="center"><img src="/tutorial/abstrakt-design-136.png" height="400"></div>
     
     `,
     color_palette: {
