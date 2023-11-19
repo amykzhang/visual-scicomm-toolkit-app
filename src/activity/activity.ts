@@ -431,7 +431,7 @@ const activity_visual_strategies: Activity = {
     Donec neque quam, condimentum in tortor a, fermentum pellentesque lectus. Sed vitae lorem volutpat magna sagittis euismod.
     `,
     color_palette: {
-        colors: ["transparent", "#9b6bc4", "#7b94fb", " #e55a8a", "#f7b05a", "#dddddd", "#737273 "],
+        colors: ["transparent", "#9b6bc4", "#7b94fb", " #e55a8a", "#f7b05a", "#dddddd", "#737273"],
         color_picker: true,
     },
 };
