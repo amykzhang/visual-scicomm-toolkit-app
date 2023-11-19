@@ -36,13 +36,12 @@ const ElementsMenuContainer = styled(SideBarContent)`
     justify-content: flex-start;
 
     gap: 11px;
-    border-radius: 0px 0px 0px 5px;
 `;
 
 const ElementsMenuBackground = styled(SideBarBackground)`
     position: fixed;
     right: 0;
-    border-radius: 0px 5px 0px 0px;
+    border-radius: 0px 0px 0px 5px;
 `;
 
 const ElementsToggle = styled(SideBarToggle)`

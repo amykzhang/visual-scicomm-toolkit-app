@@ -61,8 +61,8 @@ export const ImageTool: FC<ImageToolProps> = ({
             const x = (e.clientX - stage.x()) / stage.scaleX();
             const y = (e.clientY - stage.y()) / stage.scaleX();
             addImage(x, y, {
-                x: dimensions.width / 2,
-                y: dimensions.height / 2,
+                x: (dimensions.width * scalingFactor) / 2,
+                y: (dimensions.height * scalingFactor) / 2,
             });
         }
     };

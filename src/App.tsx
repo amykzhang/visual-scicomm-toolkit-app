@@ -1029,26 +1029,6 @@ export default function App() {
             >
                 <Layer>
                     <ExportArea exportAreaRef={exportAreaRef} {...activity.canvas_size} />
-                    <Rect // Selection Rectangle Bounding Box
-                        visible={isSelectionMode && view === APP_VIEW.select}
-                        ref={selectionRectRef}
-                        x={selectionBounds.x}
-                        y={selectionBounds.y}
-                        width={selectionBounds.width}
-                        height={selectionBounds.height}
-                        fill={color.lightBlue}
-                        stroke={color.blue}
-                        strokeWidth={2}
-                        opacity={0.25}
-                    />
-                    {isDrawing && (
-                        <Line
-                            ref={lineRef}
-                            {...constants.line}
-                            stroke={color.black}
-                            points={points}
-                        />
-                    )}
                 </Layer>
                 <Layer ref={elementsLayerRef} id="elements-layer">
                     {elements.map((element) => elementToReactElement(element))}
@@ -1097,6 +1077,28 @@ export default function App() {
                                 />
                             );
                         })}
+                </Layer>
+                <Layer id="draw-layer">
+                    <Rect // Selection Rectangle Bounding Box
+                        visible={isSelectionMode && view === APP_VIEW.select}
+                        ref={selectionRectRef}
+                        x={selectionBounds.x}
+                        y={selectionBounds.y}
+                        width={selectionBounds.width}
+                        height={selectionBounds.height}
+                        fill={color.lightBlue}
+                        stroke={color.blue}
+                        strokeWidth={2}
+                        opacity={0.25}
+                    />
+                    {isDrawing && (
+                        <Line
+                            ref={lineRef}
+                            {...constants.line}
+                            stroke={color.black}
+                            points={points}
+                        />
+                    )}
                 </Layer>
             </Stage>
 
