@@ -10,7 +10,9 @@ This repository contains the interactive drag-and-drop activity of the Visual Sc
 
 The Visual Science Communication Toolkit was created by [VISABLI](https://www.visabli.com/) collaborators from the University of Toronto, University of California Davis, and Harvard University.
 
-> Zhang KE, Jenkinson J. The Visual Science Communication Toolkit: Responding to the Need for Visual Science Communication Training in Undergraduate Life Sciences Education. _Education Sciences._ 2024; 14(3):296. https://doi.org/10.3390/educsci14030296. Software development by Max Zhang.
+> Zhang KE, Jenkinson J. The Visual Science Communication Toolkit: Responding to the Need for Visual Science Communication Training in Undergraduate Life Sciences Education. _Education Sciences._ 2024; 14(3):296. https://doi.org/10.3390/educsci14030296.
+
+###### Software development by Max Zhang.
 
 ## About
 
